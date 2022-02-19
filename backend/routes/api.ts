@@ -1,7 +1,9 @@
 /**
  * Required External Modules and Interfaces
  */
+import prisma from "../common/dbClient";
 import express, { Request, Response } from "express";
+import * as userController from "../controllers/userController";
 
 /**
  * Router Definition
@@ -9,11 +11,10 @@ import express, { Request, Response } from "express";
 
 const router = express.Router();
 
-router.get("/", async (req: Request, res: Response) => {
-  const query = req.query;
-  const params = req.params;
-
-  res.status(200).send({ data: { ...query, ...params } });
-});
+router.post(
+  "/user/register",
+  userController.validateRegister,
+  userController.register
+);
 
 export default router;
