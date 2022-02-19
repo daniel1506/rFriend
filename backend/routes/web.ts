@@ -9,6 +9,6 @@ import express, { Request, Response } from "express";
 
 const router = express.Router();
 
-router.get("/", express.static("public"));
+router.get("/", express.static("../frontend"));
 
 export default router;

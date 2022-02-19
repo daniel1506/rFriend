@@ -17,4 +17,6 @@ router.post(
   userController.register
 );
 
+router.post("/user/login", userController.validateLogin, userController.login);
+
 export default router;
