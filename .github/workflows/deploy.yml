@@ -22,16 +22,18 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       # perform deploy
       - name: set remote and deploy
         run: |
           git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/rfriend.git
-          git push heroku `git subtree split --prefix backend master`:master --force
+          git push heroku HEAD:master --force
 
       # post deploy
       - name: post deployment
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          heroku run -a rfriend prisma migrate deploy
+          heroku run -a rfriend "cd backend && npx prisma migrate deploy"

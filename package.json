@@ -1,0 +1,10 @@
+{
+  "name": "rfriend",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "cd backend && yarn build",
+    "start": "cd backend && yarn start",
+    "install": "cd backend && yarn install --production=false"
+  }
+}
