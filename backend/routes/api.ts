@@ -1,9 +1,9 @@
 /**
  * Required External Modules and Interfaces
  */
-import prisma from "../common/dbClient";
-import express, { Request, Response } from "express";
+import express from "express";
 import * as userController from "../controllers/userController";
+import authMiddleware from "../middleware/authMiddleware";
 
 /**
  * Router Definition
@@ -11,12 +11,9 @@ import * as userController from "../controllers/userController";
 
 const router = express.Router();
 
-router.post(
-  "/user/register",
-  userController.validateRegister,
-  userController.register
-);
-
+router.post("/user/register", userController.validateRegister, userController.register);
 router.post("/user/login", userController.validateLogin, userController.login);
+
+router.get("/user/", authMiddleware, userController.getProfile);
 
 export default router;

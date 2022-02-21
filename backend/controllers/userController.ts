@@ -12,11 +12,7 @@ export const validateRegister = [
   body("password").isLength({ min: 8 }),
 ];
 
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "", "Invalid input"));
@@ -55,16 +51,9 @@ export const register = async (
 
 // -----------------------------------------------------------------------------
 
-export const validateLogin = [
-  body("email").isEmail(),
-  body("password").exists(),
-];
+export const validateLogin = [body("email").isEmail(), body("password").exists()];
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "", "Invalid input"));
@@ -95,10 +84,19 @@ export const login = async (
   // user found
   const token = generateJWT(user.id, user.email);
 
-  res.status(200).send({
+  res.send({
     id: user.id,
     email: user.email,
     name: user.name,
     token: token,
   });
 };
+
+// -----------------------------------------------------------------------------
+
+// middleware: auth
+export function getProfile(req: Request, res: Response, next: NextFunction) {
+  const { id, email } = req;
+
+  res.send({ id, email });
+}
