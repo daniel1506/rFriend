@@ -1,3 +1,8 @@
+# dev modules
 node_modules
 
+# env file for current environment
 .env
+
+# typscript build output
+build

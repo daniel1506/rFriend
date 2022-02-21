@@ -1,10 +1,11 @@
 {
   "name": "rfriend-backend",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.ts"
+    "dev": "nodemon index.ts",
+    "build": "npx prisma generate && tsc --build",
+    "start": "node build/index.js"
   },
   "dependencies": {
     "@prisma/client": "3.9.2",
