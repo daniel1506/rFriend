@@ -1,5 +1,7 @@
 # rFriend
 
+Production URL: https://rfriend.herokuapp.com/
+
 [Google Drive Folder](https://drive.google.com/drive/folders/1iGmTmZUfHpdpOxF3P-ek2LPcFK6tYxkV)
 
 ## Requirements
@@ -29,7 +31,7 @@ npx prisma migrate dev
 yarn dev
 ```
 
-Then you can visit htps://localhost:3000
+Then you can visit https://localhost:3000
 
 <details>
     <summary>Shared Development Databsae</summary>
