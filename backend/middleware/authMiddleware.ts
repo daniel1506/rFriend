@@ -8,19 +8,18 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers["x-auth-token"];
 
   if (!token) {
-    return next(new HttpException(401, "Unauthorized, no token"));
+    return next(new HttpException(401, "Unauthorized. No token"));
   }
 
   try {
-    const decodedData = jwt.verify(
-      token.toString(),
-      process.env.JWT_SECRET!
-    ) as JWTpayload;
+    const decodedData = jwt.verify(token.toString(), process.env.JWT_SECRET!) as JWTpayload;
+
     req.id = decodedData.id;
     req.email = decodedData.email;
+
     next();
   } catch (e) {
-    return next(new HttpException(401, "Unauthorized, invalid token"));
+    return next(new HttpException(401, "Unauthorized. Invalid token"));
   }
 };
 
