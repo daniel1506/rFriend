@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "cd backend && yarn build",
+    "build": "cd backend && yarn build && cd ../frontend && yarn build",
     "start": "cd backend && yarn start",
+    "preinstall": "cd frontend && yarn install --frozen-lockfile",
     "install": "cd backend && yarn install --production=false"
   }
 }
