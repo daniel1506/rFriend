@@ -2,7 +2,8 @@ import './event_browser.css';
 
 function event_browser() {
   return (
-    <div className="event_browser">
+    <>
+    <div className="EventBrowser">
       <div>
         <div className="container">
             <div className="row">
@@ -43,6 +44,7 @@ function event_browser() {
         </div>
     </div>
     </div>
+    </>
   );
 }
 
