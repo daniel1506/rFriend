@@ -3,7 +3,9 @@
  */
 import express from "express";
 import * as userController from "../controllers/userController";
+import * as adminController from "../controllers/adminController";
 import authMiddleware from "../middleware/authMiddleware";
+import adminMiddleware from "../middleware/adminMiddleware";
 
 /**
  * Router Definition
@@ -15,5 +17,14 @@ router.post("/user/register", userController.validateRegister, userController.re
 router.post("/user/login", userController.validateLogin, userController.login);
 
 router.get("/user/", authMiddleware, userController.getProfile);
+
+// get all users info, admin required
+router.get("/admin/", authMiddleware, adminMiddleware, adminController.getUser);
+
+//update user info, admin required
+router.put("/admin/", authMiddleware, adminMiddleware, adminController.validateUpdate, adminController.updateUser);
+
+//update user info, admin required
+router.delete("/admin/", authMiddleware, adminMiddleware, adminController.validateDelete, adminController.deleteUser);
 
 export default router;

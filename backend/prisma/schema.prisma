@@ -16,6 +16,7 @@ model User {
   email      String  @unique
   name       String
   password   String
+  role       Role    @default(USER)
   profileUrl String?
 
   friends   User[] @relation("Friends") // User has these friends
@@ -67,4 +68,9 @@ model EventComment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
 }
