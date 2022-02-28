@@ -18,13 +18,10 @@ router.post("/user/login", userController.validateLogin, userController.login);
 
 router.get("/user/", authMiddleware, userController.getProfile);
 
-// get all users info, admin required
 router.get("/admin/", authMiddleware, adminMiddleware, adminController.getUser);
 
-//update user info, admin required
 router.put("/admin/", authMiddleware, adminMiddleware, adminController.validateUpdate, adminController.updateUser);
 
-//update user info, admin required
 router.delete("/admin/", authMiddleware, adminMiddleware, adminController.validateDelete, adminController.deleteUser);
 
 export default router;
