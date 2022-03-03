@@ -13,15 +13,24 @@ import adminMiddleware from "../middleware/adminMiddleware";
 
 const router = express.Router();
 
-router.post("/user/register", userController.validateRegister, userController.register);
-router.post("/user/login", userController.validateLogin, userController.login);
+// -----------------------------------------------------------------------------
 
-router.get("/user/", authMiddleware, userController.getProfile);
+const userRouter = express.Router();
+router.use("/user", userRouter);
 
-router.get("/admin/", authMiddleware, adminMiddleware, adminController.getUser);
+userRouter.post("/register", userController.validateRegister, userController.register);
+userRouter.post("/login", userController.validateLogin, userController.login);
+userRouter.get("/", authMiddleware, userController.getProfile);
 
-router.put("/admin/", authMiddleware, adminMiddleware, adminController.validateUpdate, adminController.updateUser);
+// -----------------------------------------------------------------------------
 
-router.delete("/admin/", authMiddleware, adminMiddleware, adminController.validateDelete, adminController.deleteUser);
+const adminRouter = express.Router();
+router.use("/admin", authMiddleware, adminMiddleware, adminRouter);
+
+adminRouter.get("/", adminController.getUser);
+adminRouter.put("/", adminController.validateUpdate, adminController.updateUser);
+adminRouter.delete("/", adminController.validateDelete, adminController.deleteUser);
+
+// -----------------------------------------------------------------------------
 
 export default router;
