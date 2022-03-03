@@ -10,9 +10,7 @@ import path from "path";
 
 const router = express.Router();
 
-const frontendLocation = path.resolve(
-  __dirname + process.env.FRONTEND_MOUNT_LOCATION
-);
+const frontendLocation = path.resolve(__dirname + process.env.FRONTEND_MOUNT_LOCATION);
 router.use(express.static(frontendLocation));
 
 export default router;
