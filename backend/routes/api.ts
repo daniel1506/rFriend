@@ -4,6 +4,7 @@
 import express from "express";
 import * as userController from "../controllers/userController";
 import * as adminController from "../controllers/adminController";
+import * as friendController from "../controllers/friendController";
 import authMiddleware from "../middleware/authMiddleware";
 import adminMiddleware from "../middleware/adminMiddleware";
 
@@ -30,6 +31,16 @@ router.use("/admin", authMiddleware, adminMiddleware, adminRouter);
 adminRouter.get("/", adminController.getUser);
 adminRouter.put("/", adminController.validateUpdate, adminController.updateUser);
 adminRouter.delete("/", adminController.validateDelete, adminController.deleteUser);
+
+// -----------------------------------------------------------------------------
+
+const friendRouter = express.Router();
+router.use("/friend", authMiddleware, friendRouter);
+
+friendRouter.get("/", friendController.get);
+friendRouter.put("/request", friendController.validate, friendController.request);
+friendRouter.put("/accept", friendController.validate, friendController.accept);
+friendRouter.delete("/", friendController.validate, friendController.remove);
 
 // -----------------------------------------------------------------------------
 

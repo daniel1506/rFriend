@@ -50,7 +50,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   // generate token
   const token = generateJWT(result.id, result.email);
 
-  res.status(200).send({
+  res.status(201).send({
     id: result.id,
     email: result.email,
     name: result.name,
