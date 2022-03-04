@@ -53,7 +53,7 @@ function Logreg() {
   }
   const addUser = () => {
     console.log({ email, username, password });
-    Axios.post('http://', { email, username, password }).then((response) => { console.log("done") }).catch((err) => { console.log(err) })
+    Axios.post('/api/user/register', { email, username, password }).then((response) => { console.log("done") }).catch((err) => { console.log(err) })
   }
   return (<>
     <ButtonGroup variant="contained" aria-label="outlined primary button group" className='regloggroup'>
