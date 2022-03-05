@@ -33,12 +33,12 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     where: {
       id: user_id,
     },
-  })
+  });
 
-  if(!user){
+  if (!user) {
     return next(new HttpException(404, "User not found"));
   }
-  
+
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
@@ -75,9 +75,9 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     where: {
       id: user_id,
     },
-  })
+  });
 
-  if(!user){
+  if (!user) {
     return next(new HttpException(404, "User not found"));
   }
 
