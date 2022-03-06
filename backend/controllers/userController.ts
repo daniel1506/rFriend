@@ -109,3 +109,55 @@ export function getProfile(req: Request, res: Response) {
 
   res.send({ id, email });
 }
+
+// -----------------------------------------------------------------------------
+
+export const validateJoin = [body("event_id").isInt()];
+
+export const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const user_id = req.id;
+  const event_id = req.body.event_id;
+
+  const event = await prisma.event.findUnique({
+    where: {
+      id: event_id,
+    },
+    include: {
+      _count: { select: { participants: true } },
+    },
+  });
+
+  if (!event) {
+    return next(new HttpException(404, "Event not found"));
+  }
+
+  if (event._count.participants == event.maxParticipants) {
+    return next(new HttpException(422, "Event is full"));
+  }
+
+  let newJoin;
+  try {
+    newJoin = await prisma.event.update({
+      where: {
+        id: event_id,
+      },
+      data: {
+        participants: { connect: { id: user_id } },
+      },
+      include: {
+        participants: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.send({ participants: [...newJoin.participants] });
+};
