@@ -1,9 +1,13 @@
-import React from 'react'
-
+import React from "react";
+import { Button, Grid } from "@mui/material";
+import KeyIcon from "@mui/icons-material/Key";
 function ForgetPassword() {
   return (
-    <div>ForgetPassword</div>
-  )
+    <Button>
+      <KeyIcon />
+      Forgot password?
+    </Button>
+  );
 }
 
-export default ForgetPassword
+export default ForgetPassword;

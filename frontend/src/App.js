@@ -1,25 +1,32 @@
 //@ts-check
-import './App.css';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import { Typography, Button, ButtonGroup, Modal, Box, Slide } from '@mui/material';
-import Logreg from './Logreg.jsx';
-const styles = theme => ({
+import "./App.css";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import {
+  Typography,
+  Button,
+  ButtonGroup,
+  Modal,
+  Box,
+  Slide,
+} from "@mui/material";
+import Logreg from "./Logreg.jsx";
+const styles = (theme) => ({
   cssLabel: {
-    color: 'green'
+    color: "green",
   },
 
   cssOutlinedInput: {
-    '&$cssFocused $notchedOutline': {
+    "&$cssFocused $notchedOutline": {
       borderColor: `${theme.palette.primary.main} !important`,
-    }
+    },
   },
 
   cssFocused: {},
 
   notchedOutline: {
-    borderWidth: '1px',
-    borderColor: 'green !important'
-  }
+    borderWidth: "1px",
+    borderColor: "green !important",
+  },
 });
 function App() {
   return (
