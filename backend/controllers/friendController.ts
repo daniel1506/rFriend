@@ -169,12 +169,12 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
 // -----------------------------------------------------------------------------
 
 export const get = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req;
+  const target_user_id = req.body.target_user_id as number;
 
   let user;
   try {
     user = await prisma.user.findFirst({
-      where: { id },
+      where: { id: target_user_id },
       include: {
         friends: {
           select: { id: true, name: true, email: true },
