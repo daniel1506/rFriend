@@ -5,13 +5,13 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `_eventtouser` DROP FOREIGN KEY `_eventtouser_ibfk_1`;
+ALTER TABLE `_EventToUser` DROP FOREIGN KEY `_eventtouser_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `_eventtouser` DROP FOREIGN KEY `_eventtouser_ibfk_2`;
+ALTER TABLE `_EventToUser` DROP FOREIGN KEY `_eventtouser_ibfk_2`;
 
 -- DropTable
-DROP TABLE `_eventtouser`;
+DROP TABLE `_EventToUser`;
 
 -- CreateTable
 CREATE TABLE `_Participants` (
