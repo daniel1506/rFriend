@@ -3,6 +3,7 @@ import HttpException from "./httpException";
 
 let prisma = new PrismaClient({
   errorFormat: "minimal",
+  log: ["warn", "error"],
 });
 
 export const prismaErrorHandler = (e: any) => {

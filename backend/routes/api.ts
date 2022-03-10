@@ -51,7 +51,7 @@ const eventRouter = express.Router();
 router.use("/event", authMiddleware, eventRouter);
 
 eventRouter.get("/", eventController.validateGet, eventController.get);
-eventRouter.post("/", eventController.validateCreate, eventController.create);
+eventRouter.post("/", eventController.validateUpsert, eventController.upsert);
 
 // -----------------------------------------------------------------------------
 

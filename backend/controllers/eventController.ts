@@ -5,7 +5,8 @@ import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
 import { eventCategory, EventCategoryType, eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
-export const validateCreate = [
+export const validateUpsert = [
+  body("id").optional().isInt().toInt(),
   body("name").isString(),
   body("category").isIn(eventCategory),
   body("time").isInt().toInt(),
@@ -19,13 +20,14 @@ export const validateCreate = [
   body("remarks").optional().isString(),
 ];
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const upsert = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "Invalid input"));
   }
-  const userID = req.id;
+  const userId = req.id;
 
+  const id = req.body.id as number | undefined;
   const { name, location, photo, remarks } = req.body;
   const category = req.body.category as EventCategoryType;
   const privacy = req.body.privacy as EventPrivacyType;
@@ -35,9 +37,9 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   const coordinateLat = req.body.coordinate_lat as number | undefined;
   const coordinateLon = req.body.coordinate_lon as number | undefined;
 
-  let event: Prisma.EventCreateInput = {
+  let event = {
     name,
-    owner: { connect: { id: userID } },
+    owner: { connect: { id: userId } },
     category,
     startsAt: new Date(time * 1000), // js Date accepts millis, not seconds
     duration,
@@ -51,13 +53,19 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
   let createEvent;
   try {
-    createEvent = await prisma.event.create({ data: event });
+    createEvent = await prisma.event.upsert({
+      where: { id },
+      update: event,
+      create: event,
+    });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
   res.status(201).send({ event: createEvent });
 };
+
+// -----------------------------------------------------------------------------
 
 export const validateGet = [body("id").isInt().toInt()];
 
@@ -143,7 +151,6 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
           ]),
         ];
         friendsList = [...new Set(friendsList.flat())];
-        console.log(friendsList);
         if (!friendsList.includes(event.ownerId)) {
           return next(new HttpException(401, "Access denied for this event"));
         }
@@ -157,3 +164,5 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
 
   return res.send({ event });
 };
+
+// -----------------------------------------------------------------------------
