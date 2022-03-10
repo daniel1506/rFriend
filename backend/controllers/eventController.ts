@@ -89,7 +89,10 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
   // check if event exists
   let event = null;
   try {
-    event = await prisma.event.findFirst({ where: { id } });
+    event = await prisma.event.findFirst({
+      where: { id },
+      include: { comments: true },
+    });
     if (!event) {
       throw "Not found";
     }
