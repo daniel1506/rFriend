@@ -19,10 +19,11 @@ model User {
   role       Role    @default(USER)
   profileUrl String?
 
-  friends   User[]   @relation("Friends") // User has these friends
-  friendsOf User[]   @relation("Friends") // User is a friend of others
+  friends   User[] @relation("Friends") // User has these friends
+  friendsOf User[] @relation("Friends") // User is a friend of others
 
-  events Event[]     @relation("Participants")
+  events         Event[] @relation("EventOwner")
+  participatesIn Event[] @relation("Participants")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,7 +41,10 @@ model FriendRquest {
 }
 
 model Event {
-  id           Int            @id @default(autoincrement())
+  id      Int  @id @default(autoincrement())
+  owner   User @relation(name: "EventOwner", fields: [ownerId], references: [id])
+  ownerId Int
+
   participants User[]         @relation("Participants")
   comments     EventComment[]
 
@@ -51,10 +55,10 @@ model Event {
   location        String
   privacy         String
   maxParticipants Int
-  photoUrl        String
-  coordinateLat   Float
-  coordinateLon   Float
-  remarks         String   @db.Text
+  photoUrl        String?
+  coordinateLat   Float?
+  coordinateLon   Float?
+  remarks         String?  @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
