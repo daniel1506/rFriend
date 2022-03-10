@@ -23,7 +23,7 @@ export const validateUpsert = [
 export const upsert = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(new HttpException(422, "Invalid input"));
+    return next(new HttpException(422, "Invalid input " + JSON.stringify(errors.array())));
   }
   const userId = req.id;
 
@@ -51,18 +51,26 @@ export const upsert = async (req: Request, res: Response, next: NextFunction) =>
     remarks,
   };
 
-  let createEvent;
+  let result;
   try {
-    createEvent = await prisma.event.upsert({
-      where: { id },
-      update: event,
-      create: event,
-    });
+    switch (req.method) {
+      case "POST": // create
+        result = await prisma.event.create({ data: event });
+        break;
+      case "PUT": // update
+        if (id === undefined) {
+          return next(new HttpException(422, "Invalid input"));
+        }
+        result = await prisma.event.update({
+          where: { id },
+          data: event,
+        });
+    }
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(201).send({ event: createEvent });
+  res.status(201).send({ event: result });
 };
 
 // -----------------------------------------------------------------------------
@@ -166,3 +174,30 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 // -----------------------------------------------------------------------------
+
+export const validateRemove = [body("id").isInt().toInt()];
+
+export const remove = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const userId = req.id;
+  const id = req.body.id as number;
+
+  // check if event exists
+  let event = null;
+  try {
+    event = await prisma.event.findFirst({ where: { id, ownerId: userId } });
+    if (!event) {
+      throw "Not found";
+    }
+
+    const deleteEvent = await prisma.event.delete({ where: { id } });
+  } catch (e) {
+    return next(new HttpException(409, "Event not found"));
+  }
+
+  res.send({});
+};
