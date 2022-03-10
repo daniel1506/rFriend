@@ -22,7 +22,6 @@ userRouter.post("/register", userController.validateRegister, userController.reg
 userRouter.post("/login", userController.validateLogin, userController.login);
 userRouter.get("/", authMiddleware, userController.getProfile);
 userRouter.put("/join", authMiddleware, userController.validateEvent, userController.joinEvent);
-userRouter.get("/comment", authMiddleware, userController.validateEvent, userController.getComment);
 userRouter.post("/comment", authMiddleware, userController.validateComment, userController.postComment);
 
 // -----------------------------------------------------------------------------

@@ -169,37 +169,6 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
 
 // -----------------------------------------------------------------------------
 
-export const getComment = async (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(new HttpException(422, "Invalid input"));
-  }
-
-  const event_id = req.body.event_id;
-
-  let event;
-  try {
-    event = await prisma.event.findUnique({
-      where: {
-        id: event_id,
-      },
-      include: {
-        comments: true,
-      },
-    });
-  } catch (e) {
-    return next(prismaErrorHandler(e));
-  }
-
-  if (!event) {
-    return next(new HttpException(404, "Event not found"));
-  }
-
-  res.send({ comments: event.comments });
-};
-
-// -----------------------------------------------------------------------------
-
 export const validateComment = [body("event_id").isInt(), body("comment").exists()];
 
 export const postComment = async (req: Request, res: Response, next: NextFunction) => {
