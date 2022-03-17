@@ -6,7 +6,10 @@ import {
   TextField,
   Grid,
   FormControl,
+  Alert,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import VerticalFlex from "./layout/VerticalFlex";
 import LoginIcon from "@mui/icons-material/Login";
 import ForgetPassword from "./ForgetPassword.js";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
@@ -15,6 +18,8 @@ import "./App.css";
 import Axios from "axios";
 import validator from "validator";
 import { useEffect } from "react";
+import { set } from "date-fns/esm";
+import post from "./lib/post";
 function Logreg() {
   const [logChecked, setLogChecked] = React.useState(false);
   const [regChecked, setRegChecked] = React.useState(false);
@@ -22,11 +27,13 @@ function Logreg() {
   const [username, setUsername] = React.useState(null);
   const [email, setEmail] = React.useState(null);
   const [emailError, setEmailError] = React.useState(false);
-  const [logEmail, setLogEmail] = React.useState(null);
   const [password, setPassword] = React.useState(null);
   const [passwordError, setPasswordError] = React.useState(false);
+  const [cfPasswordError, setcfPasswordError] = React.useState(false);
   const [cfPassword, setCfPassword] = React.useState(null);
   const [fail, setFail] = React.useState(false);
+  const [failMessage, setFailMessage] = React.useState(null);
+  const [submitting, setSubmitting] = React.useState(false);
   const handleLog = () => {
     setLogChecked((prev) => !prev);
     setRegChecked(false);
@@ -52,25 +59,62 @@ function Logreg() {
     }
   };
   const validatePassword = (e) => {
-    var cfPassword = e.target.value;
-
-    if (cfPassword == password) {
-      setPasswordError(false);
-    } else {
+    let password = e.target.value;
+    if (password.length < 8) {
       setPasswordError(true);
+    } else setPasswordError(false);
+  };
+  const confirmPassword = (e) => {
+    let cfPassword = e.target.value;
+    if (cfPassword == password) {
+      setcfPasswordError(false);
+    } else {
+      setcfPasswordError(true);
     }
   };
   useEffect(() => {
     setEmailError(false);
+    setFail(false);
+    setFailMessage(null);
   }, [logChecked, regChecked, forgetChecked]); //Reset the error showing flag if the user give up to enter the current information
-  const addUser = () => {
-    console.log({ email, username, password });
-    Axios.post("/api/user/register", { email, username, password })
-      .then((response) => {
-        console.log("done");
+  const reg = (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    let data = { email, name: username, password };
+    console.log(data);
+    post("https://rfriend.herokuapp.com/api/user/register", data)
+      .then((data) => {
+        if (data.statuscode != 201) {
+          setFail(true);
+          setFailMessage(data.message);
+        }
+        console.log("Response:", data);
       })
-      .catch((err) => {
-        console.log(err);
+      .then(() => {
+        setSubmitting(false);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+  const log = (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    let data = { email, password };
+    console.log(data);
+    post("https://rfriend.herokuapp.com/api/user/login", data)
+      .then((data) => {
+        if (data.statuscode != 200) {
+          setFail(true);
+          setFailMessage(data.message);
+        }
+        console.log("Response:", data);
+      })
+      .then(() => {
+        setSubmitting(false);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
   };
   return (
@@ -102,15 +146,9 @@ function Logreg() {
         unmountOnExit
         className="info-input-container"
       >
-        <form>
-          <Grid
-            container
-            direction="column"
-            alignItems="center"
-            justify="center"
-            gap="10px"
-            marginTop="10px"
-          >
+        {/* login form */}
+        <form onSubmit={log}>
+          <VerticalFlex>
             <TextField
               error={emailError}
               type="email"
@@ -119,7 +157,7 @@ function Logreg() {
               label="email"
               className="info-input"
               onChange={(e) => {
-                setLogEmail(e.target.value);
+                setEmail(e.target.value);
                 validateEmail(e);
               }}
             />
@@ -127,10 +165,19 @@ function Logreg() {
               id="passwordlog"
               type="password"
               label="password"
+              error={passwordError}
+              helperText={passwordError ? "Length must be larger than 8" : ""}
               className="info-input"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                validatePassword(e);
+              }}
             />
-            <Button type="submit">Submit</Button>
-          </Grid>
+            {!submitting && <Button type="submit">Submit</Button>}
+            {submitting && <LoadingButton loading />}
+            {/* Display error message if error when submit */}
+            {fail && <Alert severity="error">{failMessage}</Alert>}
+          </VerticalFlex>
         </form>
       </Slide>
       <Slide
@@ -140,15 +187,9 @@ function Logreg() {
         unmountOnExit
         className="info-input-container"
       >
-        <form>
-          <Grid
-            container
-            direction="column"
-            alignItems="center"
-            justify="center"
-            gap="10px"
-            marginTop="10px"
-          >
+        {/* reg form */}
+        <form onSubmit={reg}>
+          <VerticalFlex>
             <TextField
               id="emailReg"
               error={emailError}
@@ -174,26 +215,30 @@ function Logreg() {
               type="password"
               label="password"
               className="info-input"
+              error={passwordError}
+              helperText={passwordError ? "Length must be larger than 8" : ""}
               onChange={(e) => {
                 setPassword(e.target.value);
+                validatePassword(e);
               }}
             />
             <TextField
               id="cfPasswordReg"
-              error={passwordError}
-              helperText={passwordError ? "Doesn't match" : ""}
+              error={cfPasswordError}
+              helperText={cfPasswordError ? "Doesn't match" : ""}
               type="password"
               label="confirm password"
               className="info-input"
               onChange={(e) => {
                 setCfPassword(e.target.value);
-                validatePassword(e);
+                confirmPassword(e);
               }}
             />
-            <Button onClick={addUser} type="submit">
-              Submit
-            </Button>
-          </Grid>
+            {!submitting && <Button type="submit">Submit</Button>}
+            {submitting && <LoadingButton loading />}
+            {/* Display error message if error when submit */}
+            {fail && <Alert severity="error">{failMessage}</Alert>}
+          </VerticalFlex>
         </form>
       </Slide>
     </>

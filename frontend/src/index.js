@@ -1,13 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router } from "react-router-dom";
+import { AuthContextProvider } from "./store/auth-context";
 import "./index.css";
 import App from "./App";
-import Navbar from "./components/Navbar/Navbar";
+import Navbar from "./components/Navbar";
 import reportWebVitals from "./reportWebVitals";
-
 ReactDOM.render(
   <React.StrictMode>
-    <Navbar />
+    <Router>
+      <App />
+    </Router>
   </React.StrictMode>,
   document.getElementById("root")
 );
