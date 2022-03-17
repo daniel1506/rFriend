@@ -23,6 +23,7 @@ model User {
   friendsOf User[] @relation("Friends") // User is a friend of others
 
   events         Event[] @relation("EventOwner")
+  interestedIn    Event[] @relation("Followers")
   participatesIn Event[] @relation("Participants")
 
   createdAt DateTime @default(now())
@@ -46,6 +47,7 @@ model Event {
   ownerId Int
 
   participants User[]         @relation("Participants")
+  followers    User[]        @relation("Followers")
   comments     EventComment[]
 
   name            String
