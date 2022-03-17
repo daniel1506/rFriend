@@ -1,17 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AuthContextProvider } from "./store/auth-context";
 import "./index.css";
 import App from "./App";
+import Admin from "./pages/Admin/Admin";
 import Navbar from "./components/Navbar";
 import reportWebVitals from "./reportWebVitals";
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
-  </React.StrictMode>,
+  <AuthContextProvider>
+    <React.StrictMode>
+      <Router>
+        <Routes>
+          <Route path="/" element={<App />}></Route>
+          <Route path="/admin" element={<Admin />}></Route>
+        </Routes>
+      </Router>
+    </React.StrictMode>
+  </AuthContextProvider>,
   document.getElementById("root")
 );
 
