@@ -19,6 +19,7 @@ import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import { IconButton } from "@mui/material";
+import Input from "@mui/material/Input";
 const style = {
   position: "absolute",
   left: "0",
@@ -30,7 +31,7 @@ const style = {
   marginBottom: "auto",
   width: "40%",
   height: "600px",
-  marginTop: "-250px",
+  marginTop: "-300px",
   // "@media (max-width: 1025px)": {
   //   height: "700px",
   //   marginTop: "-350px",
@@ -77,15 +78,24 @@ export default function Profile(props) {
                 <VerticalFlex>
                   <Badge
                     badgeContent={
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => {
-                          alert("hello");
-                        }}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
+                      <label htmlFor="icon-button-file">
+                        <Input
+                          accept="image/*"
+                          id="icon-button-file"
+                          type="file"
+                          sx={{ display: "none" }}
+                        />
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => {
+                            alert("hello");
+                          }}
+                          color="primary"
+                          component="span"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </label>
                     }
                     overlap="circular"
                     anchorOrigin={{ vertical: "top", horizontal: "right" }}

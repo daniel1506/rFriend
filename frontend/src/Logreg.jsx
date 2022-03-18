@@ -17,7 +17,8 @@ import * as React from "react";
 import "./App.css";
 import Axios from "axios";
 import validator from "validator";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { set } from "date-fns/esm";
 import post from "./lib/post";
 import PasswordInput from "./components/PasswordInput";
@@ -25,6 +26,7 @@ import CfPasswordInput from "./components/CfPasswordInput";
 import EmailInput from "./components/EmailInput";
 import NameInput from "./components/NameInput";
 import SubmitButton from "./components/SubmitButton";
+import AuthContext from "./store/auth-context";
 function Logreg() {
   const [logChecked, setLogChecked] = React.useState(false);
   const [regChecked, setRegChecked] = React.useState(false);
@@ -36,6 +38,8 @@ function Logreg() {
   const [fail, setFail] = React.useState(false);
   const [failMessage, setFailMessage] = React.useState(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const authCtx = useContext(AuthContext);
+  const navigate = useNavigate();
   const handleLog = () => {
     setLogChecked((prev) => !prev);
     setRegChecked(false);
@@ -64,11 +68,13 @@ function Logreg() {
     console.log(data);
     post("https://rfriend.herokuapp.com/api/user/register", data)
       .then((data) => {
-        if (data.statuscode != 201) {
+        console.log("Response:", data);
+        if (data.status != 201) {
           setFail(true);
           setFailMessage(data.message);
+        } else {
+          authCtx.login(data.token, data.id, data.email);
         }
-        console.log("Response:", data);
       })
       .then(() => {
         setSubmitting(false);
@@ -84,11 +90,13 @@ function Logreg() {
     console.log(data);
     post("https://rfriend.herokuapp.com/api/user/login", data)
       .then((data) => {
-        if (data.statuscode != 200) {
+        console.log("Response:", data);
+        if (data.status != 200) {
           setFail(true);
           setFailMessage(data.message);
+        } else {
+          authCtx.login(data.token, data.id, data.email);
         }
-        console.log("Response:", data);
       })
       .then(() => {
         setSubmitting(false);

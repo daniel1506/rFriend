@@ -1,25 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { AuthContextProvider } from "./store/auth-context";
 import "./index.css";
-import App from "./App";
-import Profile from "./components/Profile";
-import Admin from "./pages/Admin/Admin";
-import Navbar from "./components/Navbar";
 import reportWebVitals from "./reportWebVitals";
+import App from "./App";
+import { AuthContextProvider } from "./store/auth-context";
 ReactDOM.render(
-  <AuthContextProvider>
-    <React.StrictMode>
-      <Router>
-        <Routes>
-          <Route path="/" element={<App />}></Route>
-          <Route path="/admin" element={<Admin />}></Route>
-          <Route path="/profile" element={<Profile />}></Route>
-        </Routes>
-      </Router>
-    </React.StrictMode>
-  </AuthContextProvider>,
+  <React.StrictMode>
+    <AuthContextProvider>
+      <App />
+    </AuthContextProvider>
+  </React.StrictMode>,
   document.getElementById("root")
 );
 
