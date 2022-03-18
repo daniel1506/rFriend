@@ -15,6 +15,7 @@ import PasswordInput from "./PasswordInput";
 import CfPasswordInput from "./CfPasswordInput";
 import EmailShowCase from "./EmailShowCase.js";
 import NameShowCase from "./NameShowCase";
+import SubmitButton from "./SubmitButton";
 const style = {
   position: "absolute",
   left: "0",
@@ -23,10 +24,18 @@ const style = {
   marginRight: "auto",
   top: "50%",
   bottom: "50%",
-  marginTop: "-250px",
   marginBottom: "auto",
   width: "40%",
-  height: "500px",
+  height: "600px",
+  marginTop: "-250px",
+  // "@media (max-width: 1025px)": {
+  //   height: "700px",
+  //   marginTop: "-350px",
+  // },
+  // "@media (min-width: 1026px)": {
+  //   height: "500px",
+  //   marginTop: "-250px",
+  // },
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: 10,
@@ -81,6 +90,7 @@ export default function Profile(props) {
                     setPassword={setPassword}
                   />
                   <CfPasswordInput password={password} />
+                  <SubmitButton>Submit</SubmitButton>
                 </VerticalFlex>
               </form>
             </Grid>

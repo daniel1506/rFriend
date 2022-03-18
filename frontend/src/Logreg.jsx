@@ -24,6 +24,7 @@ import PasswordInput from "./components/PasswordInput";
 import CfPasswordInput from "./components/CfPasswordInput";
 import EmailInput from "./components/EmailInput";
 import NameInput from "./components/NameInput";
+import SubmitButton from "./components/SubmitButton";
 function Logreg() {
   const [logChecked, setLogChecked] = React.useState(false);
   const [regChecked, setRegChecked] = React.useState(false);
@@ -129,7 +130,7 @@ function Logreg() {
           <VerticalFlex>
             <EmailInput setEmail={setEmail} />
             <PasswordInput setPassword={setPassword} />
-            {!submitting && <Button type="submit">Submit</Button>}
+            {!submitting && <SubmitButton type="submit">Submit</SubmitButton>}
             {submitting && <LoadingButton loading />}
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}
@@ -150,7 +151,7 @@ function Logreg() {
             <NameInput setUsername={setUsername} />
             <PasswordInput setPassword={setPassword} />
             <CfPasswordInput password={password} />
-            {!submitting && <Button type="submit">Submit</Button>}
+            {!submitting && <SubmitButton type="submit">Submit</SubmitButton>}
             {submitting && <LoadingButton loading />}
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}

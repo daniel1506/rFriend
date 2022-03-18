@@ -13,6 +13,7 @@ import KeyIcon from "@mui/icons-material/Key";
 import post from "./lib/post";
 import { LoadingButton } from "@mui/lab";
 import EmailInput from "./components/EmailInput";
+import SubmitButton from "./components/SubmitButton";
 function ForgetPassword(props) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ function ForgetPassword(props) {
             marginTop="10px"
           >
             <EmailInput setEmail={setEmail} />
-            {!loading && <Button type="submit">submit</Button>}
+            {!loading && <SubmitButton type="submit">Submit</SubmitButton>}
             {loading && <LoadingButton loading />}
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}
