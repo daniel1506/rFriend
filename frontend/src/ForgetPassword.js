@@ -12,6 +12,7 @@ import VerticalFlex from "./layout/VerticalFlex";
 import KeyIcon from "@mui/icons-material/Key";
 import post from "./lib/post";
 import { LoadingButton } from "@mui/lab";
+import EmailInput from "./components/EmailInput";
 function ForgetPassword(props) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,18 +54,7 @@ function ForgetPassword(props) {
             gap="10px"
             marginTop="10px"
           >
-            <TextField
-              error={props.emailError}
-              type="email"
-              helperText={props.emailError ? "Invalid email" : ""}
-              id="forget"
-              label="email"
-              className="info-input"
-              onChange={(e) => {
-                setEmail(e.target.value);
-                props.validateEmail(e);
-              }}
-            />
+            <EmailInput setEmail={setEmail} />
             {!loading && <Button type="submit">submit</Button>}
             {loading && <LoadingButton loading />}
             {/* Display error message if error when submit */}

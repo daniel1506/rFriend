@@ -20,6 +20,10 @@ import validator from "validator";
 import { useEffect } from "react";
 import { set } from "date-fns/esm";
 import post from "./lib/post";
+import PasswordInput from "./components/PasswordInput";
+import CfPasswordInput from "./components/CfPasswordInput";
+import EmailInput from "./components/EmailInput";
+import NameInput from "./components/NameInput";
 function Logreg() {
   const [logChecked, setLogChecked] = React.useState(false);
   const [regChecked, setRegChecked] = React.useState(false);
@@ -28,9 +32,6 @@ function Logreg() {
   const [email, setEmail] = React.useState(null);
   const [emailError, setEmailError] = React.useState(false);
   const [password, setPassword] = React.useState(null);
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [cfPasswordError, setcfPasswordError] = React.useState(false);
-  const [cfPassword, setCfPassword] = React.useState(null);
   const [fail, setFail] = React.useState(false);
   const [failMessage, setFailMessage] = React.useState(null);
   const [submitting, setSubmitting] = React.useState(false);
@@ -49,29 +50,7 @@ function Logreg() {
     setLogChecked(false);
     setRegChecked(false);
   };
-  //provide validity checking for both email input at login & email input at register
-  const validateEmail = (e) => {
-    let email = e.target.value;
-    if (validator.isEmail(email)) {
-      setEmailError(false);
-    } else {
-      setEmailError(true);
-    }
-  };
-  const validatePassword = (e) => {
-    let password = e.target.value;
-    if (password.length < 8) {
-      setPasswordError(true);
-    } else setPasswordError(false);
-  };
-  const confirmPassword = (e) => {
-    let cfPassword = e.target.value;
-    if (cfPassword == password) {
-      setcfPasswordError(false);
-    } else {
-      setcfPasswordError(true);
-    }
-  };
+  //provide validity checking for email input at register
   useEffect(() => {
     setEmailError(false);
     setFail(false);
@@ -137,7 +116,6 @@ function Logreg() {
         handleForget={handleForget}
         forgetChecked={forgetChecked}
         emailError={emailError}
-        validateEmail={validateEmail}
       />
       <Slide
         direction="up"
@@ -149,30 +127,8 @@ function Logreg() {
         {/* login form */}
         <form onSubmit={log}>
           <VerticalFlex>
-            <TextField
-              error={emailError}
-              type="email"
-              helperText={emailError ? "Invalid email" : ""}
-              id="emailLog"
-              label="email"
-              className="info-input"
-              onChange={(e) => {
-                setEmail(e.target.value);
-                validateEmail(e);
-              }}
-            />
-            <TextField
-              id="passwordlog"
-              type="password"
-              label="password"
-              error={passwordError}
-              helperText={passwordError ? "Length must be larger than 8" : ""}
-              className="info-input"
-              onChange={(e) => {
-                setPassword(e.target.value);
-                validatePassword(e);
-              }}
-            />
+            <EmailInput setEmail={setEmail} />
+            <PasswordInput setPassword={setPassword} />
             {!submitting && <Button type="submit">Submit</Button>}
             {submitting && <LoadingButton loading />}
             {/* Display error message if error when submit */}
@@ -190,50 +146,10 @@ function Logreg() {
         {/* reg form */}
         <form onSubmit={reg}>
           <VerticalFlex>
-            <TextField
-              id="emailReg"
-              error={emailError}
-              helperText={emailError ? "Invalid email" : ""}
-              type="email"
-              label="email"
-              className="email-input"
-              onChange={(e) => {
-                setEmail(e.target.value);
-                validateEmail(e);
-              }}
-            />
-            <TextField
-              id="usernameReg"
-              label="username"
-              className="info-input"
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-            />
-            <TextField
-              id="passwordReg"
-              type="password"
-              label="password"
-              className="info-input"
-              error={passwordError}
-              helperText={passwordError ? "Length must be larger than 8" : ""}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                validatePassword(e);
-              }}
-            />
-            <TextField
-              id="cfPasswordReg"
-              error={cfPasswordError}
-              helperText={cfPasswordError ? "Doesn't match" : ""}
-              type="password"
-              label="confirm password"
-              className="info-input"
-              onChange={(e) => {
-                setCfPassword(e.target.value);
-                confirmPassword(e);
-              }}
-            />
+            <EmailInput setEmail={setEmail} />
+            <NameInput setUsername={setUsername} />
+            <PasswordInput setPassword={setPassword} />
+            <CfPasswordInput password={password} />
             {!submitting && <Button type="submit">Submit</Button>}
             {submitting && <LoadingButton loading />}
             {/* Display error message if error when submit */}

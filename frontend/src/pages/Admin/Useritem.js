@@ -15,22 +15,52 @@ function Useritem(props) {
       <ListItemButton component="a" href="#simple-list">
         <ListItemText
           primary={
-            <Grid container direction={{ xs: "row" }} alignItems="center">
-              <AccountCircleIcon />
-              <ShortText sx={{ marginLeft: 2 }}>user</ShortText>
+            <Grid
+              container
+              direction={{ xs: "row" }}
+              alignItems="center"
+              justifyContent={{ xs: "space-between" }}
+              gap={{ sm: 2, xs: 0 }}
+            >
+              <Grid item>
+                <Grid
+                  container
+                  direction={{ xs: "column", sm: "row" }}
+                  alignItems="center"
+                  justifyContent={{ xs: "start" }}
+                  gap={{ sm: 2, xs: 0 }}
+                >
+                  <AccountCircleIcon />
+                  <ShortText>user</ShortText>
+                </Grid>
+              </Grid>
+              <Grid item>
+                <Grid
+                  container
+                  direction={{ xs: "column", sm: "row" }}
+                  alignItems={{ xs: "end" }}
+                  justifyContent={{ xs: "end" }}
+                  gap={{ sm: 2, xs: 1 }}
+                >
+                  <Button
+                    variant="contained"
+                    endIcon={<LockResetIcon />}
+                    color="warning"
+                  >
+                    Reset password
+                  </Button>
+                  <Button
+                    variant="contained"
+                    endIcon={<BlockIcon />}
+                    color="error"
+                  >
+                    Ban
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
           }
         />
-        <Button
-          variant="contained"
-          endIcon={<BlockIcon />}
-          sx={{ marginRight: 2 }}
-        >
-          Ban
-        </Button>
-        <Button variant="contained" endIcon={<LockResetIcon />}>
-          Reset password
-        </Button>
       </ListItemButton>
     </ListItem>
   );

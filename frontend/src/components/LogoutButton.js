@@ -4,7 +4,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 function LogoutButton(props) {
   return (
-    <Button variant="outlined" startIcon={<ExitToAppIcon />}>
+    <Button variant="outlined" startIcon={<ExitToAppIcon />} {...props}>
       Logout
     </Button>
   );
