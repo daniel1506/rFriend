@@ -1,7 +1,7 @@
 //@ts-check
 import "./App.css";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import logo from "./static/logo.svg";
+import logo from "./static/img/logo.svg";
 import {
   Typography,
   Button,

@@ -2,13 +2,12 @@ import * as React from "react";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-import testlogo from "../static/img/logo512.png";
+import testlogo from "../static/img/nbuna.jpg";
 import VerticalFlex from "../layout/VerticalFlex";
 import NameInput from "./NameInput";
 import PasswordInput from "./PasswordInput";
@@ -16,6 +15,10 @@ import CfPasswordInput from "./CfPasswordInput";
 import EmailShowCase from "./EmailShowCase.js";
 import NameShowCase from "./NameShowCase";
 import SubmitButton from "./SubmitButton";
+import Badge from "@mui/material/Badge";
+import EditIcon from "@mui/icons-material/Edit";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import { IconButton } from "@mui/material";
 const style = {
   position: "absolute",
   left: "0",
@@ -72,11 +75,27 @@ export default function Profile(props) {
             >
               <Grid item>
                 <VerticalFlex>
-                  <Avatar
-                    alt="Cindy Baker"
-                    src={testlogo}
-                    sx={{ width: 200, height: 200 }}
-                  />
+                  <Badge
+                    badgeContent={
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => {
+                          alert("hello");
+                        }}
+                        color="primary"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    }
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <Avatar
+                      alt="Cindy Baker"
+                      src={testlogo}
+                      sx={{ width: 200, height: 200 }}
+                    />
+                  </Badge>
                   <NameShowCase>owo</NameShowCase>
                   <EmailShowCase>owo@example.com</EmailShowCase>
                 </VerticalFlex>
