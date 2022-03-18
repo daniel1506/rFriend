@@ -1,6 +1,7 @@
 //@ts-check
 import "./App.css";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import logo from "./static/logo.svg";
 import {
   Typography,
   Button,
@@ -32,7 +33,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <GroupAddIcon className="App-logo" style={{ fontSize: "200px" }} />
+        <img src={logo} className="App-logo" style={{ width: 300 }} />
         <Typography variant="h1">rFriend</Typography>
         <Typography variant="h5">Save your event</Typography>
         <Logreg />

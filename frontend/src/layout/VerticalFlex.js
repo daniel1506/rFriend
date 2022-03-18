@@ -9,7 +9,7 @@ function VerticalFlex(props) {
       alignItems="center"
       justify="center"
       gap="10px"
-      marginTop="10px"
+      {...props}
     >
       {props.children}
     </Grid>
