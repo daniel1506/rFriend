@@ -27,6 +27,12 @@ userRouter.put("/join", authMiddleware, userController.validateEvent, userContro
 userRouter.put("/save", authMiddleware, userController.validateEvent, userController.saveEvent);
 userRouter.post("/comment", authMiddleware, userController.validateComment, userController.postComment);
 
+// No need auth/validation for forget password?
+userRouter.post("/forget_pw", userController.forgetPassword);
+userRouter.put("/profile", authMiddleware, userController.validateProfile, userController.updateProfile);
+userRouter.get("/test", userController.testing);  //delete this
+
+
 // -----------------------------------------------------------------------------
 
 const adminRouter = express.Router();

@@ -6,6 +6,11 @@ import HttpException from "../common/httpException";
 import bcrypt from "bcrypt";
 import { generateJWT } from "../services/authService";
 
+import {PutObjectCommand, PutObjectCommandInput} from "@aws-sdk/client-s3";
+import { s3Client } from "../AWS/s3Cient";
+import { stringify } from "querystring";
+import { runMain } from "module";
+
 // -----------------------------------------------------------------------------
 
 export const validateRegister = [
@@ -14,7 +19,7 @@ export const validateRegister = [
   body("password").isLength({ min: 8 }),
 ];
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => { console.log("hello world\n", req.body   );
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "Invalid input"));
@@ -110,6 +115,87 @@ export function getProfile(req: Request, res: Response) {
 
   res.send({ id, email });
 }
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+export function forgetPassword(req: Request, res: Response) {
+  const { id, email } = req;
+
+  res.send({ id, email });
+}
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+export const validateProfile = [body("profile").exists(), body("profile").isString()];
+
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  // const {user_id, profile : encoded_image} = req.body;
+  const {user_id, profile} = req.body;
+
+  /* 
+    find out the type of the image
+    Note that profile has the format: image/jpeg;base64,xxxx.....
+  */
+  let type: string = profile.split("/")[1].split(";")[0];
+  let key: string = "img" + String(user_id);
+  
+  // turn the string into binary data. The image cannot be shown without doing this
+  const encoded_image: Buffer = Buffer.from(profile.split(',')[1], "base64"); 
+
+  // Set the parameters.
+  const bucketParams: PutObjectCommandInput = {
+    Bucket: process.env.BUCKET_NAME,
+    // Specify the name of the new object. For example, 'index.html'.
+    // To create a directory for the object, use '/'. For example, 'myApp/package.json'.
+    Key: key,
+    Body: encoded_image,  // Content of the new object.
+    ContentEncoding: "base64",
+    ContentType: "image/" + type,
+    ACL: 'public-read'   // for public access
+  };
+
+  // Create and upload the object to the S3 bucket.
+  try {
+    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+    
+    console.log("Successfully uploaded object: " + bucketParams.Bucket + "/" + bucketParams.Key);
+    console.log(data);
+
+    // generate an url for the image
+    let profileURL : String = "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
+
+    res.status(200).send(
+      {profileURL: profileURL}
+      );
+
+   // Store the url into the database
+
+  } catch (err) {
+    return next(new HttpException(500, "Error in AWS."));
+  }
+
+
+}
+
+// -----------------testing (delete)--------------
+import {ListBucketsCommand} from "@aws-sdk/client-s3";
+export const testing = async (req: Request, res: Response, next: NextFunction)=>{
+  try {
+    console.log(process.env.AWS_ACCESS_KEY_ID);
+    const data = await s3Client.send(new ListBucketsCommand({}));
+    console.log("Success", data.Buckets);
+    res.send(data);
+  } catch (err) {
+    console.log("Error", err);
+    res.send(err);
+  }
+}
+
 
 // -----------------------------------------------------------------------------
 

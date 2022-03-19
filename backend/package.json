@@ -11,6 +11,7 @@
     "test:watch": "jest --watchAll"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.54.0",
     "@prisma/client": "^3.10.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
