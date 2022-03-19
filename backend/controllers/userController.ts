@@ -169,6 +169,54 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
 
 // -----------------------------------------------------------------------------
 
+export const saveEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const user_id = req.id;
+  const event_id = req.body.event_id;
+
+  let event;
+  try {
+    event = await prisma.event.findUnique({
+      where: {
+        id: event_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!event) {
+    return next(new HttpException(404, "Event not found"));
+  }
+
+  let newSave;
+  try {
+    newSave = await prisma.event.update({
+      where: {
+        id: event_id,
+      },
+      data: {
+        followers: { connect: { id: user_id } },
+      },
+      include: {
+        followers: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.send({ followers: [...newSave.followers] });
+};
+
+// -----------------------------------------------------------------------------
+
 export const validateComment = [body("event_id").isInt(), body("comment").exists()];
 
 export const postComment = async (req: Request, res: Response, next: NextFunction) => {
@@ -179,6 +227,21 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
 
   const user_id = req.id;
   const { event_id, comment } = req.body;
+
+  let result;
+  try {
+    result = await prisma.event.findUnique({
+      where: {
+        id: event_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!result) {
+    return next(new HttpException(404, "Event not found"));
+  }
 
   let newComment;
   try {
