@@ -2,21 +2,20 @@ import * as React from "react";
 import TextField from "@mui/material/TextField";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import StaticTimePicker from "@mui/lab/StaticTimePicker";
+import DateTimePicker from "@mui/lab/DateTimePicker";
 
-export default function TimePicker() {
+export default function BasicDateTimePicker() {
   const [value, setValue] = React.useState(new Date());
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <StaticTimePicker
-        displayStaticWrapperAs="mobile"
+      <DateTimePicker
+        renderInput={(props) => <TextField {...props} />}
+        label="DateTimePicker"
         value={value}
         onChange={(newValue) => {
           setValue(newValue);
-          console.log(newValue);
         }}
-        renderInput={(params) => <TextField {...params} />}
       />
     </LocalizationProvider>
   );

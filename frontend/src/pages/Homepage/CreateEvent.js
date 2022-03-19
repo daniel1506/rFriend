@@ -34,8 +34,8 @@ const style = {
   bottom: "50%",
   marginBottom: "auto",
   width: "400px",
-  height: "600px",
-  marginTop: "-300px",
+  height: "320px",
+  marginTop: "-160px",
   // "@media (max-width: 1025px)": {
   //   height: "700px",
   //   marginTop: "-350px",
@@ -163,11 +163,14 @@ function CreateEvent(props) {
                 </ToggleButton>
               </Grid>
             </Grid>
-          </Grid>
-          <TimePicker />
-          <Grid container direction="row" justifyContent={"space-around"}>
-            <CloseButton onClick={handleClose}>Cancel</CloseButton>
-            <SubmitButton>Submit</SubmitButton>
+
+            <Grid container diraction="row" justifyContent={"center"}>
+              <TimePicker />
+            </Grid>
+            <Grid container direction="row" justifyContent={"space-around"}>
+              <CloseButton onClick={handleClose}>Cancel</CloseButton>
+              <SubmitButton>Submit</SubmitButton>
+            </Grid>
           </Grid>
         </Box>
       </Slide>

@@ -47,9 +47,8 @@ const style = {
 };
 
 export default function Profile(props) {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => props.setShowProfile(true);
+  const handleClose = () => props.setShowProfile(false);
   const [password, setPassword] = React.useState(null);
   return (
     <div>
@@ -57,7 +56,7 @@ export default function Profile(props) {
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={open}
+        open={props.showProfile}
         onClose={handleClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
@@ -65,7 +64,7 @@ export default function Profile(props) {
           timeout: 500,
         }}
       >
-        <Slide in={open}>
+        <Slide in={props.showProfile}>
           <Box sx={style}>
             <Grid
               container
