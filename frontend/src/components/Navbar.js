@@ -104,7 +104,14 @@ export default function Navbar(props) {
       open={isPageMenuOpen}
       onClose={handlePageMenuClose}
     >
-      <MenuItem onClick={handlePageMenuClose}>Page 1</MenuItem>
+      <MenuItem
+        onClick={() => {
+          handlePageMenuClose();
+          props.setShowCreateEvent(true);
+        }}
+      >
+        Page 1
+      </MenuItem>
       <MenuItem onClick={handlePageMenuClose}>Page 2</MenuItem>
       <MenuItem onClick={handlePageMenuClose}>Page 3</MenuItem>
       <MenuItem onClick={handlePageMenuClose}>Page 4</MenuItem>

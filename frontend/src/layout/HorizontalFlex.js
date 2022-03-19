@@ -1,13 +1,13 @@
 //A helper component for quickly flex items in vertical direction
 import React from "react";
 import { Grid } from "@mui/material";
-function VerticalFlex(props) {
+function HorizontalFlex(props) {
   return (
     <Grid
       container
-      direction="column"
+      direction="row"
       alignItems="center"
-      justifyContent="center"
+      justifyContent="space-between"
       gap="10px"
       {...props}
     >
@@ -16,4 +16,4 @@ function VerticalFlex(props) {
   );
 }
 
-export default VerticalFlex;
+export default HorizontalFlex;
