@@ -12,23 +12,26 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useContext } from "react";
+import { AuthContextProvider } from "./store/auth-context";
 function App() {
   const authCtx = useContext(AuthContext);
   return (
-    <Router>
-      <Routes>
-        {!authCtx.isLoggedIn && <Route exact path="/" element={<Auth />} />}
-        {authCtx.isLoggedIn && (
-          <Route path="/homepage" element={<Homepage />} />
-        )}
-        {authCtx.isLoggedIn && (
-          <Route path="*" element={<Navigate to="/homepage" />} />
-        )}
-        {!authCtx.isLoggedIn && (
-          <Route path="*" element={<Navigate to="/" />} />
-        )}
-      </Routes>
-    </Router>
+    <AuthContextProvider>
+      <Router>
+        <Routes>
+          {!authCtx.isLoggedIn && <Route exact path="/" element={<Auth />} />}
+          {authCtx.isLoggedIn && (
+            <Route path="/homepage" element={<Homepage />} />
+          )}
+          {authCtx.isLoggedIn && (
+            <Route path="*" element={<Navigate to="/homepage" />} />
+          )}
+          {!authCtx.isLoggedIn && (
+            <Route path="*" element={<Navigate to="/" />} />
+          )}
+        </Routes>
+      </Router>
+    </AuthContextProvider>
   );
 }
 
