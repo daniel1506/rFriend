@@ -5,6 +5,8 @@ import Profile from "./components/Profile";
 import Admin from "./pages/Admin/Admin";
 import Navbar from "./components/Navbar";
 import Homepage from "./pages/Homepage/Homepage";
+import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
+import ConfirmEmail from "./pages/ConfirmEmail/ConfirmEmail";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,6 +19,8 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="api/user/verify" element={<ConfirmEmail />} />
+        <Route path="/verify" element={<VerifyEmail />} />
         {!authCtx.isLoggedIn && <Route exact path="/" element={<Auth />} />}
         {authCtx.isLoggedIn && (
           <Route path="/homepage" element={<Homepage />} />
