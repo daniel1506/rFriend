@@ -18,7 +18,7 @@ function ConfirmEmail() {
     >
       <Zoom
         in={!clicked}
-        timeout={1000}
+        timeout={500}
         sx={{ display: pop ? "none" : "block" }}
       >
         <Button
@@ -27,13 +27,13 @@ function ConfirmEmail() {
             setClicked(true);
             setTimeout(() => {
               setPop(true);
-            }, 1000);
+            }, 500);
           }}
         >
           <EmailIcon sx={{ fontSize: "200px" }} />
         </Button>
       </Zoom>
-      <Zoom in={pop} timeout={1000} sx={{ display: pop ? "block" : "none" }}>
+      <Zoom in={pop} timeout={500} sx={{ display: pop ? "block" : "none" }}>
         <Button variant="contained" color="success">
           <MarkEmailReadIcon sx={{ fontSize: "200px" }} />
         </Button>

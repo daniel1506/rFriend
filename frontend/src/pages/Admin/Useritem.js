@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState } from "react";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import ShortText from "../../components/ShortText";
@@ -10,7 +10,17 @@ import BlockIcon from "@mui/icons-material/Block";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Card from "@mui/material/Card";
+import SubmitButton from "../../components/SubmitButton";
+import { TextField, Box } from "@mui/material";
+import put from "../../lib/put";
 function Useritem(props) {
+  const [newPassword, setNewPassword] = useState("");
+  const reset = (user_id, password) => {
+    const data = { user_id, password };
+    put("https://rfriend.herokuapp.com/api/admin", data).then((result) => {
+      console.log(result);
+    });
+  };
   return (
     <Card>
       <ListItem disablePadding>
@@ -33,21 +43,30 @@ function Useritem(props) {
                     gap={{ sm: 2, xs: 0 }}
                   >
                     <AccountCircleIcon />
-                    <ShortText>user</ShortText>
+                    <ShortText>{props.name}</ShortText>
                   </Grid>
                 </Grid>
                 <Grid item>
                   <Grid
                     container
                     direction={{ xs: "column", sm: "row" }}
-                    alignItems={{ xs: "end" }}
+                    alignItems={{ xs: "end", md: "center" }}
                     justifyContent={{ xs: "end" }}
                     gap={{ sm: 2, xs: 1 }}
                   >
+                    <TextField
+                      label="new password"
+                      onChange={(e) => {
+                        setNewPassword(e.target.value);
+                      }}
+                    />
                     <Button
                       variant="contained"
                       endIcon={<LockResetIcon />}
                       color="warning"
+                      onClick={(e) => {
+                        reset(props.userid, newPassword);
+                      }}
                     >
                       Reset password
                     </Button>
@@ -55,6 +74,9 @@ function Useritem(props) {
                       variant="contained"
                       endIcon={<BlockIcon />}
                       color="error"
+                      onClick={() => {
+                        props.ban(props.userid);
+                      }}
                     >
                       Ban
                     </Button>

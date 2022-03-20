@@ -19,16 +19,16 @@ function ConfirmReset() {
     >
       <Zoom
         in={!clicked}
-        timeout={1000}
+        timeout={500}
         sx={{ display: pop ? "none" : "block" }}
       >
         <Button>
           <LockResetIcon sx={{ fontSize: "200px" }} />
         </Button>
       </Zoom>
-      <Zoom in={pop} timeout={1000} sx={{ display: pop ? "block" : "none" }}>
+      <Zoom in={pop} timeout={500} sx={{ display: pop ? "block" : "none" }}>
         <Button>
-          <DoneIcon sx={{ fontSize: "200px" }} />
+          <DoneIcon sx={{ fontSize: "200px" }} color="success" />
         </Button>
       </Zoom>
       <Typography variant="h3">Enter your new password</Typography>
@@ -40,7 +40,7 @@ function ConfirmReset() {
           setClicked(true);
           setTimeout(() => {
             setPop(true);
-          }, 1000);
+          }, 500);
         }}
       >
         Submit

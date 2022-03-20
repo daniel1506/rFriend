@@ -1,9 +1,9 @@
 //This function accepts api and data to post, and return the response object from server. Moreover, the status code is added to the response object for further use.
-function post(url, data) {
+function put(url, data) {
   let status;
   const token = localStorage.getItem("token") || "";
   return fetch(url, {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "x-auth-token": token,
@@ -19,4 +19,4 @@ function post(url, data) {
       return data;
     });
 }
-export default post;
+export default put;
