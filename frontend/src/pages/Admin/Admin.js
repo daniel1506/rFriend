@@ -28,7 +28,6 @@ function Admin() {
         userid={userdata.id}
         password={userdata.password}
         key={userdata.id}
-        reset={reset}
       />
     );
   });
