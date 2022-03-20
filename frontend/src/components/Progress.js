@@ -10,9 +10,11 @@ function Progress(props) {
   return (
     <>
       {props.loading == true && props.error == null && (
-        <LoadingButton loading variant="outlined" color={props.color}>
-          owo
-        </LoadingButton>
+        <LoadingButton
+          loading
+          variant="text"
+          color={props.color}
+        ></LoadingButton>
       )}
       {props.error == false && (
         <Zoom

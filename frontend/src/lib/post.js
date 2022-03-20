@@ -1,4 +1,4 @@
-//This function accepts api and data to post, and return the response object from server. Moreover, the status code is added to the response object for further use.
+//This function accepts api and data to send post request, and return the response object from server. Moreover, the status code is added to the response object for further use.
 function post(url, data) {
   let status;
   const token = localStorage.getItem("token") || "";
