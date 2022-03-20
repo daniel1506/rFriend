@@ -11,6 +11,12 @@ import { useEffect } from "react";
 function Admin() {
   const [usersdata, setUsersData] = useState([]);
   const authCtx = useContext(AuthContext);
+  const [banned, setBanned] = useState(0);
+  const handleSetBanned = () => {
+    setBanned((prev) => {
+      return prev + 1;
+    });
+  };
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/admin")
       .then((data) => {
@@ -20,7 +26,7 @@ function Admin() {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [banned]);
   const useritems = usersdata.map((userdata) => {
     return (
       <Useritem
@@ -28,6 +34,7 @@ function Admin() {
         userid={userdata.id}
         password={userdata.password}
         key={userdata.id}
+        setBanned={handleSetBanned}
       />
     );
   });

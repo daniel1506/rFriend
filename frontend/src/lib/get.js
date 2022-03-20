@@ -1,4 +1,4 @@
-//This function accepts api and token to get, and return the response object from server. Moreover, the status code is added to data.status for further use.
+//This function accepts api and token to send get request, and return the response object from server. Moreover, the status code is added to data.status for further use.
 //The token is an optional parameter.
 function get(url) {
   const token = localStorage.getItem("token") || "";
