@@ -7,6 +7,8 @@ import Navbar from "./components/Navbar";
 import Homepage from "./pages/Homepage/Homepage";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ConfirmEmail from "./pages/ConfirmEmail/ConfirmEmail";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import ConfirmReset from "./pages/ConfirmReset/ConfirmReset";
 import {
   BrowserRouter as Router,
   Routes,
@@ -19,6 +21,8 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ConfirmReset />} />
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} />
         {!authCtx.isLoggedIn && <Route exact path="/" element={<Auth />} />}
