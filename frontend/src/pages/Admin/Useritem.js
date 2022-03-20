@@ -13,13 +13,28 @@ import Card from "@mui/material/Card";
 import SubmitButton from "../../components/SubmitButton";
 import { TextField, Box } from "@mui/material";
 import put from "../../lib/put";
+import Progress from "../../components/Progress";
+import { set } from "date-fns";
 function Useritem(props) {
   const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(null);
+  const [error, setError] = useState(null);
+  const clearProgress = () => {
+    setLoading(null);
+    setError(null);
+  };
   const reset = (user_id, password) => {
     const data = { user_id, password };
-    put("https://rfriend.herokuapp.com/api/admin", data).then((result) => {
-      console.log(result);
-    });
+    setLoading(true);
+    put("https://rfriend.herokuapp.com/api/admin", data)
+      .then((result) => {
+        console.log(result);
+        if (result.status != 200) setError(true);
+        else setError(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <Card>
@@ -54,6 +69,7 @@ function Useritem(props) {
                     justifyContent={{ xs: "end" }}
                     gap={{ sm: 2, xs: 1 }}
                   >
+                    {loading && <Progress loading={loading} error={error} />}
                     <TextField
                       label="new password"
                       onChange={(e) => {
@@ -65,6 +81,7 @@ function Useritem(props) {
                       endIcon={<LockResetIcon />}
                       color="warning"
                       onClick={(e) => {
+                        clearProgress();
                         reset(props.userid, newPassword);
                       }}
                     >
