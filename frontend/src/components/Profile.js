@@ -22,6 +22,7 @@ import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import { IconButton } from "@mui/material";
 import Input from "@mui/material/Input";
 import AuthContext from "../store/auth-context";
+import put from "../lib/put";
 const style = {
   position: "absolute",
   left: "0",
@@ -55,6 +56,34 @@ export default function Profile(props) {
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
   const [password, setPassword] = React.useState(null);
+  const [Image, setImage] = React.useState(null);
+  const uploadImage = async (e) => {
+    const file = e.target.files[0];
+    const base64 = await convertBase64(file);
+    const data = { base64 };
+    put("https://github.com/chonhao/rFriend/api/user/profile", data)
+      .then((result) => {
+        console.log(result.profile_url);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
   return (
     <div>
       <Button onClick={handleOpen}>Open modal</Button>
@@ -88,6 +117,9 @@ export default function Profile(props) {
                           id="icon-button-file"
                           type="file"
                           sx={{ display: "none" }}
+                          onChange={(e) => {
+                            uploadImage(e);
+                          }}
                         />
                         <IconButton
                           aria-label="delete"
