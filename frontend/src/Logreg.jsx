@@ -73,7 +73,7 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          authCtx.login(data.token, data.id, data.email);
+          authCtx.login(data.token, data.id, data.email, data.name);
         }
       })
       .then(() => {
@@ -95,7 +95,7 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          authCtx.login(data.token, data.id, data.email);
+          authCtx.login(data.token, data.id, data.email, data.name);
         }
       })
       .then(() => {

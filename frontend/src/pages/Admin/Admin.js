@@ -40,7 +40,12 @@ function Admin() {
   });
   return (
     <>
-      <Navbar Admin />
+      <Navbar
+        Admin
+        onLogout={() => {
+          authCtx.logout();
+        }}
+      />
       <Container>
         <List>{useritems.length == 0 ? "Loading" : useritems}</List>
       </Container>

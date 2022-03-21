@@ -38,6 +38,7 @@ function Useritem(props) {
         console.log(result);
         if (result.status != 200) setError(true);
         else setError(false);
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
@@ -58,6 +59,7 @@ function Useritem(props) {
             return prev + 1;
           });
         }
+        setBanning(false);
       })
       .catch((err) => {
         console.log(err);
@@ -103,31 +105,47 @@ function Useritem(props) {
                         label="new password"
                         setPassword={setNewPassword}
                       />
-                      <ResultDisplay error={error} color="warning" />
-                      <SubmitButton
-                        variant="contained"
-                        endIcon={<LockResetIcon />}
-                        color="warning"
-                        onClick={(e) => {
-                          clearProgress();
-                          reset(props.userid, newPassword);
-                        }}
-                        loading={loading}
-                      >
-                        Reset password
-                      </SubmitButton>
-                      <ResultDisplay error={banError} color="error" />
-                      <SubmitButton
-                        variant="contained"
-                        endIcon={<BlockIcon />}
-                        loading={banning}
-                        color="error"
-                        onClick={() => {
-                          ban(props.userid);
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: { xs: "row" },
+                          alignItems: "center",
                         }}
                       >
-                        Ban
-                      </SubmitButton>
+                        <ResultDisplay error={error} color="warning" />
+                        <SubmitButton
+                          variant="contained"
+                          endIcon={<LockResetIcon />}
+                          color="warning"
+                          onClick={(e) => {
+                            clearProgress();
+                            reset(props.userid, newPassword);
+                          }}
+                          loading={loading}
+                        >
+                          Reset password
+                        </SubmitButton>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: { xs: "row" },
+                          alignItems: "center",
+                        }}
+                      >
+                        <ResultDisplay error={banError} color="error" />
+                        <SubmitButton
+                          variant="contained"
+                          endIcon={<BlockIcon />}
+                          loading={banning}
+                          color="error"
+                          onClick={() => {
+                            ban(props.userid);
+                          }}
+                        >
+                          Ban
+                        </SubmitButton>
+                      </Box>
                     </Grid>
                   </Grid>
                 </Grid>
