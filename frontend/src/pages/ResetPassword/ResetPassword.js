@@ -1,5 +1,6 @@
 //@ts-check
-import { React, useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import { Box, Typography, Fade } from "@mui/material";
 function ResetPassword() {

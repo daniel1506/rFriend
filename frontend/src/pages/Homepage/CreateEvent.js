@@ -1,4 +1,5 @@
-import { React, useState } from "react";
+import React from "react";
+import { useState } from "react";
 import VerticalFlex from "../../layout/VerticalFlex";
 import {
   TextField,
@@ -14,6 +15,8 @@ import {
   FormControl,
   TextareaAutosize,
   ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
 } from "@mui/material";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -23,6 +26,9 @@ import HorizontalFlex from "../../layout/HorizontalFlex";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SubmitButton from "../../components/SubmitButton";
 import CloseButton from "../../components/CloseButton";
+import SquareToggleButton from "../../components/SquareToggleButton";
+import PersonIcon from "@mui/icons-material/Person";
+import PrivacyButtonGroup from "../../components/PrivacyButtonGroup";
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -57,13 +63,16 @@ const style = {
   p: 4,
 };
 function CreateEvent(props) {
+  const [privacy, setPrivacy] = React.useState("friend");
   const handleClose = () => props.setShowCreateEvent(false);
   const [title, setTitle] = useState(null);
   const [titleError, setTitleError] = useState(false);
   const [category, setCategory] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
   const [notification, setNotification] = useState(false);
   const validateTitle = (title) => {};
+  const handleChangePrivacy = (event, newPrivacy) => {
+    setPrivacy(newPrivacy);
+  };
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -157,13 +166,13 @@ function CreateEvent(props) {
                 </Select>
               </FormControl>
 
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+              {/* <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="Privacy">Privacy*</InputLabel>
                 <Select
                   labelId="Privacy"
                   value={privacy}
                   onChange={(e) => {
-                    setCategory(e.target.value);
+                    setPrivacy(e.target.value);
                   }}
                   label="Privacy"
                 >
@@ -171,7 +180,11 @@ function CreateEvent(props) {
                   <MenuItem value={20}>Twenty</MenuItem>
                   <MenuItem value={30}>Thirty</MenuItem>
                 </Select>
-              </FormControl>
+              </FormControl> */}
+              <PrivacyButtonGroup
+                value={privacy}
+                onChange={handleChangePrivacy}
+              />
             </Box>
 
             <Box
@@ -184,8 +197,7 @@ function CreateEvent(props) {
               }}
             >
               <TimePicker />
-              <ToggleButton
-                value="check"
+              <SquareToggleButton
                 selected={notification}
                 onChange={() => {
                   setNotification((prev) => !prev);
@@ -193,18 +205,20 @@ function CreateEvent(props) {
                 color="primary"
               >
                 <NotificationsIcon />
-              </ToggleButton>
+              </SquareToggleButton>
             </Box>
             <Box
               sx={{
                 display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
+                flexDirection: { xs: "column-reverse", sm: "row" },
                 justifyContent: "space-around",
-                aligenItems: "center",
+                alignItems: "center",
                 gap: 1,
               }}
             >
-              <CloseButton onClick={handleClose}>Cancel</CloseButton>
+              <CloseButton onClick={handleClose} sx={{ flexGrow: 0 }}>
+                Cancel
+              </CloseButton>
               <SubmitButton>Submit</SubmitButton>
             </Box>
           </Box>
