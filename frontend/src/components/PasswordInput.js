@@ -15,11 +15,16 @@ function PasswordInput(props) {
       label={props.label ? props.label : "password"} //if props.label is given, then dispaly props.label, else display defaut i.e. "password"
       className="info-input"
       error={passwordError}
-      helperText={passwordError ? "Length must be larger than 8" : ""}
+      helperText={
+        passwordError && !props.noHelperText
+          ? "Length must be larger than 8"
+          : ""
+      }
       onChange={(e) => {
         props.setPassword(e.target.value);
         validatePassword(e);
       }}
+      {...props}
     />
   );
 }

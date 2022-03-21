@@ -73,7 +73,7 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          authCtx.login(data.token, data.id, data.email);
+          authCtx.login(data.token, data.id, data.email, data.name);
         }
       })
       .then(() => {
@@ -95,7 +95,7 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          authCtx.login(data.token, data.id, data.email);
+          authCtx.login(data.token, data.id, data.email, data.name);
         }
       })
       .then(() => {
@@ -138,8 +138,9 @@ function Logreg() {
           <VerticalFlex>
             <EmailInput setEmail={setEmail} />
             <PasswordInput setPassword={setPassword} />
-            {!submitting && <SubmitButton type="submit">Submit</SubmitButton>}
-            {submitting && <LoadingButton loading />}
+            <SubmitButton loading={submitting} type="submit">
+              Submit
+            </SubmitButton>
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}
           </VerticalFlex>
@@ -159,8 +160,9 @@ function Logreg() {
             <NameInput setUsername={setUsername} />
             <PasswordInput setPassword={setPassword} />
             <CfPasswordInput password={password} />
-            {!submitting && <SubmitButton type="submit">Submit</SubmitButton>}
-            {submitting && <LoadingButton loading />}
+            <SubmitButton type="submit" loading={submitting}>
+              Submit
+            </SubmitButton>
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}
           </VerticalFlex>
