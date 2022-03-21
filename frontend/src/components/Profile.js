@@ -31,7 +31,9 @@ const style = {
   top: "50%",
   bottom: "50%",
   marginBottom: "auto",
-  width: "40%",
+  "@media (min-width: 700px)": {
+    width: "40%",
+  }, //width will be 100% when on narrow screen(mobile)
   height: "600px",
   marginTop: "-300px",
   // "@media (max-width: 1025px)": {
