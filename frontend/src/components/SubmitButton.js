@@ -4,7 +4,11 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 function SubmitButton(props) {
   return (
-    <LoadingButton variant="contained" endIcon={<SendIcon />} {...props}>
+    <LoadingButton
+      variant="contained"
+      endIcon={props.icon == null ? <SendIcon /> : props.icon}
+      {...props}
+    >
       {props.children}
     </LoadingButton>
   );

@@ -14,7 +14,7 @@ import SubmitButton from "../../components/SubmitButton";
 import { TextField, Box } from "@mui/material";
 import put from "../../lib/put";
 import deleteReq from "../../lib/delete";
-import Progress from "../../components/Progress";
+import ResultDisplay from "../../components/ResultDisplay";
 import { set } from "date-fns";
 import PasswordInput from "../../components/PasswordInput";
 import Grow from "@mui/material/Grow";
@@ -98,19 +98,13 @@ function Useritem(props) {
                       justifyContent={{ xs: "end" }}
                       gap={{ sm: 2, xs: 1 }}
                     >
-                      {loading && (
-                        <Progress
-                          loading={loading}
-                          error={error}
-                          color="warning"
-                        />
-                      )}
                       <PasswordInput
                         noHelperText
                         label="new password"
                         setPassword={setNewPassword}
                       />
-                      <Button
+                      <ResultDisplay error={error} color="warning" />
+                      <SubmitButton
                         variant="contained"
                         endIcon={<LockResetIcon />}
                         color="warning"
@@ -118,26 +112,22 @@ function Useritem(props) {
                           clearProgress();
                           reset(props.userid, newPassword);
                         }}
+                        loading={loading}
                       >
                         Reset password
-                      </Button>
-                      {banning && (
-                        <Progress
-                          loading={banning}
-                          error={banError}
-                          color="error"
-                        />
-                      )}
-                      <Button
+                      </SubmitButton>
+                      <ResultDisplay error={banError} color="error" />
+                      <SubmitButton
                         variant="contained"
                         endIcon={<BlockIcon />}
+                        loading={banning}
                         color="error"
                         onClick={() => {
                           ban(props.userid);
                         }}
                       >
                         Ban
-                      </Button>
+                      </SubmitButton>
                     </Grid>
                   </Grid>
                 </Grid>

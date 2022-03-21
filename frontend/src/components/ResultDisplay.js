@@ -6,16 +6,9 @@ import { Zoom } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import ErrorIcon from "@mui/icons-material/Error";
 import DoneIcon from "@mui/icons-material/Done";
-function Progress(props) {
+function ResultDisplay(props) {
   return (
     <>
-      {props.loading == true && props.error == null && (
-        <LoadingButton
-          loading
-          variant="text"
-          color={props.color}
-        ></LoadingButton>
-      )}
       {props.error == false && (
         <Zoom
           in={!props.error}
@@ -38,4 +31,4 @@ function Progress(props) {
   );
 }
 
-export default Progress;
+export default ResultDisplay;
