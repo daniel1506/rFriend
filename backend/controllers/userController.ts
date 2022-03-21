@@ -98,6 +98,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     email: user.email,
     name: user.name,
     token: token,
+    role: user.role,
   });
 };
 
