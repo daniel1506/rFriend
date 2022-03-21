@@ -33,9 +33,16 @@ const style = {
   top: "50%",
   bottom: "50%",
   marginBottom: "auto",
-  width: "400px",
-  height: "320px",
   marginTop: "-160px",
+  "@media (min-width: 0px)": {
+    marginTop: "-240px",
+    height: "480px",
+  },
+  "@media (min-width: 600px)": {
+    width: "400px",
+    height: "290px",
+  },
+
   // "@media (max-width: 1025px)": {
   //   height: "700px",
   //   marginTop: "-350px",
@@ -71,107 +78,136 @@ function CreateEvent(props) {
     >
       <Slide in={props.showCreateEvent}>
         <Box sx={style}>
-          <Grid
-            container
-            direction={{ xs: "column" }}
-            justifyContent="center"
-            alignItems="center"
-            gap="10px"
+          <Box
+            sx={{
+              display: { xs: "flex" },
+              flexDirection: { xs: "column" },
+              aligenItems: "center",
+              justifyContent: "space-around",
+              gap: 1,
+            }}
           >
-            <Grid container spacing={2}>
-              <Grid container item xs={6} md={6} justifyContent="center">
-                <TextField
-                  error={titleError}
-                  helperText={titleError ? "Must fill in" : ""}
-                  type="text"
-                  label="title*"
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                aligenItems: "center",
+                justifyContent: "space-around",
+                gap: 1,
+              }}
+            >
+              <TextField
+                error={titleError}
+                helperText={titleError ? "Must fill in" : ""}
+                type="text"
+                label="title*"
+                onChange={(e) => {
+                  props.setTitle(e.target.value);
+                  validateTitle(e.target.value);
+                }}
+              />
+              <TextField
+                type="text"
+                label="location"
+                onChange={(e) => {
+                  props.setLocation(e.target.value);
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                aligenItems: "center",
+                justifyContent: "space-around",
+                gap: 1,
+              }}
+            >
+              <TextField label="quota" type="number" />
+              <TextField
+                label="remark"
+                type="text"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "row" },
+                aligenItems: "center",
+                justifyContent: "space-around",
+                gap: 1,
+              }}
+            >
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="Category">Category</InputLabel>
+                <Select
+                  labelId="Category"
+                  value={category}
                   onChange={(e) => {
-                    props.setTitle(e.target.value);
-                    validateTitle(e.target.value);
+                    setCategory(e.target.value);
                   }}
-                />
-              </Grid>
-              <Grid container item xs={6} md={6} justifyContent="center">
-                <TextField
-                  type="text"
-                  label="location"
-                  onChange={(e) => {
-                    props.setLocation(e.target.value);
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid container item xs={6} justifyContent="center">
-                <TextField label="quota" type="number" />
-              </Grid>
-              <Grid container item xs={6} justifyContent="center">
-                <TextField
-                  label="remark"
-                  type="text"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Grid container justifyContent="space-between">
-              <Grid item container xs={4} justifyContent="center">
-                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                  <InputLabel id="Category">Category</InputLabel>
-                  <Select
-                    labelId="Category"
-                    value={category}
-                    onChange={(e) => {
-                      setCategory(e.target.value);
-                    }}
-                    label="Category"
-                  >
-                    <MenuItem value={10}>Ten</MenuItem>
-                    <MenuItem value={20}>Twenty</MenuItem>
-                    <MenuItem value={30}>Thirty</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item container xs={4} justifyContent="center">
-                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                  <InputLabel id="Privacy">Privacy*</InputLabel>
-                  <Select
-                    labelId="Privacy"
-                    value={privacy}
-                    onChange={(e) => {
-                      setCategory(e.target.value);
-                    }}
-                    label="Privacy"
-                  >
-                    <MenuItem value={10}>Ten</MenuItem>
-                    <MenuItem value={20}>Twenty</MenuItem>
-                    <MenuItem value={30}>Thirty</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item container xs={4} justifyContent="center">
-                <ToggleButton
-                  value="check"
-                  selected={notification}
-                  onChange={() => {
-                    setNotification((prev) => !prev);
-                  }}
-                  color="primary"
+                  label="Category"
                 >
-                  <NotificationsIcon />
-                </ToggleButton>
-              </Grid>
-            </Grid>
+                  <MenuItem value={10}>Ten</MenuItem>
+                  <MenuItem value={20}>Twenty</MenuItem>
+                  <MenuItem value={30}>Thirty</MenuItem>
+                </Select>
+              </FormControl>
 
-            <Grid container diraction="row" justifyContent={"center"}>
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="Privacy">Privacy*</InputLabel>
+                <Select
+                  labelId="Privacy"
+                  value={privacy}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                  }}
+                  label="Privacy"
+                >
+                  <MenuItem value={10}>Ten</MenuItem>
+                  <MenuItem value={20}>Twenty</MenuItem>
+                  <MenuItem value={30}>Thirty</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "row" },
+                justifyContent: "space-around",
+                aligenItems: "center",
+                gap: 1,
+              }}
+            >
               <TimePicker />
-            </Grid>
-            <Grid container direction="row" justifyContent={"space-around"}>
+              <ToggleButton
+                value="check"
+                selected={notification}
+                onChange={() => {
+                  setNotification((prev) => !prev);
+                }}
+                color="primary"
+              >
+                <NotificationsIcon />
+              </ToggleButton>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                justifyContent: "space-around",
+                aligenItems: "center",
+                gap: 1,
+              }}
+            >
               <CloseButton onClick={handleClose}>Cancel</CloseButton>
               <SubmitButton>Submit</SubmitButton>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Box>
       </Slide>
     </Modal>
