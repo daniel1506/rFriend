@@ -14,12 +14,12 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     return next(prismaErrorHandler(e));
   }
 
-  res.status(200).json(user);
+  res.status(201).send(user);
 };
 
 // -----------------------------------------------------------------------------
 
-export const validateUpdate = [body("user_id").isInt(), body("password").isLength({ min: 8 })];
+export const validateUpdate = [body("userId").isInt(), body("password").isLength({ min: 8 })];
 
 export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -27,13 +27,13 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const { user_id, password } = req.body;
+  const { userId, password } = req.body;
 
   let user;
   try {
     user = await prisma.user.findUnique({
       where: {
-        id: user_id,
+        id: userId,
       },
     });
   } catch (e) {
@@ -51,7 +51,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
   try {
     result = await prisma.user.update({
       where: {
-        id: user_id,
+        id: userId,
       },
       data: {
         password: hash,
@@ -61,12 +61,12 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     return next(prismaErrorHandler(e));
   }
 
-  res.status(200).json({ message: "password updated" });
+  res.status(201).send({ message: "Password updated" });
 };
 
 // -----------------------------------------------------------------------------
 
-export const validateDelete = [body("user_id").isInt()];
+export const validateDelete = [body("userId").isInt()];
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -74,13 +74,13 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const user_id = req.body.user_id;
+  const userId = req.body.userId;
 
   let user;
   try {
     user = await prisma.user.findUnique({
       where: {
-        id: user_id,
+        id: userId,
       },
     });
   } catch (e) {
@@ -95,12 +95,12 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
   try {
     result = await prisma.user.delete({
       where: {
-        id: user_id,
+        id: userId,
       },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(200).json({ message: "user deleted" });
+  res.status(201).send({ message: "User deleted" });
 };
