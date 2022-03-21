@@ -15,11 +15,13 @@ import CfPasswordInput from "./CfPasswordInput";
 import EmailShowCase from "./EmailShowCase.js";
 import NameShowCase from "./NameShowCase";
 import SubmitButton from "./SubmitButton";
+import CloseButton from "./CloseButton";
 import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import { IconButton } from "@mui/material";
 import Input from "@mui/material/Input";
+import AuthContext from "../store/auth-context";
 const style = {
   position: "absolute",
   left: "0",
@@ -29,7 +31,9 @@ const style = {
   top: "50%",
   bottom: "50%",
   marginBottom: "auto",
-  width: "40%",
+  "@media (min-width: 700px)": {
+    width: "40%",
+  }, //width will be 100% when on narrow screen(mobile)
   height: "600px",
   marginTop: "-300px",
   // "@media (max-width: 1025px)": {
@@ -47,6 +51,7 @@ const style = {
 };
 
 export default function Profile(props) {
+  const authCtx = React.useContext(AuthContext);
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
   const [password, setPassword] = React.useState(null);
@@ -105,8 +110,8 @@ export default function Profile(props) {
                       sx={{ width: 200, height: 200 }}
                     />
                   </Badge>
-                  <NameShowCase>owo</NameShowCase>
-                  <EmailShowCase>owo@example.com</EmailShowCase>
+                  <NameShowCase>{authCtx.name}</NameShowCase>
+                  <EmailShowCase>{authCtx.email}</EmailShowCase>
                 </VerticalFlex>
               </Grid>
 
@@ -119,6 +124,7 @@ export default function Profile(props) {
                   />
                   <CfPasswordInput password={password} />
                   <SubmitButton>Submit</SubmitButton>
+                  <CloseButton onClick={handleClose}>Close</CloseButton>
                 </VerticalFlex>
               </form>
             </Grid>

@@ -16,6 +16,10 @@ import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import LogoutButton from "./LogoutButton";
+import Button from "@mui/material/Button";
+import NameShowCase from "./NameShowCase";
+import AuthContext from "../store/auth-context";
+import { useContext } from "react";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -57,10 +61,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Navbar(props) {
+  //get context by itself here, make the module more self-contained, reduce coupling
+  const authCtx = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorEl2, setAnchorEl2] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-
   const isMenuOpen = Boolean(anchorEl);
   const isPageMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -238,32 +243,41 @@ export default function Navbar(props) {
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            {/* display Admin name if the props.Admin exists */}
-            {props.Admin ? (
-              <span>
-                <Typography
-                  variant="subtitle2"
-                  component="div"
-                  sx={{ display: { xs: "none", sm: "inline" }, marginRight: 2 }}
-                >
-                  Admin name
-                </Typography>
-                <LogoutButton color="inherit" />
-              </span>
-            ) : (
-              <IconButton
-                size="large"
-                edge="end"
-                aria-label="account of current user"
-                aria-controls={menuId}
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-            )}
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              flexDirection: { md: "row" },
+              alignItems: { md: "center" },
+              gap: 2,
+            }}
+          >
+            <NameShowCase
+              color="inherit"
+              variant="text"
+              onClick={() => {
+                handleMenuClose();
+                props.setShowProfile(true);
+              }}
+            >
+              {authCtx.name}
+            </NameShowCase>
+            <LogoutButton
+              color="inherit"
+              onClick={() => {
+                handleMenuClose();
+                props.onLogout();
+              }}
+            />
+
+            {/* <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            ></IconButton> */}
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton

@@ -56,8 +56,9 @@ function ForgetPassword(props) {
             marginTop="10px"
           >
             <EmailInput setEmail={setEmail} />
-            {!loading && <SubmitButton type="submit">Submit</SubmitButton>}
-            {loading && <LoadingButton loading />}
+            <SubmitButton type="submit" loading={loading}>
+              Submit
+            </SubmitButton>
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}
           </VerticalFlex>

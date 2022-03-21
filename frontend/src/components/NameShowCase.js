@@ -7,6 +7,7 @@ function NameShowCase(props) {
       variant="outlined"
       startIcon={<PersonOutlineIcon />}
       sx={{ textTransform: "none" }}
+      {...props}
     >
       {props.children}
     </Button>
