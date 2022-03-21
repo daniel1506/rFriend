@@ -266,7 +266,7 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ followers: [...newSave.followers] });
+  res.status(201).send({ followers: [...newSave.followers] });
 };
 
 // -----------------------------------------------------------------------------
