@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { generateFriendsList, generateFOFList } from "../services/friendService";
 
 import bcrypt from "bcrypt";
 import { generateJWT } from "../services/authService";
@@ -112,7 +113,60 @@ export function getProfile(req: Request, res: Response) {
 
 // -----------------------------------------------------------------------------
 
-export const validateEvent = [body("event_id").isInt()];
+export const browseEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.id;
+
+  let user;
+  try {
+    user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!user) {
+    return next(new HttpException(404, "User not found"));
+  }
+
+  const friendsList = (await generateFriendsList(userId)) as number[];
+  const fofList = (await generateFOFList(userId)) as number[];
+
+  let result;
+  try {
+    result = await prisma.event.findMany({
+      where: {
+        OR: [
+          {
+            ownerId: userId,
+            privacy: "only-me",
+          },
+          {
+            ownerId: { in: friendsList },
+            privacy: "friends",
+          },
+          {
+            ownerId: { in: fofList },
+            privacy: "friends-of-friends",
+          },
+          {
+            privacy: "public",
+          },
+        ],
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ event: result });
+};
+
+// -----------------------------------------------------------------------------
+
+export const validateEvent = [body("eventId").isInt()];
 
 export const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -120,14 +174,14 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const user_id = req.id;
-  const event_id = req.body.event_id;
+  const userId = req.id;
+  const eventId = req.body.eventId;
 
   let event;
   try {
     event = await prisma.event.findUnique({
       where: {
-        id: event_id,
+        id: eventId,
       },
       include: {
         _count: { select: { participants: true } },
@@ -149,10 +203,10 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
   try {
     newJoin = await prisma.event.update({
       where: {
-        id: event_id,
+        id: eventId,
       },
       data: {
-        participants: { connect: { id: user_id } },
+        participants: { connect: { id: userId } },
       },
       include: {
         participants: {
@@ -164,12 +218,12 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ participants: [...newJoin.participants] });
+  res.status(201).send({ participants: [...newJoin.participants] });
 };
 
 // -----------------------------------------------------------------------------
 
-export const validateComment = [body("event_id").isInt(), body("comment").exists()];
+export const validateComment = [body("eventId").isInt(), body("comment").exists()];
 
 export const postComment = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -177,14 +231,14 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const user_id = req.id;
-  const { event_id, comment } = req.body;
+  const userId = req.id;
+  const { eventId, comment } = req.body;
 
   let newComment;
   try {
     newComment = await prisma.eventComment.create({
       data: {
-        eventId: event_id,
+        eventId: eventId,
         text: comment,
       },
     });
@@ -196,7 +250,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     event = await prisma.event.update({
       where: {
-        id: event_id,
+        id: eventId,
       },
       data: {
         comments: {
@@ -211,7 +265,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ comments: event.comments });
+  res.status(201).send({ comments: event.comments });
 };
 
 // -----------------------------------------------------------------------------
