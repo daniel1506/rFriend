@@ -123,9 +123,6 @@ export default function Profile(props) {
                         />
                         <IconButton
                           aria-label="delete"
-                          onClick={() => {
-                            alert("hello");
-                          }}
                           color="primary"
                           component="span"
                         >

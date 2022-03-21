@@ -240,6 +240,9 @@ export default function Navbar(props) {
             <StyledInputBase
               placeholder={props.Admin ? "Search username" : "Search event"}
               inputProps={{ "aria-label": "search" }}
+              onChange={(e) => {
+                props.handleSearch(e.target.value);
+              }}
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
