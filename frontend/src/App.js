@@ -26,16 +26,21 @@ function App() {
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} />
         {!authCtx.isLoggedIn && <Route exact path="/" element={<Auth />} />}
-        {authCtx.isLoggedIn && (
+        {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="/homepage" element={<Homepage />} />
         )}
-        {authCtx.isLoggedIn && (
+        {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
+          <Route path="/admin" element={<Admin />} />
+        )}
+        {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="*" element={<Navigate to="/homepage" />} />
+        )}
+        {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
+          <Route path="*" element={<Navigate to="/admin" />} />
         )}
         {!authCtx.isLoggedIn && (
           <Route path="*" element={<Navigate to="/" />} />
         )}
-        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
   );
