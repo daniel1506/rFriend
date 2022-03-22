@@ -21,10 +21,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/reset" element={<ResetPassword />} />
+        {/* <Route path="/reset" element={<ResetPassword />} />
         <Route path="/reset-password" element={<ConfirmReset />} />
         <Route path="api/user/verify" element={<ConfirmEmail />} />
-        <Route path="/verify" element={<VerifyEmail />} />
+        <Route path="/verify" element={<VerifyEmail />} /> */}
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
