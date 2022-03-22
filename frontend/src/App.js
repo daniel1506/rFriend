@@ -25,21 +25,20 @@ function App() {
         <Route path="/reset-password" element={<ConfirmReset />} />
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} />
-        {!authCtx.isLoggedIn && <Route exact path="/" element={<Auth />} />}
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
-          <Route path="/homepage" element={<Homepage />} />
+          <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
         {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<Admin />} /> //need to login and have admin role to view admin page
         )}
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
-          <Route path="*" element={<Navigate to="/homepage" />} />
+          <Route path="*" element={<Navigate to="/homepage" />} /> //if an user wants to go to any irrevalent path, redirect it to home page
         )}
         {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
-          <Route path="*" element={<Navigate to="/admin" />} />
+          <Route path="*" element={<Navigate to="/admin" />} /> //if an admin wants to go to any irrevalent path, redirect it to admin page
         )}
         {!authCtx.isLoggedIn && (
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Auth />} /> //if a unlogin user wants to go any irrevalent path, redirent it to login page
         )}
       </Routes>
     </Router>
