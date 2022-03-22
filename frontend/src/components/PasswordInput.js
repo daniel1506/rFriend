@@ -17,7 +17,7 @@ function PasswordInput(props) {
       error={passwordError}
       helperText={
         passwordError && !props.noHelperText
-          ? "Length must be larger than 8"
+          ? "Must be at least 8 characters long"
           : ""
       }
       onChange={(e) => {
