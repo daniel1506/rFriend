@@ -19,7 +19,7 @@ import { useContext } from "react";
 function App() {
   const authCtx = useContext(AuthContext);
   return (
-    <Router basename="/">
+    <Router>
       <Routes>
         {/* <Route path="/reset" element={<ResetPassword />} />
         <Route path="/reset-password" element={<ConfirmReset />} />
