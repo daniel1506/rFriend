@@ -6,6 +6,7 @@ import { generateFriendsList, generateFOFList } from "../services/friendService"
 
 import bcrypt from "bcrypt";
 import { generateJWT } from "../services/authService";
+import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
 // -----------------------------------------------------------------------------
 
@@ -141,18 +142,18 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
         OR: [
           {
             ownerId: userId,
-            privacy: "only-me",
+            privacy: eventPrivacy[0] as EventPrivacyType,
           },
           {
             ownerId: { in: friendsList },
-            privacy: "friends",
+            privacy: eventPrivacy[1] as EventPrivacyType,
           },
           {
             ownerId: { in: fofList },
-            privacy: "friends-of-friends",
+            privacy: eventPrivacy[2] as EventPrivacyType,
           },
           {
-            privacy: "public",
+            privacy: eventPrivacy[3] as EventPrivacyType,
           },
         ],
       },
