@@ -55,7 +55,12 @@ export const upsert = async (req: Request, res: Response, next: NextFunction) =>
   try {
     switch (req.method) {
       case "POST": // create
-        result = await prisma.event.create({ data: event });
+        result = await prisma.event.create({
+          data: {
+            ...event,
+            participants: { connect: { id: userId } },
+          },
+        });
         break;
       case "PUT": // update
         if (id === undefined) {
@@ -91,7 +96,7 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
   try {
     event = await prisma.event.findFirst({
       where: { id },
-      include: { comments: true },
+      include: { comments: true, participants: true, owner: true },
     });
     if (!event) {
       throw "Not found";
