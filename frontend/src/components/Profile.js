@@ -23,6 +23,7 @@ import { IconButton } from "@mui/material";
 import Input from "@mui/material/Input";
 import AuthContext from "../store/auth-context";
 import put from "../lib/put";
+import get from "../lib/get";
 const style = {
   position: "absolute",
   left: "0",
@@ -56,20 +57,24 @@ export default function Profile(props) {
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
   const [password, setPassword] = React.useState(null);
-  const [Image, setImage] = React.useState(null);
+  const [profilePicUrl, setProfilePicUrl] = React.useState(null);
+  const getProfilePic = () => {
+    get("");
+  };
   const uploadImage = async (e) => {
     const file = e.target.files[0];
     const base64 = await convertBase64(file);
+    console.log(base64);
     const data = { base64 };
-    put("https://github.com/chonhao/rFriend/api/user/profile", data)
+    put("https://rfriend.herokuapp.com/api/user/profile", data)
       .then((result) => {
         console.log(result.profile_url);
+        setProfilePicUrl(result.profile_url);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
   const convertBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -135,7 +140,7 @@ export default function Profile(props) {
                   >
                     <Avatar
                       alt="Cindy Baker"
-                      src={testlogo}
+                      src={profilePicUrl}
                       sx={{ width: 200, height: 200 }}
                     />
                   </Badge>

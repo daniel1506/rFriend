@@ -10,7 +10,6 @@ function PasswordInput(props) {
   };
   return (
     <TextField
-      id="passwordReg"
       type="password"
       label={props.label ? props.label : "password"} //if props.label is given, then dispaly props.label, else display defaut i.e. "password"
       className="info-input"
