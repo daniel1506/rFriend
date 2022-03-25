@@ -1,5 +1,7 @@
+// import { NextFunction, query, Request, Response } from "express";
 import { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+// import { body, param, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
 
@@ -8,6 +10,11 @@ import { generateJWT } from "../services/authService";
 
 import {PutObjectCommand, PutObjectCommandInput} from "@aws-sdk/client-s3";
 import { s3Client } from "../AWS/s3Cient";
+
+import jwt from "jsonwebtoken";
+
+import {sendEmail, generateForgetPasswordEmail} from "../services/emailService";
+
 import { stringify } from "querystring";
 import { runMain } from "module";
 
@@ -110,32 +117,206 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 // -----------------------------------------------------------------------------
 
 // middleware: auth
-export function getProfile(req: Request, res: Response) {
-  const { id, email } = req;
+export const validateGetProfile = [query("user_id").exists().isInt()];
 
-  res.send({ id, email });
-}
-
-// -----------------------------------------------------------------------------
-// middleware: auth
-export function forgetPassword(req: Request, res: Response) {
-  const { id, email } = req;
-
-  res.send({ id, email });
-}
-
-// -----------------------------------------------------------------------------
-// middleware: auth
-export const validateProfile = [body("profile").exists(), body("profile").isString()];
-
-export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+export async function getProfile(req: Request, res: Response, next: NextFunction) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "Invalid input"));
   }
 
+
+  const id:number  = Number(req.query.user_id);
+  
+  try{
+    console.log(req.query); //delete this
+    const user = await prisma.user.findUnique(
+      {
+        where: {"id": id}
+      }
+    ); 
+    console.log(user); // delete this
+
+    if(!user){
+      return next(new HttpException(401, "Cannot find user"));
+    }
+
+    let key: String = "img" + String(id);
+    let profile_url: String = "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
+  
+    res.send(
+      {
+        name: user.name,
+        email: user.email,
+        profile_url: profile_url
+      }
+      );
+
+  }
+  catch(e){
+    return next(prismaErrorHandler(e));
+  }
+
+
+}
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+export async function forgetPassword(req: Request, res: Response, next: NextFunction) {
+  // const { id, email } = req;
+  const {email} = req.body;
+  
+  let user;
+  try{
+      user = await prisma.user.findUnique(
+        {
+          where: {email: email}
+        }
+      ); 
+
+      // first check if the email exist
+      if(!user){
+        return next(new HttpException(400, "Email does not exist."));
+      }
+  }
+  catch(e){
+    return next(prismaErrorHandler(e));
+  }
+
+  // If the email exists, generate a token using another jwt_secret, different from authentication
+  const token: string = jwt.sign(
+                                  {
+                                    id: user.id,
+                                    email: user.email,
+                                  },
+                                  process.env.JWT_SECRET_FORGET_PW!,
+                                  { expiresIn: 36000 }
+                                );
+
+  // store/update the token into the DB
+  try{
+    user = await prisma.user.update(
+      {
+        where: {email: email},
+        data: {"profileUrl": token}     // change this to the forget_pw token field after it is added
+      }
+    ); 
+
+    // first check if the email exist
+    if(!user){
+      return next(new HttpException(400, "Cannot update token for forget password."));
+    }
+  }
+  catch(e){
+      return next(prismaErrorHandler(e));
+  }
+
+  try{
+      // send a recovery email with the token
+      let email_content: string = generateForgetPasswordEmail(token);
+      let email_title: string = "Change password for rFriend: " + email;
+      sendEmail(email, email_title, email_content);
+
+
+    
+      
+
+      res.send({ "user_id": user.id,
+                  "email" : user.email,
+                  "token" : token
+                });
+  }
+  catch(e){
+    return next(new HttpException(400, "Cannot send email"));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+export const validateNewPassword = [
+  body("password").isLength({ min: 8 })
+];
+
+export async function resetPassword(req: Request, res: Response, next: NextFunction) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+
+  const { password, token } = req.body;
+  console.log(token); //delete this
+  // check if the forget password token is valid (i.e. not yet expired and exists in the DB)
+  try{
+    jwt.verify(token, process.env.JWT_SECRET_FORGET_PW!);
+  }
+  catch(e){
+    return next(new HttpException(401, "Forget password token expired"));
+  }
+
+
+  let user;
+  try{
+    // use findFirst since profileUrl may be null, and hence not unique. However, it is unique if exists
+    user = await prisma.user.findFirst(
+      {
+        where: {"profileUrl": token}             // change this to the forget_pw token field after it is added 
+      }
+    ); 
+
+    // first check if the email exist
+    if(!user){
+      return next(new HttpException(401, "Invalid forget password token"));
+    }
+  }
+  catch(e){
+      return next(prismaErrorHandler(e));
+  }
+
+  // save the new hashed password into the DB
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+  
+    try{
+      // use updateMany since profileUrl may be null, and hence not unique. However, it is unique if exists
+      user = await prisma.user.updateMany(
+        {
+          where: {"profileUrl": token},               // change this to the forget_pw token field after it is added
+          data: {
+                  "password": hash,
+                  "profileUrl": null                 // change this to the forget_pw token field after it is added  // delete the used forget password token
+                }     
+        }
+      ); 
+
+      console.log(user);  // delete this
+    }
+    catch(e){
+        return next(prismaErrorHandler(e));
+    }
+
+
+  
+  res.send();
+}
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+// the base64 image must start with 
+export const validateProfile = [body("profile").exists().isString().matches("data:image\/.*;base64,.*")];
+
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  console.log("1"); //delete this
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+  console.log("2"); //delete this
   // const {user_id, profile : encoded_image} = req.body;
-  const {user_id, profile} = req.body;
+  const {profile} = req.body;
+  let user_id: number = req.id;
+  console.log(req);
 
   /* 
     find out the type of the image
@@ -176,6 +357,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
    // Store the url into the database
 
   } catch (err) {
+    console.log("error"); //delete this
     return next(new HttpException(500, "Error in AWS."));
   }
 
@@ -184,6 +366,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
 
 // -----------------testing (delete)--------------
 import {ListBucketsCommand} from "@aws-sdk/client-s3";
+import { nextTick } from "process";
 export const testing = async (req: Request, res: Response, next: NextFunction)=>{
   try {
     console.log(process.env.AWS_ACCESS_KEY_ID);
