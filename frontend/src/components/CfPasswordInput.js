@@ -19,6 +19,7 @@ function CfPasswordInput(props) {
       className="info-input"
       onChange={(e) => {
         confirmPassword(e);
+        props.setCfPasswordError(cfPasswordError);
       }}
     />
   );

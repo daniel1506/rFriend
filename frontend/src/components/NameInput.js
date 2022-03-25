@@ -20,6 +20,7 @@ function NameInput(props) {
       onChange={(e) => {
         props.setUsername(e.target.value);
         validateName(e);
+        props.setNameError(nameError);
       }}
     />
   );

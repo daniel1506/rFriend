@@ -22,6 +22,7 @@ function PasswordInput(props) {
       onChange={(e) => {
         props.setPassword(e.target.value);
         validatePassword(e);
+        props.setPasswordError(passwordError);
       }}
       {...props}
     />
