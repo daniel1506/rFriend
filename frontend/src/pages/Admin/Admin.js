@@ -57,7 +57,7 @@ function Admin() {
   return (
     <>
       <Navbar
-        Admin
+        admin
         onLogout={() => {
           authCtx.logout();
         }}

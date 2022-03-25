@@ -1,3 +1,5 @@
+//this navbar component can switch between admin and normal user verion, example below shows how to activate admin mode:
+//<Navbar admin />
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
@@ -242,6 +244,7 @@ export default function Navbar(props) {
         onClick={() => {
           authCtx.logout();
         }}
+        sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
       >
         {/* <IconButton
           size="large"
@@ -261,7 +264,7 @@ export default function Navbar(props) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={props.Admin ? { background: "black" } : {}}>
+      <AppBar position="static" sx={props.admin ? { background: "black" } : {}}>
         <Toolbar>
           <IconButton
             size="large"
@@ -271,7 +274,8 @@ export default function Navbar(props) {
             aria-controls={pageMenuId}
             aria-haspopup="true"
             onClick={() => {
-              setOpenDrawer(true);
+              //the ui in drawer is useless for admin, so we don't allow the drawer to open if it's admin case
+              if (!props.admin) setOpenDrawer(true);
             }}
             sx={{ mr: 2 }}
           >
@@ -290,7 +294,7 @@ export default function Navbar(props) {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder={props.Admin ? "Search username" : "Search event"}
+              placeholder={props.admin ? "Search username" : "Search event"}
               inputProps={{ "aria-label": "search" }}
               onChange={(e) => {
                 props.handleSearch(e.target.value);
