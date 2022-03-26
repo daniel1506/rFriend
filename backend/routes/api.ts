@@ -31,7 +31,7 @@ userRouter.post("/comment", authMiddleware, userController.validateComment, user
 userRouter.post("/forget_pw", userController.forgetPassword);
 userRouter.post("/pw_reset", userController.validateNewPassword, userController.resetPassword);
 userRouter.put("/profile", authMiddleware, userController.validateProfile, userController.updateProfile);
-userRouter.get("/test", userController.testing);  //delete this
+
 
 
 // -----------------------------------------------------------------------------

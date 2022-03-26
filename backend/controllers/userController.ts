@@ -129,13 +129,13 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
   const id:number  = Number(req.query.user_id);
   
   try{
-    console.log(req.query); //delete this
+    
     const user = await prisma.user.findUnique(
       {
         where: {"id": id}
       }
     ); 
-    console.log(user); // delete this
+    
 
     if(!user){
       return next(new HttpException(401, "Cannot find user"));
@@ -190,7 +190,7 @@ export async function forgetPassword(req: Request, res: Response, next: NextFunc
                                     email: user.email,
                                   },
                                   process.env.JWT_SECRET_FORGET_PW!,
-                                  { expiresIn: 36000 }
+                                  { expiresIn: 36000 }   //expire in an hour
                                 );
 
   // store/update the token into the DB
@@ -198,7 +198,7 @@ export async function forgetPassword(req: Request, res: Response, next: NextFunc
     user = await prisma.user.update(
       {
         where: {email: email},
-        data: {"profileUrl": token}     // change this to the forget_pw token field after it is added
+        data: {"resetPasswordToken": token}  
       }
     ); 
 
@@ -245,7 +245,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
 
 
   const { password, token } = req.body;
-  console.log(token); //delete this
+  
   // check if the forget password token is valid (i.e. not yet expired and exists in the DB)
   try{
     jwt.verify(token, process.env.JWT_SECRET_FORGET_PW!);
@@ -260,7 +260,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
     // use findFirst since profileUrl may be null, and hence not unique. However, it is unique if exists
     user = await prisma.user.findFirst(
       {
-        where: {"profileUrl": token}             // change this to the forget_pw token field after it is added 
+        where: {"resetPasswordToken": token}            
       }
     ); 
 
@@ -282,15 +282,15 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
       // use updateMany since profileUrl may be null, and hence not unique. However, it is unique if exists
       user = await prisma.user.updateMany(
         {
-          where: {"profileUrl": token},               // change this to the forget_pw token field after it is added
+          where: {"resetPasswordToken": token},               // change this to the forget_pw token field after it is added
           data: {
                   "password": hash,
-                  "profileUrl": null                 // change this to the forget_pw token field after it is added  // delete the used forget password token
+                  "resetPasswordToken": null                 
                 }     
         }
       ); 
 
-      console.log(user);  // delete this
+      
     }
     catch(e){
         return next(prismaErrorHandler(e));
@@ -298,7 +298,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
 
 
   
-  res.send();
+  res.send(user);
 }
 
 // -----------------------------------------------------------------------------
@@ -308,15 +308,15 @@ export const validateProfile = [body("profile").exists().isString().matches("dat
 
 export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
-  console.log("1"); //delete this
+  
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "Invalid input"));
   }
-  console.log("2"); //delete this
+  
   // const {user_id, profile : encoded_image} = req.body;
   const {profile} = req.body;
   let user_id: number = req.id;
-  console.log(req);
+  
 
   /* 
     find out the type of the image
@@ -357,27 +357,13 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
    // Store the url into the database
 
   } catch (err) {
-    console.log("error"); //delete this
+    
     return next(new HttpException(500, "Error in AWS."));
   }
 
 
 }
 
-// -----------------testing (delete)--------------
-import {ListBucketsCommand} from "@aws-sdk/client-s3";
-import { nextTick } from "process";
-export const testing = async (req: Request, res: Response, next: NextFunction)=>{
-  try {
-    console.log(process.env.AWS_ACCESS_KEY_ID);
-    const data = await s3Client.send(new ListBucketsCommand({}));
-    console.log("Success", data.Buckets);
-    res.send(data);
-  } catch (err) {
-    console.log("Error", err);
-    res.send(err);
-  }
-}
 
 
 // -----------------------------------------------------------------------------
