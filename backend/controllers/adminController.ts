@@ -19,7 +19,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 
 // -----------------------------------------------------------------------------
 
-export const validateUpdate = [body("userId").isInt(), body("password").isLength({ min: 8 })];
+export const validateUpdate = [body("user_id").isInt(), body("password").isLength({ min: 8 })];
 
 export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -27,13 +27,13 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const { userId, password } = req.body;
+  const { user_id, password } = req.body;
 
   let user;
   try {
     user = await prisma.user.findUnique({
       where: {
-        id: userId,
+        id: user_id,
       },
     });
   } catch (e) {
@@ -51,7 +51,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
   try {
     result = await prisma.user.update({
       where: {
-        id: userId,
+        id: user_id,
       },
       data: {
         password: hash,
@@ -66,7 +66,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
 
 // -----------------------------------------------------------------------------
 
-export const validateDelete = [body("userId").isInt()];
+export const validateDelete = [body("user_id").isInt()];
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -74,13 +74,13 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const userId = req.body.userId;
+  const user_id = req.body.user_id;
 
   let user;
   try {
     user = await prisma.user.findUnique({
       where: {
-        id: userId,
+        id: user_id,
       },
     });
   } catch (e) {
@@ -95,7 +95,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
   try {
     result = await prisma.user.delete({
       where: {
-        id: userId,
+        id: user_id,
       },
     });
   } catch (e) {

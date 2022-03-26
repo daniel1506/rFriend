@@ -115,13 +115,13 @@ export function getProfile(req: Request, res: Response) {
 // -----------------------------------------------------------------------------
 
 export const browseEvent = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.id;
+  const user_id = req.id;
 
   let user;
   try {
     user = await prisma.user.findUnique({
       where: {
-        id: userId,
+        id: user_id,
       },
     });
   } catch (e) {
@@ -132,8 +132,8 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
     return next(new HttpException(404, "User not found"));
   }
 
-  const friendsList = (await generateFriendsList(userId)) as number[];
-  const fofList = (await generateFOFList(userId)) as number[];
+  const friendsList = (await generateFriendsList(user_id)) as number[];
+  const fofList = (await generateFOFList(user_id)) as number[];
 
   let result;
   try {
@@ -141,7 +141,7 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
       where: {
         OR: [
           {
-            ownerId: userId,
+            ownerId: user_id,
             privacy: eventPrivacy[0] as EventPrivacyType,
           },
           {
@@ -167,7 +167,7 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
 
 // -----------------------------------------------------------------------------
 
-export const validateEvent = [body("eventId").isInt()];
+export const validateEvent = [body("event_id").isInt()];
 
 export const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -175,14 +175,14 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const userId = req.id;
-  const eventId = req.body.eventId;
+  const user_id = req.id;
+  const event_id = req.body.event_id;
 
   let event;
   try {
     event = await prisma.event.findUnique({
       where: {
-        id: eventId,
+        id: event_id,
       },
       include: {
         _count: { select: { participants: true } },
@@ -204,10 +204,10 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
   try {
     newJoin = await prisma.event.update({
       where: {
-        id: eventId,
+        id: event_id,
       },
       data: {
-        participants: { connect: { id: userId } },
+        participants: { connect: { id: user_id } },
       },
       include: {
         participants: {
@@ -230,14 +230,14 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const userId = req.id;
-  const eventId = req.body.eventId;
+  const user_id = req.id;
+  const event_id = req.body.event_id;
 
   let event;
   try {
     event = await prisma.event.findUnique({
       where: {
-        id: eventId,
+        id: event_id,
       },
     });
   } catch (e) {
@@ -252,10 +252,10 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
   try {
     newSave = await prisma.event.update({
       where: {
-        id: eventId,
+        id: event_id,
       },
       data: {
-        followers: { connect: { id: userId } },
+        followers: { connect: { id: user_id } },
       },
       include: {
         followers: {
@@ -272,7 +272,7 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
 
 // -----------------------------------------------------------------------------
 
-export const validateComment = [body("eventId").isInt(), body("comment").exists()];
+export const validateComment = [body("event_id").isInt(), body("comment").exists()];
 
 export const postComment = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -280,14 +280,14 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
     return next(new HttpException(422, "Invalid input"));
   }
 
-  const userId = req.id;
-  const { eventId, comment } = req.body;
+  const user_id = req.id;
+  const { event_id, comment } = req.body;
 
   let result;
   try {
     result = await prisma.event.findUnique({
       where: {
-        id: eventId,
+        id: event_id,
       },
     });
   } catch (e) {
@@ -302,7 +302,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     newComment = await prisma.eventComment.create({
       data: {
-        eventId: eventId,
+        eventId: event_id,
         text: comment,
       },
     });
@@ -314,7 +314,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     event = await prisma.event.update({
       where: {
-        id: eventId,
+        id: event_id,
       },
       data: {
         comments: {
