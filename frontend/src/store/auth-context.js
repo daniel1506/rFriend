@@ -26,17 +26,18 @@ export const AuthContextProvider = (props) => {
   const userIsLoggedIn = !!token; //The first ! is just for converting to boolean
 
   const loginHandler = (token, id, email, name, role) => {
-    setToken(token);
-    setId(id);
-    setEmail(email);
-    setName(name);
-    setRole(role);
     //store to localStorage so that user doesn't need to login next time
+    //localStorage.setIten("token") must be earlier than setToken(), since the initial fetch of the home page will use get(), and get() depends on localStorage.set.
     localStorage.setItem("token", token);
     localStorage.setItem("id", id);
     localStorage.setItem("email", email);
     localStorage.setItem("name", name);
     localStorage.setItem("role", role);
+    setToken(token); //will trigger userIsLoggedIn to true and then trigger react router to redirect
+    setId(id);
+    setEmail(email);
+    setName(name);
+    setRole(role);
   };
 
   const logoutHandler = () => {

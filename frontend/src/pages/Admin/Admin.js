@@ -21,9 +21,9 @@ function Admin() {
   };
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/admin")
-      .then((data) => {
-        setUsersData(data);
-        console.log(data);
+      .then((result) => {
+        if (result.status == 200) setUsersData(result);
+        console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -31,6 +31,7 @@ function Admin() {
   }, [banned]);
   //For implementing Search---------------------------------------------------------------------------------------------------------------------
   useEffect(() => {
+    if (usersdata.length == 0) return;
     //when usersdata is fetched, we need to call handleSearch, since handleSearch controls dataToShow, and dataToShow controls what will be shown on screen
     handleSearch("");
   }, [usersdata]);

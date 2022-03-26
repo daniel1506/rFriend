@@ -4,7 +4,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 function NameShowCase(props) {
   return (
     <Button
-      variant="text"
+      variant="outlined"
       startIcon={<PersonOutlineIcon />}
       sx={{ textTransform: "none" }}
       {...props}

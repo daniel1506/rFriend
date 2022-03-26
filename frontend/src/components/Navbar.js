@@ -238,7 +238,7 @@ export default function Navbar(props) {
         </IconButton>
 
         <p>{authCtx.name}</p> */}
-        <NameShowCase>{authCtx.name}</NameShowCase>
+        <NameShowCase variant="text">{authCtx.name}</NameShowCase>
       </MenuItem>
       <MenuItem
         onClick={() => {
