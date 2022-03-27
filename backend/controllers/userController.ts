@@ -69,6 +69,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     email: result.email,
     name: result.name,
     token: token,
+    role: result.role,
   });
 };
 
