@@ -8,6 +8,7 @@ function SubmitButton(props) {
       variant="contained"
       endIcon={props.icon == null ? <SendIcon /> : props.icon}
       {...props}
+      type="submit"
     >
       {props.children}
     </LoadingButton>

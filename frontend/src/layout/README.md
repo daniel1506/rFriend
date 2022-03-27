@@ -1,1 +1,1 @@
-Similar to the components folder, this folder contains the reusable layout function e.g. css flexbox in this project
+This folder contains the reusable components that focus on making layout e.g. apply css flexbox

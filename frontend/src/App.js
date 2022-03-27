@@ -25,11 +25,11 @@ function App() {
         <Route path="/reset-password" element={<ConfirmReset />} />
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} /> */}
-        {authCtx.isLoggedIn && authCtx.role == "USER" && (
-          <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
-        )}
         {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
           <Route path="/admin" element={<Admin />} /> //need to login and have admin role to view admin page
+        )}
+        {authCtx.isLoggedIn && (
+          <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="*" element={<Navigate to="/homepage" />} /> //if an user wants to go to any irrevalent path, redirect it to home page

@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { generateFriendsList, generateFOFList } from "../services/friendService";
 import { eventCategory, EventCategoryType, eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
 export const validateUpsert = [
@@ -115,20 +116,7 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
       break;
 
     case "friends":
-      const user = await prisma.user.findFirst({
-        where: { id: userId },
-        include: {
-          friends: { select: { id: true } },
-          friendsOf: { select: { id: true } },
-        },
-      });
-
-      const friendsList = [
-        userId,
-        ...user!.friends.map((friend) => friend.id),
-        ...user!.friendsOf.map((friend) => friend.id),
-      ];
-      console.log(friendsList);
+      const friendsList = await generateFriendsList(userId);
 
       if (!friendsList.includes(event.ownerId)) {
         return next(new HttpException(401, "Access denied for this event"));
@@ -136,44 +124,11 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
       break;
 
     case "friends-of-friends": {
-      const userIncludeUserFriends: Prisma.UserInclude = {
-        friends: { select: { id: true } },
-        friendsOf: { select: { id: true } },
-      };
+      const friendsList = await generateFOFList(userId);
 
-      try {
-        const user = await prisma.user.findFirst({
-          where: { id: userId },
-          include: {
-            friends: {
-              include: userIncludeUserFriends,
-            },
-            friendsOf: {
-              include: userIncludeUserFriends,
-            },
-          },
-        });
-        let friendsList = [
-          userId,
-          ...user!.friends.map((friend: any) => [
-            friend.id,
-            ...friend.friends.map((friend: any) => friend.id),
-            ...friend.friendsOf.map((friend: any) => friend.id),
-          ]),
-          ...user!.friendsOf.map((friend: any) => [
-            friend.id,
-            ...friend.friends.map((friend: any) => friend.id),
-            ...friend.friendsOf.map((friend: any) => friend.id),
-          ]),
-        ];
-        friendsList = [...new Set(friendsList.flat())];
-        if (!friendsList.includes(event.ownerId)) {
-          return next(new HttpException(401, "Access denied for this event"));
-        }
-      } catch (e) {
-        return next(prismaErrorHandler(e));
+      if (!friendsList.includes(event.ownerId)) {
+        return next(new HttpException(401, "Access denied for this event"));
       }
-
       break;
     }
   }

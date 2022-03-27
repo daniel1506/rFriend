@@ -22,6 +22,7 @@ function EmailInput(props) {
       onChange={(e) => {
         props.setEmail(e.target.value);
         validateEmail(e);
+        props.setEmailError(emailError);
       }}
     />
   );

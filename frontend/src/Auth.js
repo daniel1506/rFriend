@@ -9,6 +9,9 @@ import {
   Modal,
   Box,
   Slide,
+  Zoom,
+  Fade,
+  Grow,
 } from "@mui/material";
 import Logreg from "./Logreg.jsx";
 const styles = (theme) => ({
@@ -33,9 +36,17 @@ function Auth() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" style={{ width: 300 }} />
-        <Typography variant="h1">rFriend</Typography>
-        <Typography variant="h5">Save your event</Typography>
+        <Zoom in={true} timeout={1000}>
+          <div>
+            <img src={logo} className="App-logo" style={{ width: 300 }} />
+          </div>
+        </Zoom>
+        <Fade in={true} timeout={1000}>
+          <div>
+            <Typography variant="h1">rFriend</Typography>
+            <Typography variant="h5">Save your event</Typography>
+          </div>
+        </Fade>
         <Logreg />
       </header>
     </div>

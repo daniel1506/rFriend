@@ -22,8 +22,10 @@ import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import { IconButton } from "@mui/material";
 import Input from "@mui/material/Input";
 import AuthContext from "../store/auth-context";
+import post from "../lib/post";
 import put from "../lib/put";
 import get from "../lib/get";
+import LoadingIcon from "./LoadingIcon";
 const style = {
   position: "absolute",
   left: "0",
@@ -33,11 +35,15 @@ const style = {
   top: "50%",
   bottom: "50%",
   marginBottom: "auto",
-  "@media (min-width: 700px)": {
-    width: "40%",
-  }, //width will be 100% when on narrow screen(mobile)
   height: "600px",
   marginTop: "-300px",
+  //The below style in the media query will replace some style above when the screen is large enough
+  "@media (min-width: 700px)": {
+    width: "30%",
+    height: "400px",
+    marginTop: "-200px",
+  },
+
   // "@media (max-width: 1025px)": {
   //   height: "700px",
   //   marginTop: "-350px",
@@ -58,20 +64,42 @@ export default function Profile(props) {
   const handleClose = () => props.setShowProfile(false);
   const [password, setPassword] = React.useState(null);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
+  const [submittingProPic, setSubmittingProPic] = React.useState(false);
+  const [submittingNewPassword, setSubmittingNewPassword] =
+    React.useState(false);
   const getProfilePic = () => {
-    get("");
+    let id = authCtx("id");
+    get(
+      `https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`
+    );
+  };
+  const submitNewPassword = () => {
+    setSubmittingNewPassword(true);
+    const data = { password };
+    post(`https://rfriend.herokuapp.com/api/user/pw_reset`, data)
+      .then((result) => {
+        setSubmittingNewPassword(false);
+      })
+      .catch((error) => {
+        setSubmittingNewPassword(false);
+        console.log(error);
+      });
   };
   const uploadImage = async (e) => {
     const file = e.target.files[0];
     const base64 = await convertBase64(file);
     console.log(base64);
     const data = { base64 };
+    setSubmittingProPic(true);
     put("https://rfriend.herokuapp.com/api/user/profile", data)
       .then((result) => {
+        setSubmittingProPic(false);
+        console.log(result.status);
         console.log(result.profile_url);
         setProfilePicUrl(result.profile_url);
       })
       .catch((err) => {
+        setSubmittingProPic(false);
         console.log(err);
       });
   };
@@ -91,7 +119,6 @@ export default function Profile(props) {
   };
   return (
     <div>
-      <Button onClick={handleOpen}>Open modal</Button>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -130,8 +157,10 @@ export default function Profile(props) {
                           aria-label="delete"
                           color="primary"
                           component="span"
+                          disabled={submittingProPic}
                         >
-                          <EditIcon />
+                          {!submittingProPic && <EditIcon />}
+                          {submittingProPic && <LoadingIcon />}
                         </IconButton>
                       </label>
                     }
@@ -149,15 +178,21 @@ export default function Profile(props) {
                 </VerticalFlex>
               </Grid>
 
-              <form>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  submitNewPassword();
+                }}
+              >
                 <VerticalFlex>
-                  <NameInput label="new username" />
                   <PasswordInput
                     label="new password"
                     setPassword={setPassword}
                   />
                   <CfPasswordInput password={password} />
-                  <SubmitButton>Submit</SubmitButton>
+                  <SubmitButton loading={submittingNewPassword}>
+                    Submit
+                  </SubmitButton>
                   <CloseButton onClick={handleClose}>Close</CloseButton>
                 </VerticalFlex>
               </form>

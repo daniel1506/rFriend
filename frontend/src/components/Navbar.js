@@ -1,3 +1,5 @@
+//this navbar component can switch between admin and normal user verion, example below shows how to activate admin mode:
+//<Navbar admin />
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
@@ -19,7 +21,18 @@ import LogoutButton from "./LogoutButton";
 import Button from "@mui/material/Button";
 import NameShowCase from "./NameShowCase";
 import AuthContext from "../store/auth-context";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import {
+  SwipeableDrawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { useContext } from "react";
+import { set } from "date-fns";
+import LogoutIcon from "@mui/icons-material/Logout";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -69,6 +82,7 @@ export default function Navbar(props) {
   const isMenuOpen = Boolean(anchorEl);
   const isPageMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -94,33 +108,46 @@ export default function Navbar(props) {
   const menuId = "primary-search-account-menu";
   const pageMenuId = "page-menu";
   const renderPageMenu = (
-    <Menu
-      anchorEl={anchorEl2}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
+    <SwipeableDrawer
+      open={openDrawer}
+      onClose={() => {
+        setOpenDrawer(false);
       }}
-      id={pageMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
+      onOpen={() => {
+        setOpenDrawer(true);
       }}
-      open={isPageMenuOpen}
-      onClose={handlePageMenuClose}
     >
-      <MenuItem
+      <Box
+        sx={{ width: 250 }}
+        role="presentation"
         onClick={() => {
-          handlePageMenuClose();
-          props.setShowCreateEvent(true);
+          setOpenDrawer(false);
+        }}
+        onKeyDown={() => {
+          setOpenDrawer(false);
         }}
       >
-        Page 1
-      </MenuItem>
-      <MenuItem onClick={handlePageMenuClose}>Page 2</MenuItem>
-      <MenuItem onClick={handlePageMenuClose}>Page 3</MenuItem>
-      <MenuItem onClick={handlePageMenuClose}>Page 4</MenuItem>
-    </Menu>
+        <List>
+          <ListItem
+            button
+            onClick={() => {
+              props.setShowCreateEvent(true);
+            }}
+          >
+            <ListItemIcon>
+              <AddCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Create event"} />
+          </ListItem>
+          <ListItem button>
+            <ListItemIcon>
+              <PeopleAltIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Friend"} />
+          </ListItem>
+        </List>
+      </Box>
+    </SwipeableDrawer>
   );
   const renderMenu = (
     <Menu
@@ -174,7 +201,7 @@ export default function Navbar(props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      {/* <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
             <MailIcon />
@@ -193,9 +220,14 @@ export default function Navbar(props) {
           </Badge>
         </IconButton>
         <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
+      </MenuItem> */}
+      <MenuItem
+        onClick={() => {
+          props.setShowProfile(true);
+        }}
+        sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
+      >
+        {/* <IconButton
           size="large"
           aria-label="account of current user"
           aria-controls="primary-search-account-menu"
@@ -204,14 +236,35 @@ export default function Navbar(props) {
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+
+        <p>{authCtx.name}</p> */}
+        <NameShowCase variant="text">{authCtx.name}</NameShowCase>
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          authCtx.logout();
+        }}
+        sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
+      >
+        {/* <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <LogoutIcon />
+        </IconButton>
+
+        <p>Logout</p> */}
+        <LogoutButton variant="text" />
       </MenuItem>
     </Menu>
   );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={props.Admin ? { background: "black" } : {}}>
+      <AppBar position="static" sx={props.admin ? { background: "black" } : {}}>
         <Toolbar>
           <IconButton
             size="large"
@@ -220,7 +273,10 @@ export default function Navbar(props) {
             aria-label="open drawer"
             aria-controls={pageMenuId}
             aria-haspopup="true"
-            onClick={handlePageMenuOpen}
+            onClick={() => {
+              //the ui in drawer is useless for admin, so we don't allow the drawer to open if it's admin case
+              if (!props.admin) setOpenDrawer(true);
+            }}
             sx={{ mr: 2 }}
           >
             <MenuIcon />
@@ -238,7 +294,7 @@ export default function Navbar(props) {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder={props.Admin ? "Search username" : "Search event"}
+              placeholder={props.admin ? "Search username" : "Search event"}
               inputProps={{ "aria-label": "search" }}
               onChange={(e) => {
                 props.handleSearch(e.target.value);
