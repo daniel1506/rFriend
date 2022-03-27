@@ -8,6 +8,3 @@ package-lock.json
 
 # typscript build output
 build
-
-# profile images for testing
-test_images

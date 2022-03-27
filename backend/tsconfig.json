@@ -14,7 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "typeRoots": ["./types"],
-    "outDir": "build",
+    "outDir": "build"
   },
   "include": ["."]
 }
