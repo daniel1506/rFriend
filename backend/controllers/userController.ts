@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { generateFriendsList, generateFOFList } from "../services/friendService";
 
 import bcrypt from "bcrypt";
 import { generateJWT } from "../services/authService";
+import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
 // -----------------------------------------------------------------------------
 
@@ -113,6 +115,59 @@ export function getProfile(req: Request, res: Response) {
 
 // -----------------------------------------------------------------------------
 
+export const browseEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const user_id = req.id;
+
+  let user;
+  try {
+    user = await prisma.user.findUnique({
+      where: {
+        id: user_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!user) {
+    return next(new HttpException(404, "User not found"));
+  }
+
+  const friendsList = (await generateFriendsList(user_id)) as number[];
+  const fofList = (await generateFOFList(user_id)) as number[];
+
+  let result;
+  try {
+    result = await prisma.event.findMany({
+      where: {
+        OR: [
+          {
+            ownerId: user_id,
+            privacy: eventPrivacy[0] as EventPrivacyType,
+          },
+          {
+            ownerId: { in: friendsList },
+            privacy: eventPrivacy[1] as EventPrivacyType,
+          },
+          {
+            ownerId: { in: fofList },
+            privacy: eventPrivacy[2] as EventPrivacyType,
+          },
+          {
+            privacy: eventPrivacy[3] as EventPrivacyType,
+          },
+        ],
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ event: result });
+};
+
+// -----------------------------------------------------------------------------
+
 export const validateEvent = [body("event_id").isInt()];
 
 export const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -165,7 +220,7 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ participants: [...newJoin.participants] });
+  res.status(201).send({ participants: [...newJoin.participants] });
 };
 
 // -----------------------------------------------------------------------------
@@ -213,7 +268,7 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ followers: [...newSave.followers] });
+  res.status(201).send({ followers: [...newSave.followers] });
 };
 
 // -----------------------------------------------------------------------------
@@ -275,7 +330,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ comments: event.comments });
+  res.status(201).send({ comments: event.comments });
 };
 
 // -----------------------------------------------------------------------------
