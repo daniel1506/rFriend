@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { getProfileUrl } from "./userController";
 
 export const validate = [body("target_user_id").isInt().toInt()];
 
@@ -161,9 +162,13 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
     return next(prismaErrorHandler(e));
   }
 
-  res.send({
-    friends: [...user.friends, ...user.friendsOf],
-  });
+  let friends = [...user!.friends, ...user!.friendsOf];
+  friends = friends.map((friend) => ({
+    ...friend,
+    profile_url: getProfileUrl(friend.id),
+  }));
+
+  res.send({ friends });
 };
 
 // -----------------------------------------------------------------------------
@@ -202,7 +207,11 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
     return next(prismaErrorHandler(e));
   }
 
-  res.send({
-    friends: [...user!.friends, ...user!.friendsOf],
-  });
+  let friends = [...user!.friends, ...user!.friendsOf];
+  friends = friends.map((friend) => ({
+    ...friend,
+    profile_url: getProfileUrl(friend.id),
+  }));
+
+  res.send({ friends });
 };

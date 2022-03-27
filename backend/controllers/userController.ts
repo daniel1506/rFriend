@@ -122,6 +122,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 // middleware: auth
 export const validateGetProfile = [query("user_id").exists().isInt()];
 
+export const getProfileUrl = (userId: number): string => {
+  const key = "img" + String(userId);
+  const url = "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
+  return url;
+};
+
 export async function getProfile(req: Request, res: Response, next: NextFunction) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -139,9 +145,7 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
       return next(new HttpException(401, "Cannot find user"));
     }
 
-    let key: String = "img" + String(id);
-    let profile_url: String =
-      "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
+    const profile_url = getProfileUrl(id);
 
     res.send({
       name: user.name,
