@@ -14,7 +14,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     return next(prismaErrorHandler(e));
   }
 
-  res.status(200).json(user);
+  res.status(201).send(user);
 };
 
 // -----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     return next(prismaErrorHandler(e));
   }
 
-  res.status(200).json({ message: "password updated" });
+  res.status(201).send({ message: "Password updated" });
 };
 
 // -----------------------------------------------------------------------------
@@ -91,16 +91,19 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     return next(new HttpException(404, "User not found"));
   }
 
-  let result;
-  try {
-    result = await prisma.user.delete({
-      where: {
-        id: user_id,
-      },
-    });
-  } catch (e) {
-    return next(prismaErrorHandler(e));
-  }
+  const deleteEvents = prisma.event.deleteMany({
+    where: {
+      ownerId: user_id,
+    },
+  });
 
-  res.status(200).json({ message: "user deleted" });
+  const deleteUser = prisma.user.delete({
+    where: {
+      id: user_id,
+    },
+  });
+
+  const transaction = await prisma.$transaction([deleteEvents, deleteUser]);
+
+  res.status(201).send({ message: "User deleted" });
 };

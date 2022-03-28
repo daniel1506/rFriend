@@ -1,10 +1,24 @@
+// import { NextFunction, query, Request, Response } from "express";
 import { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+// import { body, param, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { generateFriendsList, generateFOFList } from "../services/friendService";
 
 import bcrypt from "bcrypt";
 import { generateJWT } from "../services/authService";
+import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
+
+import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
+import { s3Client } from "../AWS/s3Cient";
+
+import jwt from "jsonwebtoken";
+
+import { sendEmail, generateForgetPasswordEmail } from "../services/emailService";
+
+import { stringify } from "querystring";
+import { runMain } from "module";
 
 // -----------------------------------------------------------------------------
 
@@ -55,6 +69,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     email: result.email,
     name: result.name,
     token: token,
+    role: result.role,
   });
 };
 
@@ -105,11 +120,263 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 // -----------------------------------------------------------------------------
 
 // middleware: auth
-export function getProfile(req: Request, res: Response) {
-  const { id, email } = req;
+export const validateGetProfile = [query("user_id").exists().isInt()];
 
-  res.send({ id, email });
+export const getProfileUrl = (userId: number): string => {
+  const key = "img" + String(userId);
+  const url = "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
+  return url;
+};
+
+export async function getProfile(req: Request, res: Response, next: NextFunction) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const id: number = Number(req.query.user_id);
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: id },
+    });
+
+    if (!user) {
+      return next(new HttpException(401, "Cannot find user"));
+    }
+
+    const profile_url = getProfileUrl(id);
+
+    res.send({
+      name: user.name,
+      email: user.email,
+      profile_url: profile_url,
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
 }
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+export async function forgetPassword(req: Request, res: Response, next: NextFunction) {
+  // const { id, email } = req;
+  const { email } = req.body;
+
+  let user;
+  try {
+    user = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    // first check if the email exist
+    if (!user) {
+      return next(new HttpException(400, "Email does not exist."));
+    }
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  // If the email exists, generate a token using another jwt_secret, different from authentication
+  const token: string = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET_FORGET_PW!,
+    { expiresIn: 36000 } //expire in an hour
+  );
+
+  // store/update the token into the DB
+  try {
+    user = await prisma.user.update({
+      where: { email: email },
+      data: { resetPasswordToken: token },
+    });
+
+    // first check if the email exist
+    if (!user) {
+      return next(new HttpException(400, "Cannot update token for forget password."));
+    }
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  try {
+    // send a recovery email with the token
+    let email_content: string = generateForgetPasswordEmail(token);
+    let email_title: string = "Change password for rFriend: " + email;
+    sendEmail(email, email_title, email_content);
+
+    res.send({ user_id: user.id, email: user.email, token: token });
+  } catch (e) {
+    return next(new HttpException(400, "Cannot send email"));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+export const validateNewPassword = [body("password").isLength({ min: 8 })];
+
+export async function resetPassword(req: Request, res: Response, next: NextFunction) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const { password, token } = req.body;
+
+  // check if the forget password token is valid (i.e. not yet expired and exists in the DB)
+  try {
+    jwt.verify(token, process.env.JWT_SECRET_FORGET_PW!);
+  } catch (e) {
+    return next(new HttpException(401, "Forget password token expired"));
+  }
+
+  let user;
+  try {
+    // use findFirst since profileUrl may be null, and hence not unique. However, it is unique if exists
+    user = await prisma.user.findFirst({
+      where: { resetPasswordToken: token },
+    });
+
+    // first check if the email exist
+    if (!user) {
+      return next(new HttpException(401, "Invalid forget password token"));
+    }
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  // save the new hashed password into the DB
+  // hash password
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(password, salt);
+
+  try {
+    // use updateMany since profileUrl may be null, and hence not unique. However, it is unique if exists
+    user = await prisma.user.updateMany({
+      where: { resetPasswordToken: token }, // change this to the forget_pw token field after it is added
+      data: {
+        password: hash,
+        resetPasswordToken: null,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.send(user);
+}
+
+// -----------------------------------------------------------------------------
+// middleware: auth
+// the base64 image must start with
+export const validateProfile = [body("profile").exists().isString().matches("data:image/.*;base64,.*")];
+
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  // const {user_id, profile : encoded_image} = req.body;
+  const { profile } = req.body;
+  let user_id: number = req.id;
+
+  /* 
+    find out the type of the image
+    Note that profile has the format: image/jpeg;base64,xxxx.....
+  */
+  let type: string = profile.split("/")[1].split(";")[0];
+  let key: string = "img" + String(user_id);
+
+  // turn the string into binary data. The image cannot be shown without doing this
+  const encoded_image: Buffer = Buffer.from(profile.split(",")[1], "base64");
+
+  // Set the parameters.
+  const bucketParams: PutObjectCommandInput = {
+    Bucket: process.env.BUCKET_NAME,
+    // Specify the name of the new object. For example, 'index.html'.
+    // To create a directory for the object, use '/'. For example, 'myApp/package.json'.
+    Key: key,
+    Body: encoded_image, // Content of the new object.
+    ContentEncoding: "base64",
+    ContentType: "image/" + type,
+    ACL: "public-read", // for public access
+  };
+
+  // Create and upload the object to the S3 bucket.
+  try {
+    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+
+    console.log("Successfully uploaded object: " + bucketParams.Bucket + "/" + bucketParams.Key);
+
+    // generate an url for the image
+    let profileURL: String =
+      "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
+
+    res.status(200).send({ profileURL: profileURL });
+
+    // Store the url into the database
+  } catch (err) {
+    return next(new HttpException(500, "Error in AWS."));
+  }
+};
+
+// -----------------------------------------------------------------------------
+
+export const browseEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const user_id = req.id;
+
+  let user;
+  try {
+    user = await prisma.user.findUnique({
+      where: {
+        id: user_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!user) {
+    return next(new HttpException(404, "User not found"));
+  }
+
+  const friendsList = (await generateFriendsList(user_id)) as number[];
+  const fofList = (await generateFOFList(user_id)) as number[];
+
+  let result;
+  try {
+    result = await prisma.event.findMany({
+      where: {
+        OR: [
+          {
+            ownerId: user_id,
+            privacy: eventPrivacy[0] as EventPrivacyType,
+          },
+          {
+            ownerId: { in: friendsList },
+            privacy: eventPrivacy[1] as EventPrivacyType,
+          },
+          {
+            ownerId: { in: fofList },
+            privacy: eventPrivacy[2] as EventPrivacyType,
+          },
+          {
+            privacy: eventPrivacy[3] as EventPrivacyType,
+          },
+        ],
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ event: result });
+};
 
 // -----------------------------------------------------------------------------
 
@@ -165,7 +432,7 @@ export const joinEvent = async (req: Request, res: Response, next: NextFunction)
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ participants: [...newJoin.participants] });
+  res.status(201).send({ participants: [...newJoin.participants] });
 };
 
 // -----------------------------------------------------------------------------
@@ -213,7 +480,7 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ followers: [...newSave.followers] });
+  res.status(201).send({ followers: [...newSave.followers] });
 };
 
 // -----------------------------------------------------------------------------
@@ -248,6 +515,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     newComment = await prisma.eventComment.create({
       data: {
+        userId: user_id,
         eventId: event_id,
         text: comment,
       },
@@ -275,7 +543,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
     return next(prismaErrorHandler(e));
   }
 
-  res.send({ comments: event.comments });
+  res.status(201).send({ comments: event.comments });
 };
 
 // -----------------------------------------------------------------------------

@@ -22,10 +22,16 @@ router.use("/user", userRouter);
 
 userRouter.post("/register", userController.validateRegister, userController.register);
 userRouter.post("/login", userController.validateLogin, userController.login);
-userRouter.get("/", authMiddleware, userController.getProfile);
+userRouter.get("/", authMiddleware, userController.validateGetProfile, userController.getProfile);
+userRouter.put("/profile", authMiddleware, userController.validateProfile, userController.updateProfile);
+
+userRouter.get("/browse", authMiddleware, userController.browseEvent);
 userRouter.put("/join", authMiddleware, userController.validateEvent, userController.joinEvent);
 userRouter.put("/save", authMiddleware, userController.validateEvent, userController.saveEvent);
 userRouter.post("/comment", authMiddleware, userController.validateComment, userController.postComment);
+
+userRouter.post("/forget_pw", userController.forgetPassword);
+userRouter.post("/pw_reset", userController.validateNewPassword, userController.resetPassword);
 
 // -----------------------------------------------------------------------------
 

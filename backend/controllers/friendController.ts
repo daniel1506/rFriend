@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { getProfileUrl } from "./userController";
 
 export const validate = [body("target_user_id").isInt().toInt()];
 
@@ -161,9 +162,13 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
     return next(prismaErrorHandler(e));
   }
 
-  res.send({
-    friends: [...user.friends, ...user.friendsOf],
-  });
+  let friends = [...user!.friends, ...user!.friendsOf];
+  friends = friends.map((friend) => ({
+    ...friend,
+    profile_url: getProfileUrl(friend.id),
+  }));
+
+  res.send({ friends });
 };
 
 // -----------------------------------------------------------------------------
@@ -171,6 +176,20 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
 export const get = async (req: Request, res: Response, next: NextFunction) => {
   const target_user_id = req.body.target_user_id as number;
 
+  // check if target user exists
+  try {
+    const targetUser = await prisma.user.findFirst({
+      where: { id: target_user_id },
+    });
+
+    if (!targetUser) {
+      return next(new HttpException(404, "User not found"));
+    }
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  // query friends of the target user
   let user;
   try {
     user = await prisma.user.findFirst({
@@ -188,7 +207,11 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
     return next(prismaErrorHandler(e));
   }
 
-  res.send({
-    friends: [...user!.friends, ...user!.friendsOf],
-  });
+  let friends = [...user!.friends, ...user!.friendsOf];
+  friends = friends.map((friend) => ({
+    ...friend,
+    profile_url: getProfileUrl(friend.id),
+  }));
+
+  res.send({ friends });
 };
