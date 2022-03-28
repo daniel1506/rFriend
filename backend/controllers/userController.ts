@@ -515,6 +515,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     newComment = await prisma.eventComment.create({
       data: {
+        userId: user_id,
         eventId: event_id,
         text: comment,
       },
