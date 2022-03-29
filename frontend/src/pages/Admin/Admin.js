@@ -22,7 +22,7 @@ function Admin() {
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/admin")
       .then((result) => {
-        if (result.status == 200) setUsersData(result);
+        if (result.status == 201) setUsersData(result);
         console.log(result);
       })
       .catch((error) => {
