@@ -53,7 +53,7 @@ function Useritem(props) {
     deleteReq("https://rfriend.herokuapp.com/api/admin/", data)
       .then((result) => {
         console.log(result);
-        if (result.status != 200) setBanError(true);
+        if (result.status != 201) setBanError(true);
         else {
           setBanError(false);
           props.setBanned((prev) => {
