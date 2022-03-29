@@ -37,7 +37,7 @@ function Useritem(props) {
     put("https://rfriend.herokuapp.com/api/admin", data)
       .then((result) => {
         console.log(result);
-        if (result.status != 200) setError(true);
+        if (result.status != 201) setError(true);
         else setError(false);
         setLoading(false);
       })
