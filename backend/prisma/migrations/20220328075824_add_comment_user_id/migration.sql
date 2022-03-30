@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `eventcomment` ADD COLUMN `userId` INTEGER NOT NULL;
+ALTER TABLE `EventComment` ADD COLUMN `userId` INTEGER NOT NULL;
