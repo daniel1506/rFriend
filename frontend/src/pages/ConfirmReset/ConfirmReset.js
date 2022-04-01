@@ -6,8 +6,11 @@ import { Box, Typography, Zoom, Button, Alert } from "@mui/material";
 import PasswordInput from "../../components/PasswordInput";
 import CfPasswordInput from "../../components/CfPasswordInput";
 import SubmitButton from "../../components/SubmitButton";
+import { useNavigate } from "react-router-dom";
 import post from "../../lib/post";
+import { navigate } from "react-big-calendar/lib/utils/constants";
 function ConfirmReset() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [password, setPassword] = useState("");
@@ -19,20 +22,23 @@ function ConfirmReset() {
     const splittedCurrentUrl = currentUrl.split("/");
     const resetToken = splittedCurrentUrl[splittedCurrentUrl.length - 1];
     console.log(resetToken);
-    let data = { token: resetToken };
+    let data = { token: resetToken, password };
     setLoading(true);
     post("https://rfriend.herokuapp.com/api/user/pw_reset", data)
       .then((result) => {
         if (result.status != 200) {
           setLoading(false);
           setFailed(true);
+          setSuccess(false);
           setFailedMessage(result.message);
         } else {
           setSuccess(true);
+          navigate("/");
         }
       })
       .catch((err) => {
         console.log(err);
+        setSuccess(false);
       });
   };
   return (
@@ -79,7 +85,7 @@ function ConfirmReset() {
         <SubmitButton onClick={submitPassword} disabled={success}>
           Submit
         </SubmitButton>
-        {failed && <Alert severity="fail">{failedMessage}</Alert>}
+        {failed && <Alert severity="error">{failedMessage}</Alert>}
       </Box>
     </Box>
   );
