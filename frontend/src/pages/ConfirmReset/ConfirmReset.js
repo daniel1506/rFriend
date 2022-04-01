@@ -33,7 +33,9 @@ function ConfirmReset() {
           setFailedMessage(result.message);
         } else {
           setSuccess(true);
-          navigate("/");
+          setTimeout(() => {
+            navigate("/");
+          }, 500);
         }
       })
       .catch((err) => {

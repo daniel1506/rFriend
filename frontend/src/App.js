@@ -37,10 +37,10 @@ function App() {
         {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
           <Route path="*" element={<Navigate to="/admin" />} /> //if an admin wants to go to any irrevalent path, redirect it to admin page
         )}
+        <Route path="/reset-password/*" element={<ConfirmReset />} />
         {!authCtx.isLoggedIn && (
           <Route path="*" element={<Auth />} /> //if a unlogin user wants to go any irrevalent path, redirent it to login page
         )}
-        <Route path="/reset-password/*" element={<ConfirmReset />} />
       </Routes>
     </Router>
   );
