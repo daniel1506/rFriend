@@ -8,7 +8,6 @@ import CfPasswordInput from "../../components/CfPasswordInput";
 import SubmitButton from "../../components/SubmitButton";
 import { useNavigate } from "react-router-dom";
 import post from "../../lib/post";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 function ConfirmReset() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
