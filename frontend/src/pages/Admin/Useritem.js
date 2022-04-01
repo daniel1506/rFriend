@@ -21,25 +21,25 @@ import PasswordInput from "../../components/PasswordInput";
 import Grow from "@mui/material/Grow";
 function Useritem(props) {
   const [newPassword, setNewPassword] = useState("");
-  const [loading, setLoading] = useState(null);
+  const [resetting, setResetting] = useState(null);
   const [error, setError] = useState(null);
   const [banning, setBanning] = useState(null);
   const [banError, setBanError] = useState(null);
   const clearProgress = () => {
-    setLoading(null);
+    setResetting(null);
     setError(null);
   };
   const reset = (user_id, password) => {
     //sending request to reset user password
     const data = { user_id, password };
     console.log(data);
-    setLoading(true);
+    setResetting(true);
     put("https://rfriend.herokuapp.com/api/admin", data)
       .then((result) => {
         console.log(result);
         if (result.status != 201) setError(true);
         else setError(false);
-        setLoading(false);
+        setResetting(false);
       })
       .catch((err) => {
         console.log(err);
@@ -119,10 +119,11 @@ function Useritem(props) {
                           endIcon={<LockResetIcon />}
                           color="warning"
                           onClick={(e) => {
+                            e.stopPropagation();
                             clearProgress();
                             reset(props.userid, newPassword);
                           }}
-                          loading={loading}
+                          loading={resetting}
                         >
                           Reset password
                         </SubmitButton>
@@ -140,7 +141,8 @@ function Useritem(props) {
                           endIcon={<BlockIcon />}
                           loading={banning}
                           color="error"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             ban(props.userid);
                           }}
                         >

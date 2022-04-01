@@ -1,4 +1,5 @@
 //@ts-check
+//This page is deprecated
 import React from "react";
 import { useState, useEffect } from "react";
 import LockResetIcon from "@mui/icons-material/LockReset";

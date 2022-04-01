@@ -40,6 +40,7 @@ function App() {
         {!authCtx.isLoggedIn && (
           <Route path="*" element={<Auth />} /> //if a unlogin user wants to go any irrevalent path, redirent it to login page
         )}
+        <Route path="/reset-password/*" element={<ConfirmReset />} />
       </Routes>
     </Router>
   );
