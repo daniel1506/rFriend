@@ -17,6 +17,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -24,6 +25,7 @@ import StaticTimePicker from "@mui/lab/StaticTimePicker";
 import TimePicker from "./TimePicker";
 import HorizontalFlex from "../../layout/HorizontalFlex";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import SubmitButton from "../../components/SubmitButton";
 import CloseButton from "../../components/CloseButton";
 import SquareToggleButton from "../../components/SquareToggleButton";
@@ -206,6 +208,25 @@ function CreateEvent(props) {
               >
                 <NotificationsIcon />
               </SquareToggleButton>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "row" },
+                justifyContent: "space-around",
+                aligenItems: "center",
+                gap: 1,
+              }}
+            >
+              <TimePicker />
+              <IconButton
+                color="primary"
+                aria-label="upload picture"
+                component="span"
+                sx={{ width: 54, height: 54 }}
+              >
+                <PhotoCamera />
+              </IconButton>
             </Box>
             <Box
               sx={{

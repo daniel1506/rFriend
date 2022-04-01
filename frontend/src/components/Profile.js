@@ -40,6 +40,11 @@ const style = {
   //The below style in the media query will replace some style above when the screen is large enough
   "@media (min-width: 700px)": {
     width: "30%",
+    height: "600px",
+    marginTop: "-300px",
+  },
+  "@media (min-width: 1400px)": {
+    width: "30%",
     height: "400px",
     marginTop: "-200px",
   },
@@ -67,11 +72,22 @@ export default function Profile(props) {
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
   const [submittingNewPassword, setSubmittingNewPassword] =
     React.useState(false);
+  const [email, setEmail] = React.useState("");
+  const [username, setUserName] = React.useState("");
   const getProfilePic = () => {
-    let id = authCtx("id");
+    let id = props.id ? props.id : authCtx("id");
     get(
       `https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`
-    );
+    )
+      .then((result) => {
+        console.log(result);
+        setProfilePicUrl(result.profile_url);
+        setEmail(result.email);
+        setUserName(result.name);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   const submitNewPassword = () => {
     setSubmittingNewPassword(true);
@@ -87,10 +103,11 @@ export default function Profile(props) {
   };
   const uploadImage = async (e) => {
     const file = e.target.files[0];
-    const base64 = await convertBase64(file);
-    console.log(base64);
-    const data = { base64 };
+    const profile = await convertBase64(file);
+    console.log(profile);
+    const data = { profile };
     setSubmittingProPic(true);
+    console.log(data);
     put("https://rfriend.herokuapp.com/api/user/profile", data)
       .then((result) => {
         setSubmittingProPic(false);
@@ -145,7 +162,7 @@ export default function Profile(props) {
                     badgeContent={
                       <label htmlFor="icon-button-file">
                         <Input
-                          accept="image/*"
+                          inputProps={{ accept: "image/*" }}
                           id="icon-button-file"
                           type="file"
                           sx={{ display: "none" }}
@@ -158,6 +175,7 @@ export default function Profile(props) {
                           color="primary"
                           component="span"
                           disabled={submittingProPic}
+                          sx={{ display: props.id ? "none" : "block" }}
                         >
                           {!submittingProPic && <EditIcon />}
                           {submittingProPic && <LoadingIcon />}
@@ -173,29 +191,31 @@ export default function Profile(props) {
                       sx={{ width: 200, height: 200 }}
                     />
                   </Badge>
-                  <NameShowCase>{authCtx.name}</NameShowCase>
-                  <EmailShowCase>{authCtx.email}</EmailShowCase>
+                  <NameShowCase>{username}</NameShowCase>
+                  <EmailShowCase>{email}</EmailShowCase>
                 </VerticalFlex>
               </Grid>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  submitNewPassword();
-                }}
-              >
-                <VerticalFlex>
-                  <PasswordInput
-                    label="new password"
-                    setPassword={setPassword}
-                  />
-                  <CfPasswordInput password={password} />
-                  <SubmitButton loading={submittingNewPassword}>
-                    Submit
-                  </SubmitButton>
-                  <CloseButton onClick={handleClose}>Close</CloseButton>
-                </VerticalFlex>
-              </form>
+              {!props.id && (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submitNewPassword();
+                  }}
+                >
+                  <VerticalFlex>
+                    <PasswordInput
+                      label="new password"
+                      setPassword={setPassword}
+                    />
+                    <CfPasswordInput password={password} />
+                    <SubmitButton loading={submittingNewPassword}>
+                      Submit
+                    </SubmitButton>
+                    <CloseButton onClick={handleClose}>Close</CloseButton>
+                  </VerticalFlex>
+                </form>
+              )}
             </Grid>
           </Box>
         </Slide>

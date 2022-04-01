@@ -68,7 +68,7 @@ function Useritem(props) {
   };
   return (
     <Grow in={true} timeout={500}>
-      <Card sx={{ marginBottom: 2 }}>
+      <Card sx={{ marginBottom: 2 }} onClick={props.onClick}>
         <ListItem disablePadding>
           <ListItemButton component="a" href="#simple-list">
             <ListItemText
