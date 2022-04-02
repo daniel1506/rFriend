@@ -7,7 +7,7 @@ import HttpException from "../common/httpException";
 import { generateFriendsList, generateFOFList } from "../services/friendService";
 
 import bcrypt from "bcrypt";
-import { generateJWT } from "../services/authService";
+import { generateJWT, JWTpayload } from "../services/authService";
 import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
 import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
@@ -15,10 +15,7 @@ import { s3Client } from "../AWS/s3Cient";
 
 import jwt from "jsonwebtoken";
 
-import { sendEmail, generateForgetPasswordEmail } from "../services/emailService";
-
-import { stringify } from "querystring";
-import { runMain } from "module";
+import { sendEmail, generateForgetPasswordEmail, sendVerifyEmailEmail } from "../services/emailService";
 
 // -----------------------------------------------------------------------------
 
@@ -61,6 +58,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     return next(prismaErrorHandler(e));
   }
 
+  sendVerifyEmailEmail(result.id, result.name, result.email);
+
   // generate token
   const token = generateJWT(result.id, result.email);
 
@@ -70,6 +69,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     name: result.name,
     token: token,
     role: result.role,
+    verified_at: result.verfiedAt,
   });
 };
 
@@ -114,6 +114,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     name: user.name,
     token: token,
     role: user.role,
+    verified_at: user.verfiedAt,
   });
 };
 
@@ -544,6 +545,32 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   }
 
   res.status(201).send({ comments: event.comments });
+};
+
+// -----------------------------------------------------------------------------
+
+export const validateVerifyEmail = [body("token").exists()];
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const { token } = req.body;
+
+  try {
+    const { id } = jwt.verify(token.toString(), process.env.JWT_SECRET_VERIFY_EMAIL!) as JWTpayload;
+
+    await prisma.user.update({
+      where: { id },
+      data: { verfiedAt: new Date() },
+    });
+  } catch (e) {
+    return next(new HttpException(422, "Invalid email verify token"));
+  }
+
+  res.status(200).send({});
 };
 
 // -----------------------------------------------------------------------------
