@@ -371,12 +371,13 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
           },
         ],
       },
+      include: { comments: true },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(201).send({ event: result });
+  res.status(200).send({ event: result });
 };
 
 // -----------------------------------------------------------------------------
