@@ -23,12 +23,15 @@ import NameShowCase from "./NameShowCase";
 import AuthContext from "../store/auth-context";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import Avatar from "@mui/material/Avatar";
+import FriendShowCase from "./FriendShowCase";
 import {
   SwipeableDrawer,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  Divider,
 } from "@mui/material";
 import { useContext } from "react";
 import { set } from "date-fns";
@@ -135,16 +138,12 @@ export default function Navbar(props) {
             }}
           >
             <ListItemIcon>
-              <AddCircleIcon />
+              <AddCircleIcon sx={{ height: 40, width: 40 }} color="info" />
             </ListItemIcon>
             <ListItemText primary={"Create event"} />
           </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <PeopleAltIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Friend"} />
-          </ListItem>
+          <Divider />
+          <FriendShowCase name="owo" />
         </List>
       </Box>
     </SwipeableDrawer>

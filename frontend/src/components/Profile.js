@@ -26,8 +26,9 @@ import post from "../lib/post";
 import put from "../lib/put";
 import get from "../lib/get";
 import LoadingIcon from "./LoadingIcon";
+import CrossButton from "./CrossButton";
 const style = {
-  position: "absolute",
+  position: "relative",
   left: "0",
   right: "0",
   marginLeft: "auto",
@@ -149,6 +150,7 @@ export default function Profile(props) {
       >
         <Slide in={props.showProfile}>
           <Box sx={style}>
+            <CrossButton handleClose={handleClose} color="secondary" />
             <Grid
               container
               direction={{ xs: "column", sm: "row" }}

@@ -25,6 +25,7 @@ function App() {
         <Route path="/reset-password" element={<ConfirmReset />} />
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} /> */}
+        <Route path="/reset-password/:token" element={<ConfirmReset />} />
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
@@ -37,7 +38,6 @@ function App() {
         {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
           <Route path="*" element={<Navigate to="/admin" />} /> //if an admin wants to go to any irrevalent path, redirect it to admin page
         )}
-        <Route path="/reset-password/*" element={<ConfirmReset />} />
         {!authCtx.isLoggedIn && (
           <Route path="*" element={<Auth />} /> //if a unlogin user wants to go any irrevalent path, redirent it to login page
         )}

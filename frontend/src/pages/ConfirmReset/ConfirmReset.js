@@ -6,9 +6,10 @@ import { Box, Typography, Zoom, Button, Alert } from "@mui/material";
 import PasswordInput from "../../components/PasswordInput";
 import CfPasswordInput from "../../components/CfPasswordInput";
 import SubmitButton from "../../components/SubmitButton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import post from "../../lib/post";
 function ConfirmReset() {
+  let token = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -17,11 +18,11 @@ function ConfirmReset() {
   const [failedMessage, setFailedMessage] = useState("");
   console.log(window.location.href);
   const submitPassword = () => {
-    const currentUrl = window.location.href;
-    const splittedCurrentUrl = currentUrl.split("/");
-    const resetToken = splittedCurrentUrl[splittedCurrentUrl.length - 1];
-    console.log(resetToken);
-    let data = { token: resetToken, password };
+    // const currentUrl = window.location.href;
+    // const splittedCurrentUrl = currentUrl.split("/");
+    // const resetToken = splittedCurrentUrl[splittedCurrentUrl.length - 1];
+    // console.log(resetToken);
+    let data = { token, password };
     setLoading(true);
     post("https://rfriend.herokuapp.com/api/user/pw_reset", data)
       .then((result) => {
