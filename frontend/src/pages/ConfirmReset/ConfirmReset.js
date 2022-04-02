@@ -9,7 +9,7 @@ import SubmitButton from "../../components/SubmitButton";
 import { useNavigate, useParams } from "react-router-dom";
 import post from "../../lib/post";
 function ConfirmReset() {
-  let token = useParams();
+  let params = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -22,7 +22,7 @@ function ConfirmReset() {
     // const splittedCurrentUrl = currentUrl.split("/");
     // const resetToken = splittedCurrentUrl[splittedCurrentUrl.length - 1];
     // console.log(resetToken);
-    let data = { token, password };
+    let data = { token: params.token, password };
     setLoading(true);
     post("https://rfriend.herokuapp.com/api/user/pw_reset", data)
       .then((result) => {

@@ -10,7 +10,7 @@ function CrossButton(props) {
       sx={{ position: "absolute", top: 10, right: 10 }}
       {...props}
     >
-      <CancelIcon />
+      <CancelIcon sx={{ height: 30, width: 30 }} />
     </IconButton>
   );
 }

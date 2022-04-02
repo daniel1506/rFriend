@@ -1,8 +1,15 @@
 import React from "react";
-import { ListItem, ListItemIcon, ListItemText, Avatar } from "@mui/material";
+import {
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Avatar,
+  Box,
+} from "@mui/material";
+import CrossButton from "./CrossButton";
 function FriendShowCase(props) {
   return (
-    <ListItem>
+    <ListItem button onClick={props.onClick}>
       <ListItemIcon>
         <Avatar src={props.proPic} />
       </ListItemIcon>

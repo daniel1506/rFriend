@@ -27,6 +27,7 @@ import put from "../lib/put";
 import get from "../lib/get";
 import LoadingIcon from "./LoadingIcon";
 import CrossButton from "./CrossButton";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 const style = {
   position: "relative",
   left: "0",
@@ -71,6 +72,7 @@ export default function Profile(props) {
   const [password, setPassword] = React.useState(null);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
+  const [removing, setRemoving] = React.useState(false);
   const [submittingNewPassword, setSubmittingNewPassword] =
     React.useState(false);
   const [email, setEmail] = React.useState("");
@@ -171,6 +173,7 @@ export default function Profile(props) {
                           onChange={(e) => {
                             uploadImage(e);
                           }}
+                          disabled={submittingProPic}
                         />
                         <IconButton
                           aria-label="delete"
@@ -195,6 +198,15 @@ export default function Profile(props) {
                   </Badge>
                   <NameShowCase>{username}</NameShowCase>
                   <EmailShowCase>{email}</EmailShowCase>
+                  {!removing && (
+                    <IconButton
+                      color="error"
+                      sx={{ display: props.id ? "block" : "none" }}
+                    >
+                      <PersonRemoveIcon />
+                    </IconButton>
+                  )}
+                  {removing && <LoadingIcon color="error" />}
                 </VerticalFlex>
               </Grid>
 
