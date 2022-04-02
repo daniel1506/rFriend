@@ -9,20 +9,20 @@ import DoneIcon from "@mui/icons-material/Done";
 function ResultDisplay(props) {
   return (
     <>
-      {props.error == false && (
+      {props.error === false && (
         <Zoom
           in={!props.error}
           timeout={500}
-          color={props.color == null ? "error" : props.color}
+          color={props.color == null ? "inherit" : props.color}
         >
           <DoneIcon />
         </Zoom>
       )}
-      {props.error == true && (
+      {props.error === true && (
         <Zoom
           in={props.error}
           timeout={500}
-          color={props.color == null ? "success" : props.color}
+          color={props.color == null ? "inherit" : props.color}
         >
           <ErrorIcon />
         </Zoom>

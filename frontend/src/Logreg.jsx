@@ -136,7 +136,7 @@ function Logreg() {
       >
         {/* login form */}
         <form onSubmit={log}>
-          <VerticalFlex>
+          <VerticalFlex gap="10px">
             <EmailInput setEmail={setEmail} />
             <PasswordInput setPassword={setPassword} />
             <SubmitButton loading={submitting} type="submit">
@@ -156,7 +156,7 @@ function Logreg() {
       >
         {/* reg form */}
         <form onSubmit={reg}>
-          <VerticalFlex>
+          <VerticalFlex gap="10px">
             <EmailInput setEmail={setEmail} />
             <NameInput setUsername={setUsername} />
             <PasswordInput setPassword={setPassword} />

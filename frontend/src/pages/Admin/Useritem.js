@@ -21,10 +21,10 @@ import PasswordInput from "../../components/PasswordInput";
 import Grow from "@mui/material/Grow";
 function Useritem(props) {
   const [newPassword, setNewPassword] = useState("");
-  const [resetting, setResetting] = useState(null);
-  const [error, setError] = useState(null);
-  const [banning, setBanning] = useState(null);
-  const [banError, setBanError] = useState(null);
+  const [resetting, setResetting] = useState(false);
+  const [error, setError] = useState(undefined);
+  const [banning, setBanning] = useState(false);
+  const [banError, setBanError] = useState(undefined);
   const clearProgress = () => {
     setResetting(null);
     setError(null);
@@ -116,10 +116,9 @@ function Useritem(props) {
                           alignItems: "center",
                         }}
                       >
-                        <ResultDisplay error={error} color="warning" />
                         <SubmitButton
                           variant="contained"
-                          endIcon={<LockResetIcon />}
+                          error={error}
                           color="warning"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -138,10 +137,9 @@ function Useritem(props) {
                           alignItems: "center",
                         }}
                       >
-                        <ResultDisplay error={banError} color="error" />
                         <SubmitButton
                           variant="contained"
-                          endIcon={<BlockIcon />}
+                          error={banError}
                           loading={banning}
                           color="error"
                           onClick={(e) => {
