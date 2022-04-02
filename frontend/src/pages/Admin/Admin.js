@@ -79,6 +79,7 @@ function Admin() {
         id={selectedUserId}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
+        admin
       />
     </>
   );

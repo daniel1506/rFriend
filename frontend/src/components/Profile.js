@@ -19,7 +19,7 @@ import CloseButton from "./CloseButton";
 import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
-import { IconButton } from "@mui/material";
+import { IconButton, CircularProgress } from "@mui/material";
 import Input from "@mui/material/Input";
 import AuthContext from "../store/auth-context";
 import post from "../lib/post";
@@ -30,6 +30,10 @@ import CrossButton from "./CrossButton";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 const style = {
   position: "relative",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
   left: "0",
   right: "0",
   marginLeft: "auto",
@@ -77,8 +81,10 @@ export default function Profile(props) {
     React.useState(false);
   const [email, setEmail] = React.useState("");
   const [username, setUserName] = React.useState("");
-  const getProfilePic = () => {
-    let id = props.id ? props.id : authCtx("id");
+  const [loading, setLoading] = React.useState(true);
+  const getUserProfile = () => {
+    let id = props.id ? props.id : authCtx.id;
+    setLoading(true);
     get(
       `https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`
     )
@@ -87,11 +93,15 @@ export default function Profile(props) {
         setProfilePicUrl(result.profile_url);
         setEmail(result.email);
         setUserName(result.name);
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+  React.useEffect(() => {
+    getUserProfile();
+  }, [props.id]);
   const submitNewPassword = () => {
     setSubmittingNewPassword(true);
     const data = { password };
@@ -153,84 +163,92 @@ export default function Profile(props) {
         <Slide in={props.showProfile}>
           <Box sx={style}>
             <CrossButton handleClose={handleClose} color="secondary" />
-            <Grid
-              container
-              direction={{ xs: "column", sm: "row" }}
-              justifyContent={{ xs: "space-around" }}
-              alignItems={{ xs: "center" }}
-              sx={{ height: "100%" }}
-            >
-              <Grid item>
-                <VerticalFlex>
-                  <Badge
-                    badgeContent={
-                      <label htmlFor="icon-button-file">
-                        <Input
-                          inputProps={{ accept: "image/*" }}
-                          id="icon-button-file"
-                          type="file"
-                          sx={{ display: "none" }}
-                          onChange={(e) => {
-                            uploadImage(e);
-                          }}
-                          disabled={submittingProPic}
-                        />
-                        <IconButton
-                          aria-label="delete"
-                          color="primary"
-                          component="span"
-                          disabled={submittingProPic}
-                          sx={{ display: props.id ? "none" : "block" }}
-                        >
-                          {!submittingProPic && <EditIcon />}
-                          {submittingProPic && <LoadingIcon />}
-                        </IconButton>
-                      </label>
-                    }
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <Avatar
-                      alt="Cindy Baker"
-                      src={profilePicUrl}
-                      sx={{ width: 200, height: 200 }}
-                    />
-                  </Badge>
-                  <NameShowCase>{username}</NameShowCase>
-                  <EmailShowCase>{email}</EmailShowCase>
-                  {!removing && (
-                    <IconButton
-                      color="error"
-                      sx={{ display: props.id ? "block" : "none" }}
-                    >
-                      <PersonRemoveIcon />
-                    </IconButton>
-                  )}
-                  {removing && <LoadingIcon color="error" />}
-                </VerticalFlex>
-              </Grid>
-
-              {!props.id && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    submitNewPassword();
-                  }}
+            {loading && <CircularProgress />}
+            {!loading && (
+              <>
+                <Grid
+                  container
+                  direction={{ xs: "column", sm: "row" }}
+                  justifyContent={{ xs: "space-around" }}
+                  alignItems={{ xs: "center" }}
+                  sx={{ height: "100%" }}
                 >
-                  <VerticalFlex>
-                    <PasswordInput
-                      label="new password"
-                      setPassword={setPassword}
-                    />
-                    <CfPasswordInput password={password} />
-                    <SubmitButton loading={submittingNewPassword}>
-                      Submit
-                    </SubmitButton>
-                    <CloseButton onClick={handleClose}>Close</CloseButton>
-                  </VerticalFlex>
-                </form>
-              )}
-            </Grid>
+                  <Grid item>
+                    <VerticalFlex>
+                      <Badge
+                        badgeContent={
+                          <label htmlFor="icon-button-file">
+                            <Input
+                              inputProps={{ accept: "image/*" }}
+                              id="icon-button-file"
+                              type="file"
+                              sx={{ display: "none" }}
+                              onChange={(e) => {
+                                uploadImage(e);
+                              }}
+                              disabled={submittingProPic}
+                            />
+                            <IconButton
+                              aria-label="delete"
+                              color="primary"
+                              component="span"
+                              disabled={submittingProPic}
+                              sx={{ display: props.id ? "none" : "block" }}
+                            >
+                              {!submittingProPic && <EditIcon />}
+                              {submittingProPic && <LoadingIcon />}
+                            </IconButton>
+                          </label>
+                        }
+                        overlap="circular"
+                        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                      >
+                        <Avatar
+                          alt="Cindy Baker"
+                          src={profilePicUrl}
+                          sx={{ width: 200, height: 200 }}
+                        />
+                      </Badge>
+                      <NameShowCase>{username}</NameShowCase>
+                      <EmailShowCase>{email}</EmailShowCase>
+                      {!removing && (
+                        <IconButton
+                          color="error"
+                          sx={{
+                            display:
+                              props.id && !props.admin ? "block" : "none",
+                          }}
+                        >
+                          <PersonRemoveIcon />
+                        </IconButton>
+                      )}
+                      {removing && <LoadingIcon color="error" />}
+                    </VerticalFlex>
+                  </Grid>
+
+                  {!props.id && (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        submitNewPassword();
+                      }}
+                    >
+                      <VerticalFlex>
+                        <PasswordInput
+                          label="new password"
+                          setPassword={setPassword}
+                        />
+                        <CfPasswordInput password={password} />
+                        <SubmitButton loading={submittingNewPassword}>
+                          Submit
+                        </SubmitButton>
+                        <CloseButton onClick={handleClose}>Close</CloseButton>
+                      </VerticalFlex>
+                    </form>
+                  )}
+                </Grid>
+              </>
+            )}
           </Box>
         </Slide>
       </Modal>
