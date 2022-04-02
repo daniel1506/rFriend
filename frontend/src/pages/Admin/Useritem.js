@@ -105,6 +105,9 @@ function Useritem(props) {
                         noHelperText
                         label="new password"
                         setPassword={setNewPassword}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
                       />
                       <Box
                         sx={{
