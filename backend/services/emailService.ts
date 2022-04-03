@@ -41,7 +41,7 @@ export const sendEmail = (receiver: string, subject: string, text: string) => {
 };
 
 export const generateForgetPasswordEmail = (token: string) => {
-  let link: string = "https://rfriend.herouapps.com/reset-password/" + token;
+  let link: string = `${process.env.FRONTEND_BASE_URL}/reset-password/` + token;
 
   let content: string = "Hi User,\nPlease click the below to reset password.\n";
 
@@ -58,7 +58,7 @@ export const sendVerifyEmailEmail = (id: number, name: string, email: string) =>
     { expiresIn: 36000 } // expires in an hour
   );
 
-  const link = `https://rfriend.herouapps.com/verify/${token}`;
+  const link = `${process.env.FRONTEND_BASE_URL}/verify/${token}`;
   const subject = "Please confirm your email";
   const content = `
 Hi ${name},
