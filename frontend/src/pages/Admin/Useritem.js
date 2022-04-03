@@ -125,6 +125,7 @@ function Useritem(props) {
                             clearProgress();
                             reset(props.userid, newPassword);
                           }}
+                          icon={<LockResetIcon />}
                           loading={resetting}
                         >
                           Reset password
@@ -146,6 +147,7 @@ function Useritem(props) {
                             e.stopPropagation();
                             ban(props.userid);
                           }}
+                          icon={<BlockIcon />}
                         >
                           Ban
                         </SubmitButton>

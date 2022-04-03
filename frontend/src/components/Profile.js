@@ -127,9 +127,12 @@ export default function Profile(props) {
     put("https://rfriend.herokuapp.com/api/user/profile", data)
       .then((result) => {
         setSubmittingProPic(false);
-        console.log(result.status);
-        console.log(result.profile_url);
-        setProfilePicUrl(result.profile_url);
+        console.log(result);
+        if (result.status != 200) {
+        } else {
+          console.log(result.profileURL);
+          setProfilePicUrl(result.profileURL);
+        }
       })
       .catch((err) => {
         setSubmittingProPic(false);
@@ -237,7 +240,7 @@ export default function Profile(props) {
                           sx={{
                             display: !props.id ? "flex" : "none",
                           }}
-                          endIcon={<LockResetIcon />}
+                          icon={<LockResetIcon />}
                           error={resetFailed}
                           loading={resetting}
                           onClick={() => {

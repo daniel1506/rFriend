@@ -1,9 +1,12 @@
-//This is by default a submit Button with submit icon by default. When it takes props.error, it will show the error icon and success icon depending on the value of props.error
+//This is by default a submit Button with submit icon as default option.
+//When it takes props.error, it will show the error icon and success icon depending on the value of props.error.
+//As a result, it selfcontained loading fail success indicator for any kind of submit.
 import React from "react";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import ResultDisplay from "./ResultDisplay";
+import { useEffect } from "react";
 function SubmitButton(props) {
   console.log(props);
   return (
@@ -11,7 +14,11 @@ function SubmitButton(props) {
       variant="contained"
       endIcon={
         props.error === undefined ? (
-          <SendIcon />
+          props.icon ? (
+            props.icon
+          ) : (
+            <SendIcon />
+          )
         ) : (
           <ResultDisplay error={props.error} />
         )
