@@ -71,6 +71,7 @@ function CreateEvent(props) {
   const [titleError, setTitleError] = useState(false);
   const [category, setCategory] = useState(false);
   const [notification, setNotification] = useState(false);
+  const [quota, setQuota] = useState(1);
   const validateTitle = (title) => {};
   const handleChangePrivacy = (event, newPrivacy) => {
     setPrivacy(newPrivacy);
@@ -134,7 +135,14 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TextField label="quota" type="number" />
+              <TextField
+                label="quota"
+                type="number"
+                value={quota}
+                onChange={(e) => {
+                  if (e.target.value > 0) setQuota(e.target.value);
+                }}
+              />
               <TextField
                 label="remark"
                 type="text"

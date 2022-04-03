@@ -33,9 +33,11 @@ import {
   ListItemText,
   Divider,
 } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { set } from "date-fns";
 import LogoutIcon from "@mui/icons-material/Logout";
+import get from "../lib/get";
+import AddFriendField from "./AddFriendField";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -86,7 +88,9 @@ export default function Navbar(props) {
   const isPageMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-
+  const [friendLoading, setFriendLoading] = React.useState(false);
+  const [friendFailed, setFriendFailed] = React.useState(false);
+  const [friends, setFriends] = React.useState([]);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -107,7 +111,25 @@ export default function Navbar(props) {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
-
+  const getFriends = () => {};
+  useEffect(() => {
+    setFriendLoading(true);
+    get("https://rfriend.herokuapp.com/api/friend")
+      .then((result) => {
+        setFriendLoading(false);
+        if (result.status != 200) {
+          setFriendFailed(true);
+        } else {
+          setFriends(result);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  // useEffect(() => {
+  //   friends.map((friend) => {});
+  // }, [friends]);
   const menuId = "primary-search-account-menu";
   const pageMenuId = "page-menu";
   const renderPageMenu = (
@@ -126,9 +148,6 @@ export default function Navbar(props) {
         onClick={() => {
           setOpenDrawer(false);
         }}
-        onKeyDown={() => {
-          setOpenDrawer(false);
-        }}
       >
         <List>
           <ListItem
@@ -141,6 +160,9 @@ export default function Navbar(props) {
               <AddCircleIcon sx={{ height: 40, width: 40 }} color="info" />
             </ListItemIcon>
             <ListItemText primary={"Create event"} />
+          </ListItem>
+          <ListItem>
+            <AddFriendField />
           </ListItem>
           <Divider />
           <FriendShowCase name="owo" />

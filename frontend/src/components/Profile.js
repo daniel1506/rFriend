@@ -19,7 +19,7 @@ import CloseButton from "./CloseButton";
 import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
-import { IconButton } from "@mui/material";
+import { IconButton, CircularProgress } from "@mui/material";
 import Input from "@mui/material/Input";
 import AuthContext from "../store/auth-context";
 import post from "../lib/post";
@@ -28,8 +28,14 @@ import get from "../lib/get";
 import LoadingIcon from "./LoadingIcon";
 import CrossButton from "./CrossButton";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import ErrorIcon from "@mui/icons-material/Error";
+import LockResetIcon from "@mui/icons-material/LockReset";
 const style = {
   position: "relative",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
   left: "0",
   right: "0",
   marginLeft: "auto",
@@ -69,16 +75,17 @@ export default function Profile(props) {
   const authCtx = React.useContext(AuthContext);
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
-  const [password, setPassword] = React.useState(null);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
   const [removing, setRemoving] = React.useState(false);
-  const [submittingNewPassword, setSubmittingNewPassword] =
-    React.useState(false);
+  const [resetting, setResetting] = React.useState(false);
+  const [resetFailed, setResetFailed] = React.useState(undefined);
   const [email, setEmail] = React.useState("");
   const [username, setUserName] = React.useState("");
-  const getProfilePic = () => {
-    let id = props.id ? props.id : authCtx("id");
+  const [uploading, setUpLoading] = React.useState(false);
+  const getUserProfile = () => {
+    let id = props.id ? props.id : authCtx.id;
+    setUpLoading(true);
     get(
       `https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`
     )
@@ -87,22 +94,28 @@ export default function Profile(props) {
         setProfilePicUrl(result.profile_url);
         setEmail(result.email);
         setUserName(result.name);
+        setUpLoading(false);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  const submitNewPassword = () => {
-    setSubmittingNewPassword(true);
-    const data = { password };
-    post(`https://rfriend.herokuapp.com/api/user/pw_reset`, data)
-      .then((result) => {
-        setSubmittingNewPassword(false);
-      })
-      .catch((error) => {
-        setSubmittingNewPassword(false);
-        console.log(error);
-      });
+  React.useEffect(() => {
+    getUserProfile();
+  }, [props.id]);
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
   };
   const uploadImage = async (e) => {
     const file = e.target.files[0];
@@ -123,19 +136,24 @@ export default function Profile(props) {
         console.log(err);
       });
   };
-  const convertBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
+  const resetPassword = () => {
+    let data = { email: authCtx.email };
+    setResetting(true);
+    post("https://rfriend.herokuapp.com/api/user/forget_pw", data).then(
+      (result) => {
+        setResetting(false);
+        if (result.status != 200) {
+          setResetFailed(true);
+        } else {
+          setResetFailed(false);
+        }
+      }
+    );
+  };
+  const redirectToMailBox = () => {
+    let email = authCtx.email;
+    let emailDomain = email.split("@")[1];
+    window.open(`http://${emailDomain}`, "_blank");
   };
   return (
     <div>
@@ -153,84 +171,120 @@ export default function Profile(props) {
         <Slide in={props.showProfile}>
           <Box sx={style}>
             <CrossButton handleClose={handleClose} color="secondary" />
-            <Grid
-              container
-              direction={{ xs: "column", sm: "row" }}
-              justifyContent={{ xs: "space-around" }}
-              alignItems={{ xs: "center" }}
-              sx={{ height: "100%" }}
-            >
-              <Grid item>
-                <VerticalFlex>
-                  <Badge
-                    badgeContent={
-                      <label htmlFor="icon-button-file">
-                        <Input
-                          inputProps={{ accept: "image/*" }}
-                          id="icon-button-file"
-                          type="file"
-                          sx={{ display: "none" }}
-                          onChange={(e) => {
-                            uploadImage(e);
-                          }}
-                          disabled={submittingProPic}
-                        />
-                        <IconButton
-                          aria-label="delete"
-                          color="primary"
-                          component="span"
-                          disabled={submittingProPic}
-                          sx={{ display: props.id ? "none" : "block" }}
-                        >
-                          {!submittingProPic && <EditIcon />}
-                          {submittingProPic && <LoadingIcon />}
-                        </IconButton>
-                      </label>
-                    }
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <Avatar
-                      alt="Cindy Baker"
-                      src={profilePicUrl}
-                      sx={{ width: 200, height: 200 }}
-                    />
-                  </Badge>
-                  <NameShowCase>{username}</NameShowCase>
-                  <EmailShowCase>{email}</EmailShowCase>
-                  {!removing && (
-                    <IconButton
-                      color="error"
-                      sx={{ display: props.id ? "block" : "none" }}
-                    >
-                      <PersonRemoveIcon />
-                    </IconButton>
-                  )}
-                  {removing && <LoadingIcon color="error" />}
-                </VerticalFlex>
-              </Grid>
-
-              {!props.id && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    submitNewPassword();
-                  }}
+            {uploading && <CircularProgress />}
+            {!uploading && (
+              <>
+                <Grid
+                  container
+                  direction={{ xs: "column", sm: "row" }}
+                  justifyContent={{ xs: "space-around" }}
+                  alignItems={{ xs: "center" }}
+                  sx={{ height: "100%" }}
                 >
-                  <VerticalFlex>
-                    <PasswordInput
-                      label="new password"
-                      setPassword={setPassword}
-                    />
-                    <CfPasswordInput password={password} />
-                    <SubmitButton loading={submittingNewPassword}>
-                      Submit
-                    </SubmitButton>
-                    <CloseButton onClick={handleClose}>Close</CloseButton>
-                  </VerticalFlex>
-                </form>
-              )}
-            </Grid>
+                  <Grid item>
+                    <VerticalFlex gap="10px">
+                      <Badge
+                        badgeContent={
+                          <label htmlFor="icon-button-file">
+                            <Input
+                              inputProps={{ accept: "image/*" }}
+                              id="icon-button-file"
+                              type="file"
+                              sx={{ display: "none" }}
+                              onChange={(e) => {
+                                uploadImage(e);
+                              }}
+                              disabled={submittingProPic}
+                            />
+                            <IconButton
+                              aria-label="delete"
+                              color="primary"
+                              component="span"
+                              disabled={submittingProPic}
+                              sx={{ display: props.id ? "none" : "block" }}
+                            >
+                              {!submittingProPic && <EditIcon />}
+                              {submittingProPic && <LoadingIcon />}
+                            </IconButton>
+                          </label>
+                        }
+                        overlap="circular"
+                        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                      >
+                        <Avatar
+                          alt="Cindy Baker"
+                          src={profilePicUrl}
+                          sx={{ width: 200, height: 200 }}
+                        />
+                      </Badge>
+                      <NameShowCase>{username}</NameShowCase>
+                      <EmailShowCase>{email}</EmailShowCase>
+                      {!removing && (
+                        <IconButton
+                          color="error"
+                          sx={{
+                            display:
+                              props.id && !props.admin ? "block" : "none",
+                          }}
+                        >
+                          <PersonRemoveIcon />
+                        </IconButton>
+                      )}
+                      {resetFailed !== false && (
+                        <SubmitButton
+                          variant="contained"
+                          color="warning"
+                          sx={{
+                            display: !props.id ? "flex" : "none",
+                          }}
+                          endIcon={<LockResetIcon />}
+                          error={resetFailed}
+                          loading={resetting}
+                          onClick={() => {
+                            resetPassword();
+                          }}
+                        >
+                          Reset Password
+                        </SubmitButton>
+                      )}
+                      {resetFailed === false && (
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          onClick={() => {
+                            redirectToMailBox();
+                            authCtx.logout();
+                          }}
+                        >
+                          Check Your email
+                        </Button>
+                      )}
+                    </VerticalFlex>
+                  </Grid>
+
+                  {/* {!props.id && (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        submitNewPassword();
+                      }}
+                    >
+                      <VerticalFlex>
+                        <PasswordInput
+                          label="new password"
+                          setPassword={setPassword}
+                        />
+                        <CfPasswordInput password={password} />
+                        <SubmitButton uploading={submittingNewPassword}>
+                          Submit
+                        </SubmitButton>
+                        <CloseButton onClick={handleClose}>Close</CloseButton>
+                      </VerticalFlex>
+                    </form>
+                  )} */}
+                </Grid>
+              </>
+            )}
           </Box>
         </Slide>
       </Modal>

@@ -1,6 +1,6 @@
 //This component can be used to express for loading, successful, and fail status
 //it depends on props.error and props.loading
-//example usage: {loading && <Progress loading={loading} error={error} />}
+//example usage: {loading && <Progress error={error} />}
 import React from "react";
 import { Zoom } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
@@ -9,20 +9,20 @@ import DoneIcon from "@mui/icons-material/Done";
 function ResultDisplay(props) {
   return (
     <>
-      {props.error == false && (
+      {props.error === false && (
         <Zoom
           in={!props.error}
           timeout={500}
-          color={props.color == null ? "error" : props.color}
+          color={props.color == null ? "inherit" : props.color}
         >
           <DoneIcon />
         </Zoom>
       )}
-      {props.error == true && (
+      {props.error === true && (
         <Zoom
           in={props.error}
           timeout={500}
-          color={props.color == null ? "success" : props.color}
+          color={props.color == null ? "inherit" : props.color}
         >
           <ErrorIcon />
         </Zoom>
