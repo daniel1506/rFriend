@@ -325,7 +325,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
 
     // Store the url into the database
   } catch (err) {
-    return next(new HttpException(500, "Error in AWS."));
+    return next(new HttpException(500, "Error in AWS: " + err));
   }
 };
 
