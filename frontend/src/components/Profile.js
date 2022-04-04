@@ -130,8 +130,9 @@ export default function Profile(props) {
         console.log(result);
         if (result.status != 200) {
         } else {
-          console.log(result.profileURL);
-          setProfilePicUrl(result.profileURL);
+          let timestamp = new Date().getTime(); //to force browser download image again from the url
+          console.log(result.profileURL + `?t=${timestamp}`);
+          setProfilePicUrl(result.profileURL + `?t=${timestamp}`);
         }
       })
       .catch((err) => {
