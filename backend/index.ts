@@ -5,6 +5,7 @@ import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import policy from "./helmet.config";
 
 import apiRouter from "./routes/api";
 import webRouter from "./routes/web";
@@ -24,7 +25,7 @@ const app = express();
  *  App Configuration
  */
 
-app.use(helmet());
+app.use(helmet.contentSecurityPolicy(policy));
 app.use(cors());
 app.use(express.json());
 
