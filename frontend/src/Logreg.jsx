@@ -161,7 +161,7 @@ function Logreg() {
         unmountOnExit
         className="info-input-container"
       >
-        <>
+        <div>
           {/* reg form */}
           {!emailSuccess && (
             <form onSubmit={reg}>
@@ -189,7 +189,7 @@ function Logreg() {
               Check your email
             </Button>
           )}
-        </>
+        </div>
       </Slide>
     </>
   );
