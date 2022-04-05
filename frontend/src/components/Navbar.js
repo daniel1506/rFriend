@@ -25,6 +25,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import Avatar from "@mui/material/Avatar";
 import FriendShowCase from "./FriendShowCase";
+import FriendList from "./FriendList";
 import {
   SwipeableDrawer,
   List,
@@ -88,9 +89,6 @@ export default function Navbar(props) {
   const isPageMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [friendLoading, setFriendLoading] = React.useState(false);
-  const [friendFailed, setFriendFailed] = React.useState(false);
-  const [friends, setFriends] = React.useState([]);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -111,25 +109,6 @@ export default function Navbar(props) {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
-  const getFriends = () => {};
-  useEffect(() => {
-    setFriendLoading(true);
-    get("https://rfriend.herokuapp.com/api/friend")
-      .then((result) => {
-        setFriendLoading(false);
-        if (result.status != 200) {
-          setFriendFailed(true);
-        } else {
-          setFriends(result);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-  // useEffect(() => {
-  //   friends.map((friend) => {});
-  // }, [friends]);
   const menuId = "primary-search-account-menu";
   const pageMenuId = "page-menu";
   const renderPageMenu = (
@@ -165,7 +144,7 @@ export default function Navbar(props) {
             <AddFriendField />
           </ListItem>
           <Divider />
-          <FriendShowCase name="owo" />
+          <FriendList />
         </List>
       </Box>
     </SwipeableDrawer>

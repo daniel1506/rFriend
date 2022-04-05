@@ -1,3 +1,4 @@
+//@ts-check
 import * as React from "react";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -25,11 +26,15 @@ import AuthContext from "../store/auth-context";
 import post from "../lib/post";
 import put from "../lib/put";
 import get from "../lib/get";
+import deleteReq from "../lib/delete";
 import LoadingIcon from "./LoadingIcon";
 import CrossButton from "./CrossButton";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import ErrorIcon from "@mui/icons-material/Error";
 import LockResetIcon from "@mui/icons-material/LockReset";
+import HorizontalFlex from "../layout/HorizontalFlex";
+import IdShowCase from "./IdShowCase";
+import SubmitIconButton from "./SubmitIconButton";
 const style = {
   position: "relative",
   display: "flex",
@@ -77,12 +82,13 @@ export default function Profile(props) {
   const handleClose = () => props.setShowProfile(false);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
-  const [removing, setRemoving] = React.useState(false);
   const [resetting, setResetting] = React.useState(false);
   const [resetFailed, setResetFailed] = React.useState(undefined);
   const [email, setEmail] = React.useState("");
   const [username, setUserName] = React.useState("");
   const [uploading, setUpLoading] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+  const [deleteFailed, setDeleteFailed] = React.useState(undefined);
   const getUserProfile = () => {
     let id = props.id ? props.id : authCtx.id;
     setUpLoading(true);
@@ -159,13 +165,31 @@ export default function Profile(props) {
     let emailDomain = email.split("@")[1];
     window.open(`http://${emailDomain}`, "_blank");
   };
+  const deleteFriend = () => {
+    let data = { target_user_id: props.id };
+    setDeleting(true);
+    deleteReq("https://rfriend.herokuapp.com/api/friend", data).then(
+      (result) => {
+        setDeleting(false);
+        if (result.status != 200) {
+          setDeleteFailed(true);
+        } else {
+          setDeleteFailed(false);
+          props.handleDeleted();
+        }
+      }
+    );
+  };
   return (
     <div>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={props.showProfile}
-        onClose={handleClose}
+        onClose={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
@@ -201,7 +225,6 @@ export default function Profile(props) {
                               disabled={submittingProPic}
                             />
                             <IconButton
-                              aria-label="delete"
                               color="primary"
                               component="span"
                               disabled={submittingProPic}
@@ -221,9 +244,11 @@ export default function Profile(props) {
                           sx={{ width: 200, height: 200 }}
                         />
                       </Badge>
-                      <NameShowCase>{username}</NameShowCase>
+                      <NameShowCase>
+                        {`${username} #${props.id ? props.id : authCtx.id}`}
+                      </NameShowCase>
                       <EmailShowCase>{email}</EmailShowCase>
-                      {!removing && (
+                      {/* {!deleting && (
                         <IconButton
                           color="error"
                           sx={{
@@ -233,7 +258,7 @@ export default function Profile(props) {
                         >
                           <PersonRemoveIcon />
                         </IconButton>
-                      )}
+                      )} */}
                       {resetFailed !== false && (
                         <SubmitButton
                           variant="contained"

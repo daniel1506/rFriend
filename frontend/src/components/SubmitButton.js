@@ -1,4 +1,4 @@
-//This is by default a submit Button with submit icon as default option.
+//This is a submit Button displaying submit icon as default option.
 //When it takes props.error, it will show the error icon and success icon depending on the value of props.error.
 //As a result, it selfcontained loading fail success indicator for any kind of submit.
 import React from "react";
