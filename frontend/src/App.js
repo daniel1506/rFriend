@@ -25,7 +25,10 @@ function App() {
         <Route path="/reset-password" element={<ConfirmReset />} />
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} /> */}
-        <Route path="/reset-password/:token" element={<ConfirmReset />} />
+        <Route path="/verify/:token" element={<ConfirmEmail />} />
+        {!authCtx.isLoggedIn && (
+          <Route path="/reset-password/:token" element={<ConfirmReset />} />
+        )}
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
