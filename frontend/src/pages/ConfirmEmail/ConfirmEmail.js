@@ -55,7 +55,7 @@ function ConfirmEmail() {
         in={!loading}
         timeout={500}
         sx={
-          emailFailed === undefined || true
+          emailFailed === undefined || false
             ? { display: "block" }
             : { display: "none" }
         }

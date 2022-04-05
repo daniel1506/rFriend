@@ -161,22 +161,20 @@ function Logreg() {
         unmountOnExit
         className="info-input-container"
       >
-        <div>
-          {/* reg form */}
+        {/* reg form */}
+        <form onSubmit={reg}>
           {!emailSuccess && (
-            <form onSubmit={reg}>
-              <VerticalFlex gap="10px">
-                <EmailInput setEmail={setEmail} />
-                <NameInput setUsername={setUsername} />
-                <PasswordInput setPassword={setPassword} />
-                <CfPasswordInput password={password} />
-                <SubmitButton type="submit" loading={submitting}>
-                  Submit
-                </SubmitButton>
-                {/* Display error message if error when submit */}
-                {fail && <Alert severity="error">{failMessage}</Alert>}
-              </VerticalFlex>
-            </form>
+            <VerticalFlex gap="10px">
+              <EmailInput setEmail={setEmail} />
+              <NameInput setUsername={setUsername} />
+              <PasswordInput setPassword={setPassword} />
+              <CfPasswordInput password={password} />
+              <SubmitButton type="submit" loading={submitting}>
+                Submit
+              </SubmitButton>
+              {/* Display error message if error when submit */}
+              {fail && <Alert severity="error">{failMessage}</Alert>}
+            </VerticalFlex>
           )}
           {emailSuccess && (
             <Button
@@ -189,7 +187,7 @@ function Logreg() {
               Check your email
             </Button>
           )}
-        </div>
+        </form>
       </Slide>
     </>
   );
