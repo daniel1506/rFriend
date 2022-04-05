@@ -10,7 +10,12 @@ import LoadingIcon from "./LoadingIcon";
 import { useEffect } from "react";
 function SubmitIconButton(props) {
   return (
-    <IconButton type="submit" color="primary" {...props}>
+    <IconButton
+      type="submit"
+      color="primary"
+      disabled={props.loading}
+      {...props}
+    >
       {props.error === undefined && props.loading === false ? (
         props.children ? (
           props.children

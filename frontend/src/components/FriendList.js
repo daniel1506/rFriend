@@ -47,6 +47,7 @@ function FriendList() {
         name={friend.name}
         key={friend.id}
         id={friend.id}
+        proPic={friend.profile_url}
         onClick={() => {
           setSelectedFriendId(friend.id);
           setShowProfile(true);
@@ -61,6 +62,7 @@ function FriendList() {
         name={pending_user.name}
         key={pending_user.id}
         id={pending_user.id}
+        proPic={pending_user.profile_url}
         onClick={() => {
           setSelectedFriendId(pending_user.id);
           setShowProfile(true);

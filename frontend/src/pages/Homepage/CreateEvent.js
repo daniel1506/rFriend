@@ -18,6 +18,8 @@ import {
   ToggleButtonGroup,
   Tooltip,
   IconButton,
+  Input,
+  Avatar,
 } from "@mui/material";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -31,6 +33,9 @@ import CloseButton from "../../components/CloseButton";
 import SquareToggleButton from "../../components/SquareToggleButton";
 import PersonIcon from "@mui/icons-material/Person";
 import PrivacyButtonGroup from "../../components/PrivacyButtonGroup";
+import SubmitIconButton from "../../components/SubmitIconButton";
+import ImageIcon from "@mui/icons-material/Image";
+import put from "../../lib/put";
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -41,14 +46,14 @@ const style = {
   top: "50%",
   bottom: "50%",
   marginBottom: "auto",
-  marginTop: "-160px",
   "@media (min-width: 0px)": {
-    marginTop: "-240px",
-    height: "480px",
+    marginTop: "-340px",
+    height: "680px",
   },
   "@media (min-width: 600px)": {
+    marginTop: "-255px",
     width: "400px",
-    height: "290px",
+    height: "510px",
   },
 
   // "@media (max-width: 1025px)": {
@@ -72,9 +77,37 @@ function CreateEvent(props) {
   const [category, setCategory] = useState(false);
   const [notification, setNotification] = useState(false);
   const [quota, setQuota] = useState(1);
+  const [eventPic, setEventPic] = useState("");
+  const [eventPicFailed, setEventPicFailed] = useState(undefined);
   const validateTitle = (title) => {};
   const handleChangePrivacy = (event, newPrivacy) => {
     setPrivacy(newPrivacy);
+  };
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+  const saveImage = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const eventPic = await convertBase64(file);
+      console.log(eventPic);
+      setEventPicFailed(!eventPic.startsWith("data:image"));
+      setEventPic(eventPic);
+    } catch (err) {
+      setEventPicFailed(true);
+      console.log(err);
+    }
   };
   return (
     <Modal
@@ -99,6 +132,14 @@ function CreateEvent(props) {
               gap: 1,
             }}
           >
+            <Avatar
+              variant="square"
+              src={eventPic}
+              style={{ width: "100%", height: "150px" }}
+              sx={{ borderRadius: 3 }}
+            >
+              <ImageIcon />
+            </Avatar>
             <Box
               sx={{
                 display: "flex",
@@ -227,14 +268,35 @@ function CreateEvent(props) {
               }}
             >
               <TimePicker />
-              <IconButton
-                color="primary"
-                aria-label="upload picture"
-                component="span"
-                sx={{ width: 54, height: 54 }}
-              >
-                <PhotoCamera />
-              </IconButton>
+              <label htmlFor="icon-button-file">
+                <Input
+                  inputProps={{ accept: "image/*" }}
+                  id="icon-button-file"
+                  type="file"
+                  sx={{ display: "none" }}
+                  onChange={(e) => {
+                    saveImage(e);
+                  }}
+                />
+                {/* <IconButton
+                  color="primary"
+                  aria-label="upload picture"
+                  component="span"
+                  sx={{ width: 54, height: 54 }}
+                >
+                  <PhotoCamera />
+                </IconButton> */}
+                <SubmitIconButton
+                  color="primary"
+                  aria-label="upload picture"
+                  component="span"
+                  sx={{ width: 54, height: 54 }}
+                  loading={false}
+                  error={eventPicFailed}
+                >
+                  <PhotoCamera />
+                </SubmitIconButton>
+              </label>
             </Box>
             <Box
               sx={{
