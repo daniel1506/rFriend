@@ -74,7 +74,11 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          authCtx.login(data.token, data.id, data.email, data.name, data.role);
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("id", data.id);
+          localStorage.setItem("email", data.email);
+          localStorage.setItem("name", data.name);
+          localStorage.setItem("role", data.role);
         }
       })
       .then(() => {
