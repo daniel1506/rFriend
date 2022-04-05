@@ -14,6 +14,7 @@ import post from "./lib/post";
 import { LoadingButton } from "@mui/lab";
 import EmailInput from "./components/EmailInput";
 import SubmitButton from "./components/SubmitButton";
+import redirectToMailBox from "./lib/redirectToMailBox";
 function ForgetPassword(props) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,10 +41,6 @@ function ForgetPassword(props) {
         console.error("Error:", error);
       });
   };
-  const redirectToEmailSite = () => {
-    let emailDomain = email.split("@")[1];
-    window.open(`http://${emailDomain}`, "_blank");
-  };
   return (
     <>
       <Button onClick={props.handleForget}>
@@ -69,7 +66,9 @@ function ForgetPassword(props) {
               <Button
                 variant="contained"
                 color="warning"
-                onClick={redirectToEmailSite}
+                onClick={() => {
+                  redirectToMailBox(email);
+                }}
               >
                 Check your email
               </Button>

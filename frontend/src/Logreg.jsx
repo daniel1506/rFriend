@@ -28,6 +28,7 @@ import EmailInput from "./components/EmailInput";
 import NameInput from "./components/NameInput";
 import SubmitButton from "./components/SubmitButton";
 import AuthContext from "./store/auth-context";
+import redirectToMailBox from "./lib/redirectToMailBox";
 function Logreg() {
   const [logChecked, setLogChecked] = React.useState(false);
   const [regChecked, setRegChecked] = React.useState(false);
@@ -89,10 +90,6 @@ function Logreg() {
       .catch((error) => {
         console.error("Error:", error);
       });
-  };
-  const redirectToEmailSite = () => {
-    let emailDomain = email.split("@")[1];
-    window.open(`http://${emailDomain}`, "_blank");
   };
   const log = (e) => {
     e.preventDefault();
@@ -184,7 +181,9 @@ function Logreg() {
           <Button
             variant="contained"
             color="warning"
-            onClick={redirectToEmailSite}
+            onClick={() => {
+              redirectToMailBox(email);
+            }}
           >
             Check your email
           </Button>
