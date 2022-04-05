@@ -161,33 +161,35 @@ function Logreg() {
         unmountOnExit
         className="info-input-container"
       >
-        {/* reg form */}
-        {!emailSuccess && (
-          <form onSubmit={reg}>
-            <VerticalFlex gap="10px">
-              <EmailInput setEmail={setEmail} />
-              <NameInput setUsername={setUsername} />
-              <PasswordInput setPassword={setPassword} />
-              <CfPasswordInput password={password} />
-              <SubmitButton type="submit" loading={submitting}>
-                Submit
-              </SubmitButton>
-              {/* Display error message if error when submit */}
-              {fail && <Alert severity="error">{failMessage}</Alert>}
-            </VerticalFlex>
-          </form>
-        )}
-        {emailSuccess && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => {
-              redirectToMailBox(email);
-            }}
-          >
-            Check your email
-          </Button>
-        )}
+        <>
+          {/* reg form */}
+          {!emailSuccess && (
+            <form onSubmit={reg}>
+              <VerticalFlex gap="10px">
+                <EmailInput setEmail={setEmail} />
+                <NameInput setUsername={setUsername} />
+                <PasswordInput setPassword={setPassword} />
+                <CfPasswordInput password={password} />
+                <SubmitButton type="submit" loading={submitting}>
+                  Submit
+                </SubmitButton>
+                {/* Display error message if error when submit */}
+                {fail && <Alert severity="error">{failMessage}</Alert>}
+              </VerticalFlex>
+            </form>
+          )}
+          {emailSuccess && (
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => {
+                redirectToMailBox(email);
+              }}
+            >
+              Check your email
+            </Button>
+          )}
+        </>
       </Slide>
     </>
   );
