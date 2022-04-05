@@ -39,6 +39,7 @@ function Logreg() {
   const [fail, setFail] = React.useState(false);
   const [failMessage, setFailMessage] = React.useState(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [emailSuccess, setEmailSuccess] = React.useState(false);
   const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
   const handleLog = () => {
@@ -79,6 +80,7 @@ function Logreg() {
           localStorage.setItem("email", data.email);
           localStorage.setItem("name", data.name);
           localStorage.setItem("role", data.role);
+          setEmailSuccess(true);
         }
       })
       .then(() => {
@@ -87,6 +89,10 @@ function Logreg() {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  const redirectToEmailSite = () => {
+    let emailDomain = email.split("@")[1];
+    window.open(`http://${emailDomain}`, "_blank");
   };
   const log = (e) => {
     e.preventDefault();
@@ -159,19 +165,30 @@ function Logreg() {
         className="info-input-container"
       >
         {/* reg form */}
-        <form onSubmit={reg}>
-          <VerticalFlex gap="10px">
-            <EmailInput setEmail={setEmail} />
-            <NameInput setUsername={setUsername} />
-            <PasswordInput setPassword={setPassword} />
-            <CfPasswordInput password={password} />
-            <SubmitButton type="submit" loading={submitting}>
-              Submit
-            </SubmitButton>
-            {/* Display error message if error when submit */}
-            {fail && <Alert severity="error">{failMessage}</Alert>}
-          </VerticalFlex>
-        </form>
+        {!emailSuccess && (
+          <form onSubmit={reg}>
+            <VerticalFlex gap="10px">
+              <EmailInput setEmail={setEmail} />
+              <NameInput setUsername={setUsername} />
+              <PasswordInput setPassword={setPassword} />
+              <CfPasswordInput password={password} />
+              <SubmitButton type="submit" loading={submitting}>
+                Submit
+              </SubmitButton>
+              {/* Display error message if error when submit */}
+              {fail && <Alert severity="error">{failMessage}</Alert>}
+            </VerticalFlex>
+          </form>
+        )}
+        {emailSuccess && (
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={redirectToEmailSite}
+          >
+            Check your email
+          </Button>
+        )}
       </Slide>
     </>
   );
