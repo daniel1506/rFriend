@@ -21,7 +21,7 @@ describe("User Registration", () => {
     expect(res.status).toBe(422);
   });
 
-  it("Should return 201 if successful", async () => {
+  it("Should return 200 and the corresponding user's name, email and profile_url if successful", async () => {
     const payload = {
       name: userArray[0].name,
       email: userArray[0].email,

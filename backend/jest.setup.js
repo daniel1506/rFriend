@@ -38,7 +38,7 @@ const initializeTestDatabase = () => {
   const dbName = getTestDbName(testUuid);
   console.log("Creating Database", dbName);
 
-  execSync(`${prismaBinary} db push`, {
+  execSync(`"${prismaBinary}" db push`, {
     env: {
       ...process.env,
       DATABASE_URL: getTestDbUrl(testUuid),

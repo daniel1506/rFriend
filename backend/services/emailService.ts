@@ -38,9 +38,9 @@ const sendEmail = (receiver: String, subject: String, text: String) => {
 };
 
 const generateForgetPasswordEmail = (token: string) => {
-  let link: string = "https://rfriend.herouapps.com/reset-password/" + token;
+  let link: string = "https://rfriend.herokuapp.com/reset-password/" + token;
 
-  let content: string = "Hi User,\nPlease click the below to reset password.\n";
+  let content: string = "Hi User,\nPlease click the below link to reset password.\n";
 
   content = content + link;
   content = content + "\nThis link expires in 1 hour.";
@@ -48,5 +48,5 @@ const generateForgetPasswordEmail = (token: string) => {
   return content;
 };
 
-// export {sendEmail, generateForgetPasswordEmail}
+
 export { sendEmail, generateForgetPasswordEmail };
