@@ -7,7 +7,7 @@ import HttpException from "../common/httpException";
 import { generateFriendsList, generateFOFList } from "../services/friendService";
 
 import bcrypt from "bcrypt";
-import { generateJWT } from "../services/authService";
+import { generateJWT, JWTpayload } from "../services/authService";
 import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
 import { PutObjectCommand, PutObjectCommandInput, HeadObjectCommand, HeadObjectCommandInput } from "@aws-sdk/client-s3";
@@ -15,10 +15,7 @@ import { s3Client } from "../AWS/s3Cient";
 
 import jwt from "jsonwebtoken";
 
-import { sendEmail, generateForgetPasswordEmail } from "../services/emailService";
-
-import { stringify } from "querystring";
-import { runMain } from "module";
+import { sendEmail, generateForgetPasswordEmail, sendVerifyEmailEmail } from "../services/emailService";
 
 // -----------------------------------------------------------------------------
 
@@ -61,6 +58,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     return next(prismaErrorHandler(e));
   }
 
+  sendVerifyEmailEmail(result.id, result.name, result.email);
+
   // generate token
   const token = generateJWT(result.id, result.email);
 
@@ -70,6 +69,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     name: result.name,
     token: token,
     role: result.role,
+    verified_at: result.verfiedAt,
   });
 };
 
@@ -114,6 +114,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     name: user.name,
     token: token,
     role: user.role,
+    verified_at: user.verfiedAt,
   });
 };
 
@@ -139,11 +140,13 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
   try {
     const user = await prisma.user.findUnique({
       where: { id: id },
+      include: { participatesIn: true },
     });
 
     if (!user) {
       return next(new HttpException(401, "Cannot find user"));
     }
+
 
     let response_content: {name: string, email: string, profile_url: string|null} = {
                                                                                         name: user.name,
@@ -169,6 +172,7 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
     
 
     
+
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
@@ -338,7 +342,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
 
     // Store the url into the database
   } catch (err) {
-    return next(new HttpException(500, "Error in AWS."));
+    return next(new HttpException(500, "Error in AWS: " + err));
   }
 };
 
@@ -353,6 +357,10 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
       where: {
         id: user_id,
       },
+      include: {
+        participatesIn: true,
+        interestedIn: true,
+      },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
@@ -361,6 +369,9 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
   if (!user) {
     return next(new HttpException(404, "User not found"));
   }
+
+  let joinedEvent = user.participatesIn.map((event) => event.id);
+  let likedEvent = user.interestedIn.map((event) => event.id);
 
   const friendsList = (await generateFriendsList(user_id)) as number[];
   const fofList = (await generateFOFList(user_id)) as number[];
@@ -387,12 +398,29 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
           },
         ],
       },
+      include: { comments: true },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(201).send({ event: result });
+  let x = JSON.stringify(result);
+
+  result.forEach((event: any) => {
+    if (joinedEvent.includes(event.id)) {
+      event.isEventJoined = true;
+    } else {
+      event.isEventJoined = false;
+    }
+
+    if (likedEvent.includes(event.id)) {
+      event.isEventLiked = true;
+    } else {
+      event.isEventLiked = false;
+    }
+  });
+
+  res.status(200).send({ event: result });
 };
 
 // -----------------------------------------------------------------------------
@@ -561,6 +589,32 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   }
 
   res.status(201).send({ comments: event.comments });
+};
+
+// -----------------------------------------------------------------------------
+
+export const validateVerifyEmail = [body("token").exists()];
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const { token } = req.body;
+
+  try {
+    const { id } = jwt.verify(token.toString(), process.env.JWT_SECRET_VERIFY_EMAIL!) as JWTpayload;
+
+    await prisma.user.update({
+      where: { id },
+      data: { verfiedAt: new Date() },
+    });
+  } catch (e) {
+    return next(new HttpException(422, "Invalid email verify token"));
+  }
+
+  res.status(200).send({});
 };
 
 // -----------------------------------------------------------------------------

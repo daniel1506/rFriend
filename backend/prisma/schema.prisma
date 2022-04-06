@@ -45,7 +45,7 @@ model FriendRquest {
 
 model Event {
   id      Int  @id @default(autoincrement())
-  owner   User @relation(name: "EventOwner", fields: [ownerId], references: [id])
+  owner   User @relation(name: "EventOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId Int
 
   participants User[]         @relation("Participants")
@@ -71,7 +71,7 @@ model Event {
 model EventComment {
   id      Int    @id @default(autoincrement())
   userId  Int
-  event   Event  @relation(fields: [eventId], references: [id])
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId Int
   text    String @db.Text
 

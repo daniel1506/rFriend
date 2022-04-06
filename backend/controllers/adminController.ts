@@ -91,19 +91,16 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     return next(new HttpException(404, "User not found"));
   }
 
-  const deleteEvents = prisma.event.deleteMany({
-    where: {
-      ownerId: user_id,
-    },
-  });
-
-  const deleteUser = prisma.user.delete({
-    where: {
-      id: user_id,
-    },
-  });
-
-  const transaction = await prisma.$transaction([deleteEvents, deleteUser]);
+  let result;
+  try {
+    result = await prisma.user.delete({
+      where: {
+        id: user_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
 
   res.status(201).send({ message: "User deleted" });
 };

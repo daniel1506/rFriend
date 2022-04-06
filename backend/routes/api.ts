@@ -33,6 +33,8 @@ userRouter.post("/comment", authMiddleware, userController.validateComment, user
 userRouter.post("/forget_pw", userController.forgetPassword);
 userRouter.post("/pw_reset", userController.validateNewPassword, userController.resetPassword);
 
+userRouter.post("/verify", userController.validateVerifyEmail, userController.verifyEmail);
+
 // -----------------------------------------------------------------------------
 
 const adminRouter = express.Router();

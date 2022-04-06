@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const AuthContext = React.createContext({
   //no actual effect, since you can see we will declare them in the later part, so the code here only for readability and intelSense
-  id: "",
+  id: NaN,
   email: "",
   name: "",
   token: "",

@@ -1,18 +1,17 @@
 //A helper component for quickly flex items in vertical direction
 import React from "react";
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 function VerticalFlex(props) {
   return (
-    <Grid
-      container
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      gap="10px"
+    <Box
+      display={{ xs: "flex" }}
+      flexDirection={{ xs: "column" }}
+      alignItems={{ xs: "center" }}
+      justifyContent={{ xs: "center" }}
       {...props}
     >
       {props.children}
-    </Grid>
+    </Box>
   );
 }
 

@@ -1,4 +1,5 @@
-import { NextFunction, Request, Response } from "express";
+import { UploadPartRequest } from "@aws-sdk/client-s3";
+import { NextFunction, Request, Response, urlencoded } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
@@ -207,11 +208,38 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
     return next(prismaErrorHandler(e));
   }
 
+  let pending_requests;
+
+  try {
+    pending_requests = await prisma.friendRquest.findMany({
+      where: { fromUser: target_user_id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let pending_id = pending_requests.map((request) => request.toUser);
+  let pending;
+
+  try {
+    pending = await prisma.user.findMany({
+      where: { id: { in: pending_id } },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
   let friends = [...user!.friends, ...user!.friendsOf];
   friends = friends.map((friend) => ({
     ...friend,
     profile_url: getProfileUrl(friend.id),
   }));
 
-  res.send({ friends });
+  let pending_users = pending.map((pending_user) => ({
+    ...pending_user,
+    profile_url: getProfileUrl(pending_user.id),
+  }));
+
+  res.send({ friends, pending_users });
 };

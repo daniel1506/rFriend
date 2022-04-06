@@ -21,25 +21,25 @@ import PasswordInput from "../../components/PasswordInput";
 import Grow from "@mui/material/Grow";
 function Useritem(props) {
   const [newPassword, setNewPassword] = useState("");
-  const [loading, setLoading] = useState(null);
-  const [error, setError] = useState(null);
-  const [banning, setBanning] = useState(null);
-  const [banError, setBanError] = useState(null);
+  const [resetting, setResetting] = useState(false);
+  const [error, setError] = useState(undefined);
+  const [banning, setBanning] = useState(false);
+  const [banError, setBanError] = useState(undefined);
   const clearProgress = () => {
-    setLoading(null);
+    setResetting(null);
     setError(null);
   };
   const reset = (user_id, password) => {
     //sending request to reset user password
     const data = { user_id, password };
     console.log(data);
-    setLoading(true);
+    setResetting(true);
     put("https://rfriend.herokuapp.com/api/admin", data)
       .then((result) => {
         console.log(result);
         if (result.status != 201) setError(true);
         else setError(false);
-        setLoading(false);
+        setResetting(false);
       })
       .catch((err) => {
         console.log(err);
@@ -68,7 +68,7 @@ function Useritem(props) {
   };
   return (
     <Grow in={true} timeout={500}>
-      <Card sx={{ marginBottom: 2 }}>
+      <Card sx={{ marginBottom: 2 }} onClick={props.onClick}>
         <ListItem disablePadding>
           <ListItemButton component="a" href="#simple-list">
             <ListItemText
@@ -105,6 +105,9 @@ function Useritem(props) {
                         noHelperText
                         label="new password"
                         setPassword={setNewPassword}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
                       />
                       <Box
                         sx={{
@@ -113,16 +116,17 @@ function Useritem(props) {
                           alignItems: "center",
                         }}
                       >
-                        <ResultDisplay error={error} color="warning" />
                         <SubmitButton
                           variant="contained"
-                          endIcon={<LockResetIcon />}
+                          error={error}
                           color="warning"
                           onClick={(e) => {
+                            e.stopPropagation();
                             clearProgress();
                             reset(props.userid, newPassword);
                           }}
-                          loading={loading}
+                          icon={<LockResetIcon />}
+                          loading={resetting}
                         >
                           Reset password
                         </SubmitButton>
@@ -134,15 +138,16 @@ function Useritem(props) {
                           alignItems: "center",
                         }}
                       >
-                        <ResultDisplay error={banError} color="error" />
                         <SubmitButton
                           variant="contained"
-                          endIcon={<BlockIcon />}
+                          error={banError}
                           loading={banning}
                           color="error"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             ban(props.userid);
                           }}
+                          icon={<BlockIcon />}
                         >
                           Ban
                         </SubmitButton>

@@ -14,22 +14,24 @@ import post from "./lib/post";
 import { LoadingButton } from "@mui/lab";
 import EmailInput from "./components/EmailInput";
 import SubmitButton from "./components/SubmitButton";
+import redirectToMailBox from "./lib/redirectToMailBox";
 function ForgetPassword(props) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [fail, setFail] = useState(false);
   const [failMessage, setFailMessage] = useState(false);
   const submitForget = (e) => {
     e.preventDefault();
-    setLoading(true);
     let data = { email };
     console.log(data);
+    setLoading(true);
     post("https://rfriend.herokuapp.com/api/user/forget_pw", data)
       .then((data) => {
-        if (data.statuscode != 200) {
+        if (data.status != 200) {
           setFail(true);
           setFailMessage(data.message);
-        }
+        } else setSuccess(true);
         console.log("Response:", data);
       })
       .then(() => {
@@ -53,12 +55,24 @@ function ForgetPassword(props) {
             alignItems="center"
             justify="center"
             gap="10px"
-            marginTop="10px"
           >
-            <EmailInput setEmail={setEmail} />
-            <SubmitButton type="submit" loading={loading}>
-              Submit
-            </SubmitButton>
+            {!success && <EmailInput setEmail={setEmail} />}
+            {!success && (
+              <SubmitButton type="submit" loading={loading}>
+                Submit
+              </SubmitButton>
+            )}
+            {success && (
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => {
+                  redirectToMailBox(email);
+                }}
+              >
+                Check your email
+              </Button>
+            )}
             {/* Display error message if error when submit */}
             {fail && <Alert severity="error">{failMessage}</Alert>}
           </VerticalFlex>

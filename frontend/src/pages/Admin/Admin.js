@@ -1,6 +1,7 @@
 //@ts-check
 import { React, useContext, useState } from "react";
 import AuthContext from "../../store/auth-context";
+import Profile from "../../components/Profile";
 import { Grid, Container, Box, IconButton, Avatar } from "@mui/material";
 import Navbar from "../../components/Navbar";
 import List from "@mui/material/List";
@@ -10,15 +11,18 @@ import put from "../../lib/put";
 import { useEffect } from "react";
 function Admin() {
   const [usersdata, setUsersData] = useState([]);
-  const [usersDataForShow, setUsersDataForShow] = useState([]);
+  const [filteredUserData, setFilteredUserData] = useState([]);
   const authCtx = useContext(AuthContext);
   const [banned, setBanned] = useState(0);
+  const [showProfile, setShowProfile] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(NaN);
   // const [searchWord, setSearchWord] = useState(null);
   const handleSetBanned = () => {
     setBanned((prev) => {
       return prev + 1;
     });
   };
+  console.log(selectedUserId);
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/admin")
       .then((result) => {
@@ -41,10 +45,10 @@ function Admin() {
       if (searchWord.length == 0) return true;
       else return userdata.name.includes(searchWord);
     });
-    setUsersDataForShow(filteredData);
+    setFilteredUserData(filteredData);
   };
   //---------------------------------------------------------------------------------------------------------------------
-  const useritems = usersDataForShow.map((userdata) => {
+  const useritems = filteredUserData.map((userdata) => {
     return (
       <Useritem
         name={userdata.name}
@@ -52,6 +56,10 @@ function Admin() {
         password={userdata.password}
         key={userdata.id}
         setBanned={handleSetBanned}
+        onClick={() => {
+          setSelectedUserId(userdata.id);
+          setShowProfile(true);
+        }}
       />
     );
   });
@@ -67,6 +75,12 @@ function Admin() {
       <Container>
         <List>{useritems.length == 0 ? "no data" : useritems}</List>
       </Container>
+      <Profile
+        id={selectedUserId}
+        showProfile={showProfile}
+        setShowProfile={setShowProfile}
+        admin
+      />
     </>
   );
 }

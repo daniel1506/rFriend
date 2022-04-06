@@ -1,3 +1,4 @@
+//@ts-check
 import * as React from "react";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -19,15 +20,27 @@ import CloseButton from "./CloseButton";
 import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
-import { IconButton } from "@mui/material";
+import { IconButton, CircularProgress } from "@mui/material";
 import Input from "@mui/material/Input";
 import AuthContext from "../store/auth-context";
 import post from "../lib/post";
 import put from "../lib/put";
 import get from "../lib/get";
+import deleteReq from "../lib/delete";
 import LoadingIcon from "./LoadingIcon";
+import CrossButton from "./CrossButton";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import ErrorIcon from "@mui/icons-material/Error";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import HorizontalFlex from "../layout/HorizontalFlex";
+import IdShowCase from "./IdShowCase";
+import SubmitIconButton from "./SubmitIconButton";
 const style = {
-  position: "absolute",
+  position: "relative",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
   left: "0",
   right: "0",
   marginLeft: "auto",
@@ -39,6 +52,11 @@ const style = {
   marginTop: "-300px",
   //The below style in the media query will replace some style above when the screen is large enough
   "@media (min-width: 700px)": {
+    width: "30%",
+    height: "600px",
+    marginTop: "-300px",
+  },
+  "@media (min-width: 1400px)": {
     width: "30%",
     height: "400px",
     marginTop: "-200px",
@@ -62,47 +80,35 @@ export default function Profile(props) {
   const authCtx = React.useContext(AuthContext);
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
-  const [password, setPassword] = React.useState(null);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
-  const [submittingNewPassword, setSubmittingNewPassword] =
-    React.useState(false);
-  const getProfilePic = () => {
-    let id = authCtx("id");
+  const [resetting, setResetting] = React.useState(false);
+  const [resetFailed, setResetFailed] = React.useState(undefined);
+  const [email, setEmail] = React.useState("");
+  const [username, setUserName] = React.useState("");
+  const [uploading, setUpLoading] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+  const [deleteFailed, setDeleteFailed] = React.useState(undefined);
+  const getUserProfile = () => {
+    let id = props.id ? props.id : authCtx.id;
+    setUpLoading(true);
     get(
       `https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`
-    );
-  };
-  const submitNewPassword = () => {
-    setSubmittingNewPassword(true);
-    const data = { password };
-    post(`https://rfriend.herokuapp.com/api/user/pw_reset`, data)
+    )
       .then((result) => {
-        setSubmittingNewPassword(false);
-      })
-      .catch((error) => {
-        setSubmittingNewPassword(false);
-        console.log(error);
-      });
-  };
-  const uploadImage = async (e) => {
-    const file = e.target.files[0];
-    const base64 = await convertBase64(file);
-    console.log(base64);
-    const data = { base64 };
-    setSubmittingProPic(true);
-    put("https://rfriend.herokuapp.com/api/user/profile", data)
-      .then((result) => {
-        setSubmittingProPic(false);
-        console.log(result.status);
-        console.log(result.profile_url);
+        console.log(result);
         setProfilePicUrl(result.profile_url);
+        setEmail(result.email);
+        setUserName(result.name);
+        setUpLoading(false);
       })
       .catch((err) => {
-        setSubmittingProPic(false);
         console.log(err);
       });
   };
+  React.useEffect(() => {
+    getUserProfile();
+  }, [props.id]);
   const convertBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -117,13 +123,73 @@ export default function Profile(props) {
       };
     });
   };
+  const uploadImage = async (e) => {
+    const file = e.target.files[0];
+    const profile = await convertBase64(file);
+    console.log(profile);
+    const data = { profile };
+    setSubmittingProPic(true);
+    console.log(data);
+    put("https://rfriend.herokuapp.com/api/user/profile", data)
+      .then((result) => {
+        setSubmittingProPic(false);
+        console.log(result);
+        if (result.status != 200) {
+        } else {
+          let timestamp = new Date().getTime(); //to force browser download image again from the url
+          console.log(result.profileURL + `?t=${timestamp}`);
+          setProfilePicUrl(result.profileURL + `?t=${timestamp}`);
+        }
+      })
+      .catch((err) => {
+        setSubmittingProPic(false);
+        console.log(err);
+      });
+  };
+  const resetPassword = () => {
+    let data = { email: authCtx.email };
+    setResetting(true);
+    post("https://rfriend.herokuapp.com/api/user/forget_pw", data).then(
+      (result) => {
+        setResetting(false);
+        if (result.status != 200) {
+          setResetFailed(true);
+        } else {
+          setResetFailed(false);
+        }
+      }
+    );
+  };
+  const redirectToMailBox = () => {
+    let email = authCtx.email;
+    let emailDomain = email.split("@")[1];
+    window.open(`http://${emailDomain}`, "_blank");
+  };
+  const deleteFriend = () => {
+    let data = { target_user_id: props.id };
+    setDeleting(true);
+    deleteReq("https://rfriend.herokuapp.com/api/friend", data).then(
+      (result) => {
+        setDeleting(false);
+        if (result.status != 200) {
+          setDeleteFailed(true);
+        } else {
+          setDeleteFailed(false);
+          props.handleDeleted();
+        }
+      }
+    );
+  };
   return (
     <div>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={props.showProfile}
-        onClose={handleClose}
+        onClose={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
@@ -132,71 +198,122 @@ export default function Profile(props) {
       >
         <Slide in={props.showProfile}>
           <Box sx={style}>
-            <Grid
-              container
-              direction={{ xs: "column", sm: "row" }}
-              justifyContent={{ xs: "space-around" }}
-              alignItems={{ xs: "center" }}
-              sx={{ height: "100%" }}
-            >
-              <Grid item>
-                <VerticalFlex>
-                  <Badge
-                    badgeContent={
-                      <label htmlFor="icon-button-file">
-                        <Input
-                          accept="image/*"
-                          id="icon-button-file"
-                          type="file"
-                          sx={{ display: "none" }}
-                          onChange={(e) => {
-                            uploadImage(e);
-                          }}
+            <CrossButton handleClose={handleClose} color="secondary" />
+            {uploading && <CircularProgress />}
+            {!uploading && (
+              <>
+                <Grid
+                  container
+                  direction={{ xs: "column", sm: "row" }}
+                  justifyContent={{ xs: "space-around" }}
+                  alignItems={{ xs: "center" }}
+                  sx={{ height: "100%" }}
+                >
+                  <Grid item>
+                    <VerticalFlex gap="10px">
+                      <Badge
+                        badgeContent={
+                          <label htmlFor="icon-button-file">
+                            <Input
+                              inputProps={{ accept: "image/*" }}
+                              id="icon-button-file"
+                              type="file"
+                              sx={{ display: "none" }}
+                              onChange={(e) => {
+                                uploadImage(e);
+                              }}
+                              disabled={submittingProPic}
+                            />
+                            <IconButton
+                              color="primary"
+                              component="span"
+                              disabled={submittingProPic}
+                              sx={{ display: props.id ? "none" : "block" }}
+                            >
+                              {!submittingProPic && <EditIcon />}
+                              {submittingProPic && <LoadingIcon />}
+                            </IconButton>
+                          </label>
+                        }
+                        overlap="circular"
+                        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                      >
+                        <Avatar
+                          alt="Cindy Baker"
+                          src={profilePicUrl}
+                          sx={{ width: 200, height: 200 }}
                         />
+                      </Badge>
+                      <NameShowCase>
+                        {`${username} #${props.id ? props.id : authCtx.id}`}
+                      </NameShowCase>
+                      <EmailShowCase>{email}</EmailShowCase>
+                      {/* {!deleting && (
                         <IconButton
-                          aria-label="delete"
-                          color="primary"
-                          component="span"
-                          disabled={submittingProPic}
+                          color="error"
+                          sx={{
+                            display:
+                              props.id && !props.admin ? "block" : "none",
+                          }}
                         >
-                          {!submittingProPic && <EditIcon />}
-                          {submittingProPic && <LoadingIcon />}
+                          <PersonRemoveIcon />
                         </IconButton>
-                      </label>
-                    }
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <Avatar
-                      alt="Cindy Baker"
-                      src={profilePicUrl}
-                      sx={{ width: 200, height: 200 }}
-                    />
-                  </Badge>
-                  <NameShowCase>{authCtx.name}</NameShowCase>
-                  <EmailShowCase>{authCtx.email}</EmailShowCase>
-                </VerticalFlex>
-              </Grid>
+                      )} */}
+                      {resetFailed !== false && (
+                        <SubmitButton
+                          variant="contained"
+                          color="warning"
+                          sx={{
+                            display: !props.id ? "flex" : "none",
+                          }}
+                          icon={<LockResetIcon />}
+                          error={resetFailed}
+                          loading={resetting}
+                          onClick={() => {
+                            resetPassword();
+                          }}
+                        >
+                          Reset Password
+                        </SubmitButton>
+                      )}
+                      {resetFailed === false && (
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          onClick={() => {
+                            redirectToMailBox();
+                            authCtx.logout();
+                          }}
+                        >
+                          Check Your email
+                        </Button>
+                      )}
+                    </VerticalFlex>
+                  </Grid>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  submitNewPassword();
-                }}
-              >
-                <VerticalFlex>
-                  <PasswordInput
-                    label="new password"
-                    setPassword={setPassword}
-                  />
-                  <CfPasswordInput password={password} />
-                  <SubmitButton loading={submittingNewPassword}>
-                    Submit
-                  </SubmitButton>
-                  <CloseButton onClick={handleClose}>Close</CloseButton>
-                </VerticalFlex>
-              </form>
-            </Grid>
+                  {/* {!props.id && (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        submitNewPassword();
+                      }}
+                    >
+                      <VerticalFlex>
+                        <PasswordInput
+                          label="new password"
+                          setPassword={setPassword}
+                        />
+                        <CfPasswordInput password={password} />
+                        <SubmitButton uploading={submittingNewPassword}>
+                          Submit
+                        </SubmitButton>
+                        <CloseButton onClick={handleClose}>Close</CloseButton>
+                      </VerticalFlex>
+                    </form>
+                  )} */}
+                </Grid>
+              </>
+            )}
           </Box>
         </Slide>
       </Modal>
