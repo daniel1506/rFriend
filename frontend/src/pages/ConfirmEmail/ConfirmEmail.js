@@ -54,12 +54,10 @@ function ConfirmEmail() {
       <Zoom
         in={!loading}
         timeout={500}
-        sx={
-          emailFailed === undefined || true
-            ? { display: "block" }
-            : { display: "none" }
-        }
-        sx={{ borderRadius: "20px" }}
+        sx={{
+          display: emailFailed === false ? "none" : "block",
+          borderRadius: "20px",
+        }}
       >
         <Button
           variant="contained"
