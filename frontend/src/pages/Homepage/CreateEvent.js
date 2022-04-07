@@ -139,6 +139,7 @@ function CreateEvent(props) {
       BackdropProps={{
         timeout: 500,
       }}
+      sx={{ overflow: "scroll" }}
     >
       <Slide in={props.showCreateEvent}>
         <Box sx={style}>

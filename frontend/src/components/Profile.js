@@ -204,6 +204,7 @@ export default function Profile(props) {
         BackdropProps={{
           timeout: 500,
         }}
+        sx={{ overflow: "scroll" }}
       >
         <Slide in={props.showProfile}>
           <Box sx={style}>
