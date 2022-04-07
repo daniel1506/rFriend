@@ -2,19 +2,25 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
+import { getProfileUrl } from "../controllers/userController";
 import bcrypt from "bcrypt";
 
 // -----------------------------------------------------------------------------
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
-  let user;
+  let result;
   try {
-    user = await prisma.user.findMany();
+    result = await prisma.user.findMany();
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(201).send(user);
+  let user = result.map((user) => ({
+    ...user,
+    profileUrl: getProfileUrl(user.id),
+  }));
+
+  res.send(user);
 };
 
 // -----------------------------------------------------------------------------

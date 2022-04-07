@@ -209,7 +209,6 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   let pending_requests;
-
   try {
     pending_requests = await prisma.friendRquest.findMany({
       where: { fromUser: target_user_id, acceptedAt: null },
@@ -220,10 +219,29 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
 
   let pending_id = pending_requests.map((request) => request.toUser);
   let pending;
-
   try {
     pending = await prisma.user.findMany({
       where: { id: { in: pending_id } },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let waiting_requests;
+  try {
+    waiting_requests = await prisma.friendRquest.findMany({
+      where: { toUser: target_user_id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let waiting_id = waiting_requests.map((request) => request.fromUser);
+  let waiting;
+  try {
+    waiting = await prisma.user.findMany({
+      where: { id: { in: waiting_id } },
       select: { id: true, name: true, email: true },
     });
   } catch (e) {
@@ -241,5 +259,10 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
     profile_url: getProfileUrl(pending_user.id),
   }));
 
-  res.send({ friends, pending_users });
+  let waiting_accept = waiting.map((waiting_user) => ({
+    ...waiting_user,
+    profile_url: getProfileUrl(waiting_user.id),
+  }));
+
+  res.send({ friends, pending_users, waiting_accept });
 };
