@@ -10,12 +10,12 @@ function ResultDisplay(props) {
   return (
     <>
       {props.error === false && (
-        <Zoom in={!props.error} timeout={500} color="primary" {...props}>
+        <Zoom in={!props.error} timeout={500} color="inherit" {...props}>
           <DoneIcon />
         </Zoom>
       )}
       {props.error === true && (
-        <Zoom in={props.error} timeout={500} color="primary" {...props}>
+        <Zoom in={props.error} timeout={500} color="inherit" {...props}>
           <ErrorIcon />
         </Zoom>
       )}

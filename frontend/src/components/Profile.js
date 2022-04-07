@@ -195,9 +195,11 @@ export default function Profile(props) {
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={props.showProfile}
-        onClose={(e) => {
-          e.stopPropagation();
+        onClose={() => {
           handleClose();
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
         }}
         closeAfterTransition
         BackdropComponent={Backdrop}

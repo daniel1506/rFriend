@@ -10,8 +10,8 @@ function EmailShowCase(props) {
       sx={{ textTransform: "none" }}
       {...props}
       onClick={(e) => {
+        e.stopPropagation(); //not working
         window.location.href = `mailto:${props.children}`;
-        e.preventDefault();
       }}
     >
       {props.children}
