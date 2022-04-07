@@ -35,6 +35,7 @@ import LockResetIcon from "@mui/icons-material/LockReset";
 import HorizontalFlex from "../layout/HorizontalFlex";
 import IdShowCase from "./IdShowCase";
 import SubmitIconButton from "./SubmitIconButton";
+import GeneralContext from "../store/general-context";
 const style = {
   position: "relative",
   display: "flex",
@@ -78,6 +79,7 @@ const style = {
 
 export default function Profile(props) {
   const authCtx = React.useContext(AuthContext);
+  const generalCtx = React.useContext(GeneralContext);
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
@@ -166,7 +168,7 @@ export default function Profile(props) {
     window.open(`http://${emailDomain}`, "_blank");
   };
   const deleteFriend = () => {
-    let data = { target_user_id: props.id };
+    let data = { target_user_id: parseInt(props.id) };
     setDeleting(true);
     deleteReq("https://rfriend.herokuapp.com/api/friend", data).then(
       (result) => {
@@ -175,7 +177,7 @@ export default function Profile(props) {
           setDeleteFailed(true);
         } else {
           setDeleteFailed(false);
-          props.handleDeleted();
+          generalCtx.handleFriendModified();
         }
       }
     );
@@ -248,17 +250,16 @@ export default function Profile(props) {
                         {`${username} #${props.id ? props.id : authCtx.id}`}
                       </NameShowCase>
                       <EmailShowCase>{email}</EmailShowCase>
-                      {/* {!deleting && (
-                        <IconButton
+                      {!props.admin && (
+                        <SubmitIconButton
+                          loading={deleting}
+                          error={deleteFailed}
                           color="error"
-                          sx={{
-                            display:
-                              props.id && !props.admin ? "block" : "none",
-                          }}
+                          onClick={deleteFriend}
                         >
                           <PersonRemoveIcon />
-                        </IconButton>
-                      )} */}
+                        </SubmitIconButton>
+                      )}
                       {resetFailed !== false && (
                         <SubmitButton
                           variant="contained"

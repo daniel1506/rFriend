@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import AuthContext from "../store/auth-context";
+import GeneralContext from "../store/general-context";
 import { useContext, useState } from "react";
 import put from "../lib/put";
 import get from "../lib/get";
@@ -20,6 +21,7 @@ function AddFriendField() {
   const [addFailed, setAddFailed] = useState(undefined);
   const [friendId, setFriendId] = useState(NaN);
   const authCtx = useContext(AuthContext);
+  const generalCtx = useContext(GeneralContext);
   const addFriend = () => {
     let data = { target_user_id: friendId };
     setAdding(true);
@@ -30,7 +32,10 @@ function AddFriendField() {
         console.log(result);
         if (result.status != 201) {
           setAddFailed(true);
-        } else setAddFailed(false);
+        } else {
+          setAddFailed(false);
+          generalCtx.handleFriendModified();
+        }
       })
       .catch((err) => {
         console.log(err);

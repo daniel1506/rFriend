@@ -3,6 +3,7 @@
 function get(url) {
   const token = localStorage.getItem("token") || "";
   let status;
+
   return fetch(url, {
     method: "GET",
     headers: {
