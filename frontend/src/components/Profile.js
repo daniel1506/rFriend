@@ -195,7 +195,7 @@ export default function Profile(props) {
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={props.showProfile}
-        onClose={() => {
+        onClose={(e) => {
           handleClose();
         }}
         onClick={(e) => {
