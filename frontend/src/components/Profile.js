@@ -169,15 +169,22 @@ export default function Profile(props) {
   };
   const deleteFriend = () => {
     let data = { target_user_id: parseInt(props.id) };
+    console.log(data);
     setDeleting(true);
     deleteReq("https://rfriend.herokuapp.com/api/friend", data).then(
       (result) => {
+        console.log(result);
         setDeleting(false);
         if (result.status != 200) {
           setDeleteFailed(true);
         } else {
           setDeleteFailed(false);
-          generalCtx.handleFriendModified();
+          setTimeout(() => {
+            props.setShowProfile(false);
+            setTimeout(() => {
+              generalCtx.handleFriendModified();
+            }, 500);
+          }, 500);
         }
       }
     );
@@ -255,7 +262,10 @@ export default function Profile(props) {
                           loading={deleting}
                           error={deleteFailed}
                           color="error"
-                          onClick={deleteFriend}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteFriend();
+                          }}
                         >
                           <PersonRemoveIcon />
                         </SubmitIconButton>

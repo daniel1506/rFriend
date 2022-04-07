@@ -10,20 +10,12 @@ function ResultDisplay(props) {
   return (
     <>
       {props.error === false && (
-        <Zoom
-          in={!props.error}
-          timeout={500}
-          color={props.color == null ? "inherit" : props.color}
-        >
+        <Zoom in={!props.error} timeout={500} color="primary" {...props}>
           <DoneIcon />
         </Zoom>
       )}
       {props.error === true && (
-        <Zoom
-          in={props.error}
-          timeout={500}
-          color={props.color == null ? "inherit" : props.color}
-        >
+        <Zoom in={props.error} timeout={500} color="primary" {...props}>
           <ErrorIcon />
         </Zoom>
       )}

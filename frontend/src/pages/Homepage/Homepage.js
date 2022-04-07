@@ -22,7 +22,11 @@ function Homepage() {
         showCreateEvent={showCreateEvent}
         setShowCreateEvent={setShowCreateEvent}
       />
-      <Profile setShowProfile={setShowProfile} showProfile={showProfile} />
+      <Profile
+        setShowProfile={setShowProfile}
+        showProfile={showProfile}
+        admin
+      />
     </>
   );
 }

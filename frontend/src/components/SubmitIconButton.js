@@ -24,8 +24,10 @@ function SubmitIconButton(props) {
         )
       ) : (
         <>
-          {props.loading === true && <LoadingIcon />}
-          {props.error !== undefined && <ResultDisplay error={props.error} />}
+          {props.loading === true && <LoadingIcon color={props.color} />}
+          {props.error !== undefined && (
+            <ResultDisplay error={props.error} color={props.color} />
+          )}
         </>
       )}
     </IconButton>
