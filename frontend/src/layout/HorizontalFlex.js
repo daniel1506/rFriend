@@ -5,7 +5,7 @@ function HorizontalFlex(props) {
   return (
     <Box
       display={{ xs: "flex" }}
-      flexDirection={{ xs: "row", md: "column" }}
+      flexDirection={{ xs: "row" }}
       alignItems={{ xs: "center" }}
       justifyContent={{ xs: "center" }}
       {...props}

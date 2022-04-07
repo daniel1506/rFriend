@@ -140,6 +140,7 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
   try {
     const user = await prisma.user.findUnique({
       where: { id: id },
+      include: { participatesIn: true },
     });
 
     if (!user) {
@@ -147,11 +148,13 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
     }
 
     const profile_url = getProfileUrl(id);
+    const joinedEvent = user.participatesIn.map((event) => event.name);
 
     res.send({
       name: user.name,
       email: user.email,
       profile_url: profile_url,
+      joined_event: joinedEvent,
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
@@ -322,7 +325,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
 
     // Store the url into the database
   } catch (err) {
-    return next(new HttpException(500, "Error in AWS."));
+    return next(new HttpException(500, "Error in AWS: " + err));
   }
 };
 
@@ -337,6 +340,10 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
       where: {
         id: user_id,
       },
+      include: {
+        participatesIn: true,
+        interestedIn: true,
+      },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
@@ -345,6 +352,9 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
   if (!user) {
     return next(new HttpException(404, "User not found"));
   }
+
+  let joinedEvent = user.participatesIn.map((event) => event.id);
+  let likedEvent = user.interestedIn.map((event) => event.id);
 
   const friendsList = (await generateFriendsList(user_id)) as number[];
   const fofList = (await generateFOFList(user_id)) as number[];
@@ -376,6 +386,22 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
+
+  let x = JSON.stringify(result);
+
+  result.forEach((event: any) => {
+    if (joinedEvent.includes(event.id)) {
+      event.isEventJoined = true;
+    } else {
+      event.isEventJoined = false;
+    }
+
+    if (likedEvent.includes(event.id)) {
+      event.isEventLiked = true;
+    } else {
+      event.isEventLiked = false;
+    }
+  });
 
   res.status(200).send({ event: result });
 };

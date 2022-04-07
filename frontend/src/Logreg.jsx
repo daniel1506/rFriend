@@ -28,6 +28,7 @@ import EmailInput from "./components/EmailInput";
 import NameInput from "./components/NameInput";
 import SubmitButton from "./components/SubmitButton";
 import AuthContext from "./store/auth-context";
+import redirectToMailBox from "./lib/redirectToMailBox";
 function Logreg() {
   const [logChecked, setLogChecked] = React.useState(false);
   const [regChecked, setRegChecked] = React.useState(false);
@@ -39,6 +40,7 @@ function Logreg() {
   const [fail, setFail] = React.useState(false);
   const [failMessage, setFailMessage] = React.useState(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [emailSuccess, setEmailSuccess] = React.useState(false);
   const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
   const handleLog = () => {
@@ -74,7 +76,12 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          authCtx.login(data.token, data.id, data.email, data.name, data.role);
+          localStorage.setItem("tokenx", data.token);
+          localStorage.setItem("idx", data.id);
+          localStorage.setItem("emailx", data.email);
+          localStorage.setItem("namex", data.name);
+          localStorage.setItem("rolex", data.role);
+          setEmailSuccess(true);
         }
       })
       .then(() => {
@@ -156,17 +163,30 @@ function Logreg() {
       >
         {/* reg form */}
         <form onSubmit={reg}>
-          <VerticalFlex gap="10px">
-            <EmailInput setEmail={setEmail} />
-            <NameInput setUsername={setUsername} />
-            <PasswordInput setPassword={setPassword} />
-            <CfPasswordInput password={password} />
-            <SubmitButton type="submit" loading={submitting}>
-              Submit
-            </SubmitButton>
-            {/* Display error message if error when submit */}
-            {fail && <Alert severity="error">{failMessage}</Alert>}
-          </VerticalFlex>
+          {!emailSuccess && (
+            <VerticalFlex gap="10px">
+              <EmailInput setEmail={setEmail} />
+              <NameInput setUsername={setUsername} />
+              <PasswordInput setPassword={setPassword} />
+              <CfPasswordInput password={password} />
+              <SubmitButton type="submit" loading={submitting}>
+                Submit
+              </SubmitButton>
+              {/* Display error message if error when submit */}
+              {fail && <Alert severity="error">{failMessage}</Alert>}
+            </VerticalFlex>
+          )}
+          {emailSuccess && (
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => {
+                redirectToMailBox(email);
+              }}
+            >
+              Check your email
+            </Button>
+          )}
         </form>
       </Slide>
     </>
