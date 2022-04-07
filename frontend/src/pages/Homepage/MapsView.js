@@ -78,7 +78,7 @@ const MapsView = () => {
   }, [events]);
 
   return (
-    <Wrapper apiKey="AIzaSyDlJrKgXe1HXYhS6wNei1Ld-u0ox4dHdzY" render={mapLoadingRender}>
+    <Wrapper apiKey={process.env.REACT_PUBLIC_MAPS_API_KEY} render={mapLoadingRender}>
       <Map center={center} zoom={zoom} style={{ height: "50%" }} markers={markers}></Map>
     </Wrapper>
   );
