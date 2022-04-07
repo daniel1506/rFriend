@@ -1,8 +1,24 @@
 import { useRef, useEffect, useState, useMemo } from "react";
+import ReactDOMServer from "react-dom/server";
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 import useSWR from "swr";
 import get from "../../lib/get";
 import getUrl from "../../lib/getUrl";
+
+// -----------------------------------------------------------------------------
+
+const EventRender = ({ event }) => (
+  <>
+    {Object.entries(event).map(([key, value]) => {
+      return (
+        <div>
+          <h2>{key}</h2>
+          <p>{value}</p>
+        </div>
+      );
+    })}
+  </>
+);
 
 // -----------------------------------------------------------------------------
 
@@ -23,9 +39,23 @@ const Marker = (options) => {
   }, [marker]);
 
   useEffect(() => {
+    let markerOnClickListener;
+
     if (marker) {
       marker.setOptions(options);
+      const element = <EventRender event={options.event} />;
+      const content = ReactDOMServer.renderToStaticMarkup(element);
+      markerOnClickListener = marker.addListener("click", () => {
+        options.infoWindow.setContent(content);
+        options.infoWindow.open(marker.get("map"), marker);
+      });
     }
+
+    return () => {
+      if (marker && markerOnClickListener) {
+        window.google.maps.event.removeListener(markerOnClickListener);
+      }
+    };
   }, [marker, options]);
 
   return null;
@@ -42,6 +72,7 @@ const mapLoadingRender = (status) => {
 const Map = ({ center, zoom, style, markers }) => {
   const ref = useRef();
   const [mapObj, setMapObj] = useState();
+  const infoWindow = useMemo(() => new window.google.maps.InfoWindow(), []);
 
   useEffect(() => {
     setMapObj(new window.google.maps.Map(ref.current, { center, zoom }));
@@ -50,7 +81,15 @@ const Map = ({ center, zoom, style, markers }) => {
   return (
     <div ref={ref} id="map" style={style}>
       {markers.map((m, i) => (
-        <Marker key={i} position={m.position} map={mapObj} title={m.title} clickable={true} />
+        <Marker
+          key={i}
+          position={m.position}
+          map={mapObj}
+          title={m.title}
+          clickable={true}
+          event={m.event}
+          infoWindow={infoWindow}
+        />
       ))}
     </div>
   );
@@ -71,10 +110,10 @@ const MapsView = () => {
         events.event.map((event) => ({
           position: new window.google.maps.LatLng(parseFloat(event.coordinateLat), parseFloat(event.coordinateLon)),
           title: event.name,
+          event,
         }))
       );
     }
-    console.log(events);
   }, [events]);
 
   return (
