@@ -149,6 +149,7 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
       where: { id },
       data: {
         friends: { disconnect: { id: target_user_id } },
+        friendsOf: { disconnect: { id: target_user_id } },
       },
       include: {
         friends: {
