@@ -9,12 +9,7 @@ import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ConfirmEmail from "./pages/ConfirmEmail/ConfirmEmail";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ConfirmReset from "./pages/ConfirmReset/ConfirmReset";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 function App() {
   const authCtx = useContext(AuthContext);
@@ -26,9 +21,7 @@ function App() {
         <Route path="api/user/verify" element={<ConfirmEmail />} />
         <Route path="/verify" element={<VerifyEmail />} /> */}
         <Route path="/reset-password/:token" element={<ConfirmReset />} />
-        {!authCtx.isLoggedIn && (
-          <Route path="/verify/:token" element={<ConfirmEmail />} />
-        )}
+        {!authCtx.isLoggedIn && <Route path="/verify/:token" element={<ConfirmEmail />} />}
         {authCtx.isLoggedIn && authCtx.role == "USER" && (
           <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
