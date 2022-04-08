@@ -35,7 +35,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import PrivacyButtonGroup from "../../components/PrivacyButtonGroup";
 import SubmitIconButton from "../../components/SubmitIconButton";
 import ImageIcon from "@mui/icons-material/Image";
-import put from "../../lib/put";
+import post from "../../lib/post";
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -70,7 +70,6 @@ const style = {
   p: 4,
 };
 function CreateEvent(props) {
-  const [privacy, setPrivacy] = React.useState("friend");
   const handleClose = () => props.setShowCreateEvent(false);
   const [title, setTitle] = useState(null);
   const [titleError, setTitleError] = useState(false);
@@ -79,6 +78,12 @@ function CreateEvent(props) {
   const [quota, setQuota] = useState(1);
   const [eventPic, setEventPic] = useState("");
   const [eventPicFailed, setEventPicFailed] = useState(undefined);
+  const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState(0);
+  const [location, setLocation] = useState("");
+  const [privacy, setPrivacy] = useState("friend");
+  const [maxParticipants, setMaxParticipants] = useState(1);
+  const [remarks, setRemarks] = useState("");
   const validateTitle = (title) => {};
   const handleChangePrivacy = (event, newPrivacy) => {
     setPrivacy(newPrivacy);
@@ -109,6 +114,20 @@ function CreateEvent(props) {
       console.log(err);
     }
   };
+  const createEvent = () => {
+    let duration;
+    let data = {
+      name: title,
+      category: category,
+      time: startTime,
+      duration: duration,
+      location: location,
+      max_participants: maxParticipants,
+      photo: eventPic,
+      remarks: remarks,
+    };
+    post("https://rfriend.herokuapp.com/api/event", data);
+  };
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -120,6 +139,7 @@ function CreateEvent(props) {
       BackdropProps={{
         timeout: 500,
       }}
+      sx={{ overflow: "scroll" }}
     >
       <Slide in={props.showCreateEvent}>
         <Box sx={style}>

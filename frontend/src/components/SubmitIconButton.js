@@ -24,7 +24,9 @@ function SubmitIconButton(props) {
         )
       ) : (
         <>
-          {props.loading === true && <LoadingIcon />}
+          {props.loading === true && (
+            <LoadingIcon color={props.color ? props.color : "primary"} />
+          )}
           {props.error !== undefined && <ResultDisplay error={props.error} />}
         </>
       )}

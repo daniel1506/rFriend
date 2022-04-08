@@ -35,6 +35,7 @@ import LockResetIcon from "@mui/icons-material/LockReset";
 import HorizontalFlex from "../layout/HorizontalFlex";
 import IdShowCase from "./IdShowCase";
 import SubmitIconButton from "./SubmitIconButton";
+import GeneralContext from "../store/general-context";
 const style = {
   position: "relative",
   display: "flex",
@@ -78,6 +79,7 @@ const style = {
 
 export default function Profile(props) {
   const authCtx = React.useContext(AuthContext);
+  const generalCtx = React.useContext(GeneralContext);
   const handleOpen = () => props.setShowProfile(true);
   const handleClose = () => props.setShowProfile(false);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
@@ -166,16 +168,23 @@ export default function Profile(props) {
     window.open(`http://${emailDomain}`, "_blank");
   };
   const deleteFriend = () => {
-    let data = { target_user_id: props.id };
+    let data = { target_user_id: parseInt(props.id) };
+    console.log(data);
     setDeleting(true);
     deleteReq("https://rfriend.herokuapp.com/api/friend", data).then(
       (result) => {
+        console.log(result);
         setDeleting(false);
         if (result.status != 200) {
           setDeleteFailed(true);
         } else {
           setDeleteFailed(false);
-          props.handleDeleted();
+          setTimeout(() => {
+            props.setShowProfile(false);
+            setTimeout(() => {
+              generalCtx.handleFriendModified();
+            }, 500);
+          }, 500);
         }
       }
     );
@@ -187,14 +196,17 @@ export default function Profile(props) {
         aria-describedby="transition-modal-description"
         open={props.showProfile}
         onClose={(e) => {
-          e.stopPropagation();
           handleClose();
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
         }}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
+        sx={{ overflow: "scroll" }}
       >
         <Slide in={props.showProfile}>
           <Box sx={style}>
@@ -248,17 +260,19 @@ export default function Profile(props) {
                         {`${username} #${props.id ? props.id : authCtx.id}`}
                       </NameShowCase>
                       <EmailShowCase>{email}</EmailShowCase>
-                      {/* {!deleting && (
-                        <IconButton
+                      {!props.admin && (
+                        <SubmitIconButton
+                          loading={deleting}
+                          error={deleteFailed}
                           color="error"
-                          sx={{
-                            display:
-                              props.id && !props.admin ? "block" : "none",
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteFriend();
                           }}
                         >
                           <PersonRemoveIcon />
-                        </IconButton>
-                      )} */}
+                        </SubmitIconButton>
+                      )}
                       {resetFailed !== false && (
                         <SubmitButton
                           variant="contained"

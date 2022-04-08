@@ -30,11 +30,11 @@ function ConfirmEmail() {
           setEmailFailed(false);
           setTimeout(() => {
             authCtx.login(
-              localStorage.getItem("token"),
-              localStorage.getItem("id"),
-              localStorage.getItem("email"),
-              localStorage.getItem("name"),
-              localStorage.getItem("role")
+              localStorage.getItem("tokenx"),
+              localStorage.getItem("idx"),
+              localStorage.getItem("emailx"),
+              localStorage.getItem("namex"),
+              localStorage.getItem("rolex")
             );
           }, 500);
         }
@@ -54,12 +54,10 @@ function ConfirmEmail() {
       <Zoom
         in={!loading}
         timeout={500}
-        sx={
-          emailFailed === undefined || false
-            ? { display: "block" }
-            : { display: "none" }
-        }
-        sx={{ borderRadius: "20px" }}
+        sx={{
+          display: emailFailed === false ? "none" : "block",
+          borderRadius: "20px",
+        }}
       >
         <Button
           variant="contained"

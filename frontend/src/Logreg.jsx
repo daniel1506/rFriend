@@ -76,11 +76,11 @@ function Logreg() {
           setFail(true);
           setFailMessage(data.message);
         } else {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("id", data.id);
-          localStorage.setItem("email", data.email);
-          localStorage.setItem("name", data.name);
-          localStorage.setItem("role", data.role);
+          localStorage.setItem("tokenx", data.token);
+          localStorage.setItem("idx", data.id);
+          localStorage.setItem("emailx", data.email);
+          localStorage.setItem("namex", data.name);
+          localStorage.setItem("rolex", data.role);
           setEmailSuccess(true);
         }
       })

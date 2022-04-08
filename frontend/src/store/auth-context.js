@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
 const AuthContext = React.createContext({
-  //no actual effect, since you can see we will declare them in the later part, so the code here only for readability and intelSense
-  id: NaN,
+  //we will declare and initialize them in the later part, so the code here only for readability and intelSense, no technical effect
+  //notice everything you get from localStorage will be string, since we rely on localStorage, here everything will be string to let intelSense remind user these thing will be string when we access them.
+  id: "",
   email: "",
   name: "",
   token: "",

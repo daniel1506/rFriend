@@ -3,9 +3,11 @@
 function get(url) {
   const token = localStorage.getItem("token") || "";
   let status;
+
   return fetch(url, {
     method: "GET",
     headers: {
+      "Content-Type": "application/json",
       "x-auth-token": token,
     },
   })
