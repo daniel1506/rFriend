@@ -243,8 +243,8 @@ function EventCardDeck(props) {
           {displayedEventList.map((e, index)=>{
               return (
                 <Grid key={index} item xs={12} sm={6} md={4}>
-                <EventCard eventId={e.id} eventName={e.name} hostName={e.ownerId} eventTime={e.startsAt} isJoined={e.isEventJoined} isLiked={e.isEventLiked}
-                photoUrl={e.photoUrl} eventLocation={e.location} eventCategory={e.category} maxParticipants={e.maxParticipants} eventRemark={e.remarks}/>
+                <EventCard eventId={e.id} eventName={e.name} hostId={e.ownerId} eventTime={e.startsAt} isJoined={e.isEventJoined} isLiked={e.isEventLiked}
+                photoUrl={e.photoUrl} host={e.owner} eventLocation={e.location} eventCategory={e.category} maxParticipants={e.maxParticipants} eventRemark={e.remarks}/>
                 </Grid>
               );
           })}
