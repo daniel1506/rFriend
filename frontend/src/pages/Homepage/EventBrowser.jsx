@@ -244,7 +244,7 @@ function EventCardDeck(props) {
               return (
                 <Grid key={index} item xs={12} sm={6} md={4}>
                 <EventCard eventId={e.id} eventName={e.name} hostName={e.ownerId} eventTime={e.startsAt} isJoined={e.isEventJoined} isLiked={e.isEventLiked}
-                eventLocation={e.location} eventCategory={e.category} maxParticipants={e.maxParticipants} eventRemark={e.remarks}/>
+                photoUrl={e.photoUrl} eventLocation={e.location} eventCategory={e.category} maxParticipants={e.maxParticipants} eventRemark={e.remarks}/>
                 </Grid>
               );
           })}
