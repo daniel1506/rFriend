@@ -13,7 +13,7 @@ const EventRender = ({ event }) => (
       return (
         <div>
           <h2>{key}</h2>
-          <p>{value}</p>
+          <p>{String(value)}</p>
         </div>
       );
     })}
@@ -107,11 +107,18 @@ const MapsView = () => {
   useEffect(() => {
     if (events) {
       setMarkers(
-        events.event.map((event) => ({
-          position: new window.google.maps.LatLng(parseFloat(event.coordinateLat), parseFloat(event.coordinateLon)),
-          title: event.name,
-          event,
-        }))
+        events.event.flatMap((event) => {
+          console.log(event.coordinateLat);
+          if (event.coordinateLat !== null && event.coordinateLon !== null) {
+            return {
+              position: new window.google.maps.LatLng(parseFloat(event.coordinateLat), parseFloat(event.coordinateLon)),
+              title: event.name,
+              event,
+            };
+          } else {
+            return [];
+          }
+        })
       );
     }
   }, [events]);
