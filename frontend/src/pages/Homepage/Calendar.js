@@ -29,13 +29,23 @@ import { withStyles } from "@material-ui/core/styles";
 import { owners } from "./calendar-data/tasks";
 import { TurnedIn } from "@mui/icons-material";
 import EventCardModal from "../../components/EventCardModal";
+import { Box } from "@material-ui/core";
 
 const Header = ({ children, appointmentData, ...restProps }) => (
   //<StyledAppointmentTooltipHeader
   //  {...restProps}
   //  appointmentData={appointmentData}
   //>
-  <EventCardModal />
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "end",
+      alignContent: "center",
+    }}
+  >
+    <EventCardModal />
+  </Box>
   //</StyledAppointmentTooltipHeader>
 );
 
@@ -43,8 +53,8 @@ const appointments = [
   {
     id: 0,
     title: "3310 Project Meeting",
-    startDate: new Date(2022, 2, 19, 22, 0),
-    endDate: new Date(2022, 2, 19, 24, 0),
+    startDate: new Date(2022, 3, 19, 22, 0),
+    endDate: new Date(2022, 3, 19, 24, 0),
     allDay: true,
     ownerId: 1,
   },
@@ -356,7 +366,7 @@ export default class Calendar extends React.PureComponent {
 
           <EditRecurrenceMenu />
           <AppointmentTooltip
-            //headerComponent={Header}
+            headerComponent={Header}
             showCloseButton
             showDeleteButton
             //showOpenButton
