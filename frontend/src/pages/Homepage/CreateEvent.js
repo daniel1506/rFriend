@@ -227,7 +227,8 @@ function CreateEvent(props) {
                 value={quota}
                 onChange={(e) => {
                   console.log(e.target.value);
-                  if (parseInt(e.target.value) > 0) setQuota(parseInt(e.target.value));
+                  if (parseInt(e.target.value) > 0)
+                    setQuota(parseInt(e.target.value));
                 }}
               />
               <TextField
@@ -252,7 +253,12 @@ function CreateEvent(props) {
             >
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="Category">Category</InputLabel>
-                <Select labelId="Category" value={category} onChange={handleChangeCategory} label="Category">
+                <Select
+                  labelId="Category"
+                  value={category}
+                  onChange={handleChangeCategory}
+                  label="Category"
+                >
                   <MenuItem value={"dining"}>dining</MenuItem>
                   <MenuItem value={"sports"}>sports</MenuItem>
                   <MenuItem value={"study"}>study</MenuItem>
@@ -277,7 +283,10 @@ function CreateEvent(props) {
                   <MenuItem value={30}>Thirty</MenuItem>
                 </Select>
               </FormControl> */}
-              <PrivacyButtonGroup value={privacy} onChange={handleChangePrivacy} />
+              <PrivacyButtonGroup
+                value={privacy}
+                onChange={handleChangePrivacy}
+              />
             </Box>
 
             <Box
@@ -355,7 +364,11 @@ function CreateEvent(props) {
               <CloseButton onClick={handleClose} sx={{ flexGrow: 0 }}>
                 Cancel
               </CloseButton>
-              <SubmitButton loading={creating} error={createFailed} onClick={createEvent}>
+              <SubmitButton
+                loading={creating}
+                error={createFailed}
+                onClick={createEvent}
+              >
                 Submit
               </SubmitButton>
             </Box>
