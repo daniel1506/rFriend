@@ -39,6 +39,8 @@ import { set } from "date-fns";
 import LogoutIcon from "@mui/icons-material/Logout";
 import get from "../lib/get";
 import AddFriendField from "./AddFriendField";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -89,6 +91,7 @@ export default function Navbar(props) {
   const isPageMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [isMapView, setIsMapView] = React.useState(false);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -223,21 +226,30 @@ export default function Navbar(props) {
       </MenuItem> */}
       <MenuItem
         onClick={() => {
+          setIsMapView((prev) => {
+            return !prev;
+          });
+        }}
+        sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
+      >
+        {isMapView && (
+          <Button color="inherit" startIcon={<TravelExploreIcon />}>
+            Map view
+          </Button>
+        )}
+        {!isMapView && (
+          <Button color="inherit" startIcon={<CalendarMonthIcon />}>
+            {" "}
+            Calendar view
+          </Button>
+        )}
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
           props.setShowProfile(true);
         }}
         sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
       >
-        {/* <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-
-        <p>{authCtx.name}</p> */}
         <NameShowCase variant="text">{authCtx.name}</NameShowCase>
       </MenuItem>
       <MenuItem
@@ -246,17 +258,6 @@ export default function Navbar(props) {
         }}
         sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
       >
-        {/* <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <LogoutIcon />
-        </IconButton>
-
-        <p>Logout</p> */}
         <LogoutButton variant="text" />
       </MenuItem>
     </Menu>
@@ -376,6 +377,36 @@ export default function Navbar(props) {
               gap: 2,
             }}
           >
+            {!props.admin && (
+              <>
+                {isMapView && (
+                  <Button
+                    color="inherit"
+                    startIcon={<TravelExploreIcon />}
+                    onClick={() => {
+                      setIsMapView((prev) => {
+                        return !prev;
+                      });
+                    }}
+                  >
+                    Map view
+                  </Button>
+                )}
+                {!isMapView && (
+                  <Button
+                    color="inherit"
+                    startIcon={<CalendarMonthIcon />}
+                    onClick={() => {
+                      setIsMapView((prev) => {
+                        return !prev;
+                      });
+                    }}
+                  >
+                    Calendar view
+                  </Button>
+                )}
+              </>
+            )}
             <NameShowCase
               color="inherit"
               variant="text"
