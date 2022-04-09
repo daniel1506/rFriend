@@ -19,6 +19,13 @@ body {
   margin-right: auto;
   margin-top: 30px;
   margin-bottom: 25px;
+  padding: 10px;
+}
+
+@media (min-width:768px) {
+.event-card-deck {
+  width: 75%;
+}
 }
 
 .search-input-group-text{
@@ -53,6 +60,7 @@ body {
   flex-direction: column;
   background-color: white;
   border-radius: 10px;
+  margin-bottom: 10px;
 }
 
 .div-filter h3 {
