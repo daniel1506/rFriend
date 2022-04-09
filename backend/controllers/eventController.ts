@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client";
+import { randomUUID } from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import photoUploadS3 from "../AWS/photoUploader";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
 import { generateFriendsList, generateFOFList } from "../services/friendService";
@@ -15,7 +17,7 @@ export const validateUpsert = [
   body("location").isString(),
   body("privacy").isIn(eventPrivacy),
   body("max_participants").isInt().toInt(),
-  body("photo").optional().isURL(),
+  body("photo").optional().isString().matches("data:image/.*;base64,.*"),
   body("coordinate_lon").optional().isFloat().toFloat(),
   body("coordinate_lat").optional().isFloat().toFloat(),
   body("remarks").optional().isString(),
@@ -37,6 +39,18 @@ export const upsert = async (req: Request, res: Response, next: NextFunction) =>
   const maxParticipants = req.body.max_participants as number;
   const coordinateLat = req.body.coordinate_lat as number | undefined;
   const coordinateLon = req.body.coordinate_lon as number | undefined;
+  const photoBase64 = req.body.photo as string | undefined;
+  let photoUrl: string | null = null;
+
+  // try upload photo
+  if (photoBase64) {
+    try {
+      const key = randomUUID();
+      photoUrl = await photoUploadS3(key, photoBase64);
+    } catch (e) {
+      return next(new HttpException(500, "AWS Error " + e));
+    }
+  }
 
   let event = {
     name,
@@ -50,6 +64,7 @@ export const upsert = async (req: Request, res: Response, next: NextFunction) =>
     coordinateLat,
     coordinateLon,
     remarks,
+    photoUrl,
   };
 
   let result;

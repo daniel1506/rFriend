@@ -1,7 +1,7 @@
 // import { NextFunction, query, Request, Response } from "express";
 import { NextFunction, Request, Response } from "express";
 // import { body, param, validationResult } from "express-validator";
-import { body, param, query, validationResult } from "express-validator";
+import { body, query, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
 import { generateFriendsList, generateFOFList } from "../services/friendService";
@@ -10,12 +10,13 @@ import bcrypt from "bcrypt";
 import { generateJWT, JWTpayload } from "../services/authService";
 import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
-import { PutObjectCommand, PutObjectCommandInput, HeadObjectCommand, HeadObjectCommandInput } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, HeadObjectCommandInput } from "@aws-sdk/client-s3";
 import { s3Client } from "../AWS/s3Cient";
 
 import jwt from "jsonwebtoken";
 
 import { sendEmail, generateForgetPasswordEmail, sendVerifyEmailEmail } from "../services/emailService";
+import photoUploadS3 from "../AWS/photoUploader";
 
 // -----------------------------------------------------------------------------
 
@@ -297,33 +298,13 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
   const { profile } = req.body;
   let user_id: number = req.id;
 
-  /* 
-    find out the type of the image
-    Note that profile has the format: image/jpeg;base64,xxxx.....
-  */
-  let type: string = profile.split("/")[1].split(";")[0];
   let key: string = "img" + String(user_id);
-
-  // turn the string into binary data. The image cannot be shown without doing this
-  const encoded_image: Buffer = Buffer.from(profile.split(",")[1], "base64");
-
-  // Set the parameters.
-  const bucketParams: PutObjectCommandInput = {
-    Bucket: process.env.BUCKET_NAME,
-    // Specify the name of the new object. For example, 'index.html'.
-    // To create a directory for the object, use '/'. For example, 'myApp/package.json'.
-    Key: key,
-    Body: encoded_image, // Content of the new object.
-    ContentEncoding: "base64",
-    ContentType: "image/" + type,
-    ACL: "public-read", // for public access
-  };
 
   // Create and upload the object to the S3 bucket.
   try {
-    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+    photoUploadS3(key, profile);
 
-    console.log("Successfully uploaded object: " + bucketParams.Bucket + "/" + bucketParams.Key);
+    console.log("Successfully uploaded object: " + process.env.BUCKET_NAME + "/" + key);
 
     // generate an url for the image
     let profileURL: String =

@@ -9,19 +9,22 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 function PrivacyButtonGroup(props) {
   return (
     <ToggleButtonGroup exclusive aria-label="privacy" {...props}>
-      <SquareToggleButton value="private" aria-label="private">
+      <SquareToggleButton value="only-me" aria-label="only-me">
         <Tooltip title="Only you can view this event">
           <LockIcon />
         </Tooltip>
       </SquareToggleButton>
 
-      <SquareToggleButton value="friend" aria-label="friend">
+      <SquareToggleButton value="friends" aria-label="friends">
         <Tooltip title="Your friends can view this event">
           <GroupIcon />
         </Tooltip>
       </SquareToggleButton>
 
-      <SquareToggleButton value="fof" aria-label="fof">
+      <SquareToggleButton
+        value="friends-of-friends"
+        aria-label="friends-of-friends"
+      >
         <Tooltip title="Even friends of your friends can view this event">
           <svg
             xmlns="http://www.w3.org/2000/svg"

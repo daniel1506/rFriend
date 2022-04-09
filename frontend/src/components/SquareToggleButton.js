@@ -3,7 +3,7 @@ import React from "react";
 import ToggleButton from "@mui/material/ToggleButton";
 function SquareToggleButton(props) {
   return (
-    <ToggleButton sx={{ height: "56px", width: "56px" }} {...props}>
+    <ToggleButton sx={{ height: "54px", width: "54px" }} {...props}>
       {props.children}
     </ToggleButton>
   );
