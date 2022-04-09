@@ -147,32 +147,24 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
       return next(new HttpException(401, "Cannot find user"));
     }
 
+    let response_content: { name: string; email: string; profile_url: string | null } = {
+      name: user.name,
+      email: user.email,
+      profile_url: null,
+    };
 
-    let response_content: {name: string, email: string, profile_url: string|null} = {
-                                                                                        name: user.name,
-                                                                                        email: user.email,
-                                                                                        profile_url: null
-                                                                                    };
-
-    
     const params: HeadObjectCommandInput = {
       Bucket: process.env.BUCKET_NAME,
-      Key: "img" + String(id) //if any sub folder-> path/of/the/folder.ext
+      Key: "img" + String(id), //if any sub folder-> path/of/the/folder.ext
     };
     try {
-          const header = await s3Client.send(new HeadObjectCommand(params));
-          
-          response_content["profile_url"] = getProfileUrl(id);
-          res.send(response_content);
-    } 
-    catch (err) {
-          
-          res.send(response_content);
+      const header = await s3Client.send(new HeadObjectCommand(params));
+
+      response_content["profile_url"] = getProfileUrl(id);
+      res.send(response_content);
+    } catch (err) {
+      res.send(response_content);
     }
-    
-
-    
-
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
@@ -277,7 +269,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
   try {
     // use updateMany since profileUrl may be null, and hence not unique. However, it is unique if exists
     user = await prisma.user.updateMany({
-      where: { resetPasswordToken: token }, 
+      where: { resetPasswordToken: token },
       data: {
         password: hash,
         resetPasswordToken: null,
@@ -302,7 +294,6 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     return next(new HttpException(422, "Invalid input"));
   }
 
-  
   const { profile } = req.body;
   let user_id: number = req.id;
 
@@ -398,15 +389,15 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
           },
         ],
       },
-      include: { comments: true },
+      include: { owner: { select: { name: true, profileUrl: true } }, comments: true },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  let x = JSON.stringify(result);
-
   result.forEach((event: any) => {
+    event.owner.profileUrl = getProfileUrl(event.ownerId);
+
     if (joinedEvent.includes(event.id)) {
       event.isEventJoined = true;
     } else {
