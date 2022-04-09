@@ -370,18 +370,16 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
           },
         ],
       },
-      include: { owner: { select: { name: true, profileUrl: true } }, comments: true },
+      include: {
+        owner: { select: { name: true, profileUrl: true } },
+        comments: { include: { owner: { select: { name: true, profileUrl: true } } } },
+      },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
   result.forEach((event: any) => {
-    event.owner.profileUrl = getProfileUrl(event.ownerId);
-    event.comments.forEach((user: any) => {
-      user.profileUrl = getProfileUrl(event.comments.userId);
-    });
-
     if (joinedEvent.includes(event.id)) {
       event.isEventJoined = true;
     } else {
@@ -585,7 +583,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     newComment = await prisma.eventComment.create({
       data: {
-        userId: user_id,
+        ownerId: user_id,
         eventId: event_id,
         text: comment,
       },
@@ -605,15 +603,41 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
           connect: { id: newComment.id },
         },
       },
-      include: {
-        comments: true,
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let user;
+  try {
+    user = await prisma.user.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        comments: {
+          connect: { id: newComment.id },
+        },
       },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(201).send({ comments: event.comments });
+  let eventComments;
+
+  try {
+    eventComments = await prisma.eventComment.findMany({
+      where: {
+        eventId: event_id,
+      },
+      include: { owner: { select: { name: true, profileUrl: true } } },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ comments: eventComments });
 };
 
 // -----------------------------------------------------------------------------
