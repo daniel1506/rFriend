@@ -378,6 +378,9 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
 
   result.forEach((event: any) => {
     event.owner.profileUrl = getProfileUrl(event.ownerId);
+    event.comments.forEach((user: any) => {
+      user.profileUrl = getProfileUrl(event.comments.userId);
+    });
 
     if (joinedEvent.includes(event.id)) {
       event.isEventJoined = true;
@@ -498,6 +501,56 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
   }
 
   res.status(201).send({ followers: [...newSave.followers] });
+};
+
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+
+export const unsaveEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const user_id = req.id;
+  const event_id = req.body.event_id;
+
+  let event;
+  try {
+    event = await prisma.event.findUnique({
+      where: {
+        id: event_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!event) {
+    return next(new HttpException(404, "Event not found"));
+  }
+
+  let unsave;
+  try {
+    unsave = await prisma.event.update({
+      where: {
+        id: event_id,
+      },
+      data: {
+        followers: { disconnect: { id: user_id } },
+      },
+      include: {
+        followers: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ followers: [...unsave.followers] });
 };
 
 // -----------------------------------------------------------------------------

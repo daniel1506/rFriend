@@ -108,7 +108,6 @@ const MapsView = () => {
     if (events) {
       setMarkers(
         events.event.flatMap((event) => {
-          console.log(event.coordinateLat);
           if (event.coordinateLat !== null && event.coordinateLon !== null) {
             return {
               position: new window.google.maps.LatLng(parseFloat(event.coordinateLat), parseFloat(event.coordinateLon)),

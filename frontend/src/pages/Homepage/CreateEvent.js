@@ -1,5 +1,5 @@
 //@ts-check
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useState } from "react";
 import {
   TextField,
@@ -85,7 +85,6 @@ function CreateEvent(props) {
 
   const handleChangeCategory = (e) => {
     setCategory(e.target.value);
-    setEventPic(categoryPhotos[e.target.value]);
   };
 
   const convertBase64 = (file) => {
@@ -146,6 +145,14 @@ function CreateEvent(props) {
     });
   };
 
+  const displayCustomEventPicIfAvailable = useMemo(() => {
+    if (eventPic === "") {
+      return categoryPhotos[category];
+    }
+
+    return eventPic;
+  }, [eventPic, category]);
+
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -170,7 +177,12 @@ function CreateEvent(props) {
               gap: 1,
             }}
           >
-            <Avatar variant="square" src={eventPic} style={{ width: "100%", height: "150px" }} sx={{ borderRadius: 3 }}>
+            <Avatar
+              variant="square"
+              src={displayCustomEventPicIfAvailable}
+              style={{ width: "100%", height: "150px" }}
+              sx={{ borderRadius: 3 }}
+            >
               <ImageIcon />
             </Avatar>
             <Box
