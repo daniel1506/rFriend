@@ -378,6 +378,9 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
 
   result.forEach((event: any) => {
     event.owner.profileUrl = getProfileUrl(event.ownerId);
+    event.comments.forEach((user: any) => {
+      user.profileUrl = getProfileUrl(event.comments.userId);
+    });
 
     if (joinedEvent.includes(event.id)) {
       event.isEventJoined = true;
