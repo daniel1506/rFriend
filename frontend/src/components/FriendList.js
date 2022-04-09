@@ -60,6 +60,7 @@ function FriendList() {
           setPendingSelected(false);
         }}
         incoming
+        admin
       />
     );
   });
