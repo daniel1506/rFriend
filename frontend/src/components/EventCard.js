@@ -43,7 +43,10 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-function SwitchCardIMG(category) {
+function SwitchCardIMG(category, url) {
+  if (url != null){
+    return url;
+  }
   switch (category) {
     case 'dinning':
       return 'https://media.winefolly.com/wine-tasting-dinner.jpg';
@@ -99,7 +102,7 @@ export default function EventCard(props) {
         component="img"
         height="194"
         //image=".\assets\images\cards\category_dinning.jpg"
-        image={SwitchCardIMG(props.eventCategory)}
+        image={SwitchCardIMG(props.eventCategory, props.photoUrl)}
         alt="Category Image"
       />
       <CardContent>
