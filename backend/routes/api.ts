@@ -53,6 +53,7 @@ friendRouter.post("/", friendController.get);
 friendRouter.put("/request", friendController.validate, friendController.request);
 friendRouter.put("/accept", friendController.validate, friendController.accept);
 friendRouter.delete("/", friendController.validate, friendController.remove);
+friendRouter.delete("/request", friendController.validate, friendController.deleteRequest);
 
 // -----------------------------------------------------------------------------
 

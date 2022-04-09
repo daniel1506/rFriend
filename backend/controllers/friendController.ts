@@ -164,6 +164,20 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
     return next(prismaErrorHandler(e));
   }
 
+  let request;
+  try {
+    request = await prisma.friendRquest.deleteMany({
+      where: {
+        OR: [
+          { fromUser: id, toUser: target_user_id },
+          { fromUser: target_user_id, toUser: id },
+        ],
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
   let friends = [...user!.friends, ...user!.friendsOf];
   friends = friends.map((friend) => ({
     ...friend,
@@ -266,4 +280,42 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
   }));
 
   res.send({ friends, pending_users, waiting_accept });
+};
+
+// -----------------------------------------------------------------------------
+
+export const deleteRequest = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const { id } = req;
+  const target_user_id = req.body.target_user_id as number;
+
+  let request;
+
+  try {
+    request = await prisma.friendRquest.findFirst({
+      where: { fromUser: target_user_id, toUser: id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!request) {
+    return next(new HttpException(404, "Friend request not found"));
+  }
+
+  let result;
+
+  try {
+    result = await prisma.friendRquest.deleteMany({
+      where: { fromUser: target_user_id, toUser: id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.send({ message: "Rejected" });
 };
