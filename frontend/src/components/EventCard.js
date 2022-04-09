@@ -82,8 +82,8 @@ export default function EventCard(props) {
     <Card sx={{ maxWidth: 345 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="avatar">
-            {props.hostName}
+          <Avatar sx={{ bgcolor: red[500] }} aria-label="avatar"  src={props.host.profileUrl}>
+            {props.host.name}
           </Avatar>
         }
         action={
@@ -92,8 +92,8 @@ export default function EventCard(props) {
             //</IconButton>
             <EventCardSettingBtn key={props.eventName} iconType={MoreVertIcon} items={['Edit Event', 'Discard Event']}/>        
         }
-        title={props.hostName}
-        subheader={props.eventName}
+        title={props.eventName}
+        subheader={props.host.name}
       />
       <CardMedia
         component="img"
