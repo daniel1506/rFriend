@@ -35,7 +35,7 @@ export default function Home() {
                         {eventList.map((e, index)=>{
                             return (
                                 <EventCard eventId={e.id} eventName={e.name} hostId={e.ownerId} eventTime={e.startsAt} isJoined={e.isEventJoined} isLiked={e.isEventLiked}
-                                host={e.owner} eventLocation={e.location} eventCategory={e.category} maxParticipants={e.maxParticipants} eventRemark={e.remarks}/>
+                                photoUrl={e.photoUrl} host={e.owner} eventLocation={e.location} eventCategory={e.category} maxParticipants={e.maxParticipants} eventRemark={e.remarks}/>
                             );
                         })}
                     </Stack>
