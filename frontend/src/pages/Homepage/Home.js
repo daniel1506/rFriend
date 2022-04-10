@@ -23,7 +23,14 @@ export default function Home() {
   const generalCtx = useContext(GeneralContext);
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
-      setEventList(r.event);
+      setEventList(r.event.filter((event) => {
+        if(event.isEventLiked) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }));
     });
   }, [generalCtx.eventEventModified]);
 
