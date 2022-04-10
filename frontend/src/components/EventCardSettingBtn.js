@@ -24,8 +24,8 @@ function EventCardSettingBtn(props) {
       generalCtx.handleSelectEvent(props.eventId);
     }
     if (link == "Delete Event") {
-      deleteReq("/api/event/" + props.eventId, {
-        event_id: props.eventId,
+      deleteReq("/api/event/", {
+        id: props.eventId,
       });
     }
     setAnchorEl(null);
