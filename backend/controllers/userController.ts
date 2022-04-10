@@ -307,12 +307,24 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     console.log("Successfully uploaded object: " + process.env.BUCKET_NAME + "/" + key);
 
     // generate an url for the image
-    let profileURL: String =
+    let profileURL: string =
       "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
 
-    res.status(200).send({ profileURL: profileURL });
-
     // Store the url into the database
+    let user;
+
+    try {
+      user = await prisma.user.update({
+        where: {
+          id: user_id,
+        },
+        data: { profileUrl: profileURL },
+      });
+    } catch (e) {
+      return next(prismaErrorHandler(e));
+    }
+
+    res.status(200).send({ profileURL: profileURL });
   } catch (err) {
     return next(new HttpException(500, "Error in AWS: " + err));
   }
