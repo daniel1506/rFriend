@@ -153,7 +153,7 @@ export default function EventCard(props) {
         </IconButton>
         <IconButton
           aria-label="add to favorites"
-          onClick={likeEventHandler()}
+          onClick={likeEventHandler}
         >
           {props.isLiked ? (
             <FavoriteIcon sx={{ color: pink[500] }} />
