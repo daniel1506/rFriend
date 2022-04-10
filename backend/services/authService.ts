@@ -12,6 +12,6 @@ export const generateJWT = (id: number, email: string) => {
       email: email,
     },
     process.env.JWT_SECRET!,
-    { expiresIn: 36000 }
+    { expiresIn: 360000 }
   );
 };
