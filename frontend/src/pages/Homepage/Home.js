@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import { styled } from "@mui/material/styles";
 import EventCard from "../../components/EventCard.js";
@@ -8,6 +8,7 @@ import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Calendar from "./Calendar.js";
 import get from "../../lib/get";
+import GeneralContext from "../../store/general-context.js";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -19,23 +20,17 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Home() {
   const [eventList, setEventList] = React.useState([]);
-
+  const generalCtx = useContext(GeneralContext);
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
       setEventList(r.event);
     });
-  }, []);
+  }, [generalCtx.eventEventModified]);
 
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <Grid
-          container
-          spacing={2}
-          direction="row"
-          justifyContent="center"
-          alignItems="flex-start"
-        >
+        <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
           <Grid item xs={8}>
             <Calendar />
           </Grid>

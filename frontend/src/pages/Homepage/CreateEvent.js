@@ -143,6 +143,7 @@ function CreateEvent(props) {
         setCreateFailed(true);
       } else {
         setCreateFailed(false);
+        generalCtx.handleEventModified();
         setTimeout(() => {
           handleClose();
         }, 1000);

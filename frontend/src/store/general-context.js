@@ -7,6 +7,7 @@ const GeneralContext = React.createContext({
   friendModified: 0,
   eventIdSelected: null,
   eventEventModified: false,
+  viewSelected: "",
   handleFriendModified: () => {},
   handleChangeView: () => {},
   handleSelectEvent: (eventId) => {},
@@ -16,6 +17,7 @@ const GeneralContext = React.createContext({
 export const GeneralContextProvider = (props) => {
   const [friendModified, setFriendModified] = useState(0);
   const [isMapView, setIsMapView] = useState(false);
+  const [viewSelected, setViewSelected] = useState("");
   const [eventIdSelected, setEventIdSelected] = useState(null);
   const [eventEventModified, setEventModified] = useState(false);
   const handleFriendModified = () => {

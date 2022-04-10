@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import "./EventBrowser.css";
 import { styled } from "@mui/material/styles";
@@ -31,7 +31,7 @@ import EventCard from "../../components/EventCard.js";
 //import GetEvents from './EventAPI.js';
 import get from "../../lib/get.js";
 import { StaticDatePicker } from "@mui/lab";
-
+import GeneralContext from "../../store/general-context";
 //var eventList = GetEvents('https://rfrconsole.log(r.event)iend.herokuapp.com/api/user/browse').then((r)=>{});
 //console.log(GetEvents('https://rfriend.herokuapp.com/api/user/browse'));
 //var filteredEvents = Events;
@@ -40,7 +40,7 @@ export default function EventBrowser() {
   const [searchKey, setSearchKey] = React.useState("");
   const [eventList, setEventList] = React.useState([]);
   const [filteredEvents, setFilteredEvents] = React.useState(Events);
-
+  const generalCtx = React.useContext(GeneralContext);
   const sendSearchKey = (key) => {
     // the callback. Use a better name
     setSearchKey(key);
@@ -51,10 +51,11 @@ export default function EventBrowser() {
   };
 
   useEffect(() => {
+    console("getting event");
     get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
       setEventList(r.event);
     });
-  }, []);
+  }, [generalCtx.eventEventModified]);
   //useEffect(() => {eventSearchHandler()}, [searchKey]);
 
   return (

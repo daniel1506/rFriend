@@ -31,7 +31,9 @@ import put from "../lib/put.js";
 //import Menu from '@mui/material/Menu';
 //import MenuItem from '@mui/material/MenuItem';
 import EventCardSettingBtn from "./EventCardSettingBtn.js";
-
+import GeneralContext from "../store/general-context.js";
+import { DirectionsTransitFilledTwoTone } from "@mui/icons-material";
+import { useContext } from "react";
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -67,6 +69,7 @@ function SwitchCardIMG(category, url) {
 
 export default function EventCard(props) {
   console.log(props.hostId);
+  const generalCtx = useContext(GeneralContext);
   const isHost = localStorage.getItem("id") == props.hostId;
   const [expanded, setExpanded] = React.useState(false);
 
@@ -79,14 +82,17 @@ export default function EventCard(props) {
   //}
 
   function likeEventHandler() {
-    if(!props.isLiked) {
+    if (!props.isLiked) {
       put("https://rfriend.herokuapp.com/api/user/save", {
-              event_id: props.eventId,
+        event_id: props.eventId,
+      }).then(() => {
+        generalCtx.handleEventModified();
       });
-    }
-    else {
+    } else {
       put("https://rfriend.herokuapp.com/api/user/unsave", {
-              event_id: props.eventId,
+        event_id: props.eventId,
+      }).then(() => {
+        generalCtx.handleEventModified();
       });
     }
   }
@@ -129,6 +135,8 @@ export default function EventCard(props) {
           onClick={() => {
             put("https://rfriend.herokuapp.com/api/user/join", {
               event_id: props.eventId,
+            }).then(() => {
+              generalCtx.handleEventModified();
             });
           }}
         >
@@ -143,10 +151,7 @@ export default function EventCard(props) {
             </svg>
           )}
         </IconButton>
-        <IconButton
-          aria-label="add to favorites"
-          onClick={likeEventHandler}
-        >
+        <IconButton aria-label="add to favorites" onClick={likeEventHandler}>
           {props.isLiked ? <FavoriteIcon sx={{ color: pink[500] }} /> : <FavoriteIcon />}
         </IconButton>
         <IconButton aria-label="share">

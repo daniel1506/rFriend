@@ -24,9 +24,17 @@ function EventCardSettingBtn(props) {
       generalCtx.handleSelectEvent(props.eventId);
     }
     if (link == "Delete Event") {
-      deleteReq("/api/event/", {
+      deleteReq("https://rfriend.herokuapp.com/api/event/", {
         id: props.eventId,
-      });
+      })
+        .then((result) => {
+          if (result.status == 200) {
+            generalCtx.handleEventModified();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
     setAnchorEl(null);
   };
