@@ -79,12 +79,12 @@ describe("Forget and Reset Password", () => {
   };
 
   // wait some time (used in the second test and the third test)
-  function wait(time) {
+  function wait(millisecond) {
     return new Promise((res, rej) => {
       setTimeout(() => {
         console.log("wait some time");
         res();
-      }, time);
+      }, millisecond);
     });
   }
 
@@ -99,7 +99,7 @@ describe("Forget and Reset Password", () => {
     let res = { send: jest.fn() };
     let next = jest.fn();
 
-    forgetPassword = forgetPassword_mock(36000);
+    forgetPassword = forgetPassword_mock("1h");
     let token = await forgetPassword(req, res, next); // get a token for resetting pw first
 
     req = { body: { password: new_pw, token: token } };
@@ -172,7 +172,7 @@ describe("Forget and Reset Password", () => {
     let res = { send: jest.fn() };
     let next = jest.fn();
 
-    forgetPassword = forgetPassword_mock(500); // make the expire time short enough to ensure that it expires immediately after its creation
+    forgetPassword = forgetPassword_mock("0.5s"); // make the expire time short enough to ensure that it expires immediately after its creation
     // console.log("token from last test is "); // delete
     // console.log(token); // delete
 
