@@ -173,7 +173,7 @@ function EventFilter({eventList, sendFilteredEvents}) {
             onChange={handleCategoryChange}
           >
             <MenuItem value=""><em>All</em></MenuItem>
-            <MenuItem value="dinning">Dinning</MenuItem>
+            <MenuItem value="dining">Dining</MenuItem>
             <MenuItem value="leisure">Leisure</MenuItem>
             <MenuItem value="sports">Sports</MenuItem>
             <MenuItem value="study">Study</MenuItem>
