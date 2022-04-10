@@ -3,6 +3,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import delete from '../lib/delete';
 
 //import { withStyles } from 'material-ui/styles';
 
@@ -22,6 +23,13 @@ class EventCardSettingBtn extends React.Component {
     handleClose = () => {
         this.setState({ anchorEl: null });
     };
+    
+    handleOnClick = (link) => {
+        if(link == 'Delete Event') {
+            delete('/api/event/'+this.props.eventId,{"event_id": this.props.eventId});
+        }
+        this.handleClose();
+    }
 
     render() {
         const { classes } = this.props;
@@ -29,7 +37,7 @@ class EventCardSettingBtn extends React.Component {
         const open = Boolean(anchorEl);
         const Wrapper = this.props.iconType;
         const listItems = this.props.items.map((link) =>
-            <MenuItem onClick={this.handleClose} key={link}>{link}</MenuItem>
+            <MenuItem onClick={this.handleOnClick(link)} key={link}>{link}</MenuItem>
         );
 
         return (
