@@ -26,7 +26,9 @@ class EventCardSettingBtn extends React.Component {
 
   handleOnClick = (link) => {
     if (link == "Delete Event") {
-      deleteReq("/api/event/" + this.props.eventId, { event_id: this.props.eventId });
+      deleteReq("/api/event/" + this.props.eventId, {
+        event_id: this.props.eventId,
+      });
     }
     this.setState({ anchorEl: null });
   };
@@ -37,14 +39,23 @@ class EventCardSettingBtn extends React.Component {
     const open = Boolean(anchorEl);
     const Wrapper = this.props.iconType;
     const listItems = this.props.items.map((link) => (
-      <MenuItem onClick={this.handleOnClick(link)} key={link}>
+      <MenuItem
+        onClick={() => {
+          this.handleOnClick(link);
+        }}
+        key={link}
+      >
         {link}
       </MenuItem>
     ));
 
     return (
       <div>
-        <IconButton aria-owns={open ? "menu-appbar" : null} aria-haspopup="true" onClick={this.handleMenu}>
+        <IconButton
+          aria-owns={open ? "menu-appbar" : null}
+          aria-haspopup="true"
+          onClick={this.handleMenu}
+        >
           {<Wrapper />}
         </IconButton>
         <Menu
