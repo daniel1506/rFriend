@@ -93,7 +93,7 @@ export default function EventCard(props) {
           //<IconButton aria-label="settings">
           // <MoreVertIcon />
           //</IconButton>
-          <EventCardSettingBtn key={props.eventName} iconType={MoreVertIcon} items={["Edit Event", "Discard Event"]} />
+          <EventCardSettingBtn key={props.eventId} iconType={MoreVertIcon} items={isHost?['Edit Event', 'Delete Event']:['Discard Event']} eventId={props.eventId} />
         }
         title={props.eventName}
         subheader={props.host.name}
