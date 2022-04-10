@@ -73,13 +73,22 @@ export default function EventCard(props) {
     setExpanded(!expanded);
   };
 
-  // function joinEventHandler() {
-  //   joinEvent(props.eventId);
-  // }
+  //function joinEventHandler() {
+  //  joinEvent(props.eventId);
+  //}
 
-  // function likeEventHandler() {
-  //   likeEvent(props.eventId);
-  // }
+  function likeEventHandler() {
+    if(!props.isLiked) {
+      put("https://rfriend.herokuapp.com/api/user/save", {
+              event_id: props.eventId,
+      });
+    }
+    else {
+      put("https://rfriend.herokuapp.com/api/user/unsave", {
+              event_id: props.eventId,
+      });
+    }
+  }
 
   return (
     <Card sx={{ maxWidth: 345 }}>
@@ -144,11 +153,7 @@ export default function EventCard(props) {
         </IconButton>
         <IconButton
           aria-label="add to favorites"
-          onClick={() => {
-            put("https://rfriend.herokuapp.com/api/user/save", {
-              event_id: props.eventId,
-            });
-          }}
+          onClick={likeEventHandler()}
         >
           {props.isLiked ? (
             <FavoriteIcon sx={{ color: pink[500] }} />
