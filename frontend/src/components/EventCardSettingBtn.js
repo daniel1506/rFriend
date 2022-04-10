@@ -29,7 +29,7 @@ class EventCardSettingBtn extends React.Component {
         const open = Boolean(anchorEl);
         const Wrapper = this.props.iconType;
         const listItems = this.props.items.map((link) =>
-            <MenuItem onClick={this.handleClose} >{link}</MenuItem>
+            <MenuItem onClick={this.handleClose} key={link}>{link}</MenuItem>
         );
 
         return (

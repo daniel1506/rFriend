@@ -11,7 +11,7 @@ const EventRender = ({ event }) => (
   <>
     {Object.entries(event).map(([key, value]) => {
       return (
-        <div>
+        <div key={key}>
           <h2>{key}</h2>
           <p>{String(value)}</p>
         </div>

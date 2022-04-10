@@ -44,6 +44,7 @@ export default function Home() {
               {eventList.map((e, index) => {
                 return (
                   <EventCard
+                    key={e.id}
                     eventId={e.id}
                     eventName={e.name}
                     hostId={e.ownerId}
