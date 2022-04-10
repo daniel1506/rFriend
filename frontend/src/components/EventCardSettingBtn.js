@@ -25,7 +25,7 @@ function EventCardSettingBtn(props) {
     }
     if (link == "Delete Event") {
       deleteReq("/api/event/" + props.eventId, {
-        event_id: props.eventId,
+        id: props.eventId,
       });
     }
     setAnchorEl(null);
