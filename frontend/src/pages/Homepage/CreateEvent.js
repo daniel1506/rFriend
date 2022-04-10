@@ -159,7 +159,6 @@ function CreateEvent(props) {
       duration: duration,
       location: location,
       max_participants: quota,
-      photo: eventPic,
       privacy: privacy,
       remarks: remarks,
       ...(eventPic !== "" && { photo: eventPic }),
@@ -175,6 +174,7 @@ function CreateEvent(props) {
         setCreateFailed(true);
       } else {
         setCreateFailed(false);
+        generalCtx.handleEventModified();
         setTimeout(() => {
           handleClose();
         }, 1000);

@@ -10,6 +10,7 @@ const GeneralContext = React.createContext({
   handleFriendModified: () => {},
   handleChangeView: () => {},
   handleSelectEvent: (eventId) => {},
+  handleEventModified: () => {},
 });
 
 export const GeneralContextProvider = (props) => {
