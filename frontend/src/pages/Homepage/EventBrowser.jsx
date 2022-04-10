@@ -165,7 +165,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
     <div className="div-filter shadow">
       <h3>Event Filter</h3>
 
-      <FormControl sx={{ m: 1, minWidth: 240 }}>
+      <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-category-label">Event Category</InputLabel>
         <Select
           labelId="filter-event-category-label"
@@ -185,7 +185,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           <MenuItem value="other">Other</MenuItem>
         </Select>
       </FormControl>
-      <FormControl sx={{ m: 1, minWidth: 240 }}>
+      <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-time-label">Event Time</InputLabel>
         <Select
           labelId="filter-event-time-label"
@@ -204,7 +204,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           <MenuItem value="midnight">Midnight</MenuItem>
         </Select>
       </FormControl>
-      <FormControl sx={{ m: 1, minWidth: 240 }}>
+      <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-location-label">Event Location</InputLabel>
         <Select
           labelId="filter-event-location-label"
@@ -222,7 +222,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           <MenuItem value="online">Online</MenuItem>
         </Select>
       </FormControl>
-      <FormControl sx={{ m: 1, minWidth: 240 }}>
+      <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-privacy-label">Event Privacy</InputLabel>
         <Select
           labelId="filter-event-privacy-label"
