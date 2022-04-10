@@ -5,13 +5,18 @@ const GeneralContext = React.createContext({
   //notice everything you get from localStorage will be string, since we rely on localStorage, here everything will be string to let intelSense remind user these thing will be string when we access them.
   isMapView: false,
   friendModified: 0,
+  eventIdSelected: null,
+  eventEventModified: false,
   handleFriendModified: () => {},
   handleChangeView: () => {},
+  handleSelectEvent: (eventId) => {},
 });
 
 export const GeneralContextProvider = (props) => {
   const [friendModified, setFriendModified] = useState(0);
   const [isMapView, setIsMapView] = useState(false);
+  const [eventIdSelected, setEventIdSelected] = useState(null);
+  const [eventEventModified, setEventModified] = useState(false);
   const handleFriendModified = () => {
     setFriendModified((prev) => {
       return prev + 1;
@@ -22,20 +27,27 @@ export const GeneralContextProvider = (props) => {
       return !prev;
     });
   };
-
+  const handleSelectEvent = (eventId) => {
+    setEventIdSelected(eventId);
+  };
+  const handleEventModified = () => {
+    setEventModified((prev) => {
+      return !prev;
+    });
+  };
   //provide an interface for components to use i.e. generalCtx.xxx
   const contextValue = {
     isMapView: isMapView,
     friendModified: friendModified,
+    eventEventModified: eventEventModified,
+    eventIdSelected: eventIdSelected,
     handleFriendModified: handleFriendModified,
     handleChangeView: handleChangeView,
+    handleSelectEvent: handleSelectEvent,
+    handleEventModified: handleEventModified,
   };
 
-  return (
-    <GeneralContext.Provider value={contextValue}>
-      {props.children}
-    </GeneralContext.Provider>
-  );
+  return <GeneralContext.Provider value={contextValue}>{props.children}</GeneralContext.Provider>;
 };
 
 export default GeneralContext;

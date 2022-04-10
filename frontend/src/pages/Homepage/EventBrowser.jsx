@@ -64,17 +64,10 @@ export default function EventBrowser() {
         <div className="container">
           <div className="row">
             <div className="col-md-6 col-xl-3 col-filter">
-              <EventFilter
-                eventList={eventList}
-                sendFilteredEvents={sendFilteredEvents}
-              />
+              <EventFilter eventList={eventList} sendFilteredEvents={sendFilteredEvents} />
             </div>
             <div className="col-md-6 event-card-deck">
-              <EventCardDeck
-                eventList={eventList}
-                filteredEvents={filteredEvents}
-                searchKey={searchKey}
-              />
+              <EventCardDeck eventList={eventList} filteredEvents={filteredEvents} searchKey={searchKey} />
             </div>
           </div>
         </div>
@@ -161,36 +154,11 @@ function EventFilter({ eventList, sendFilteredEvents }) {
       }
       if (filterTime != null && filterTime != "") {
         let time = new Date(event.startsAt);
-        if (
-          time.getHours() >= 6 &&
-          time.getHours() < 12 &&
-          filterTime != "morning"
-        )
-          return false;
-        else if (
-          time.getHours() >= 12 &&
-          time.getHours() < 18 &&
-          filterTime != "afternoon"
-        )
-          return false;
-        else if (
-          time.getHours() >= 18 &&
-          time.getHours() < 21 &&
-          filterTime != "evening"
-        )
-          return false;
-        else if (
-          time.getHours() >= 21 &&
-          time.getHours() < 24 &&
-          filterTime != "night"
-        )
-          return false;
-        else if (
-          time.getHours() >= 0 &&
-          time.getHours() < 6 &&
-          filterTime != "midnight"
-        )
-          return false;
+        if (time.getHours() >= 6 && time.getHours() < 12 && filterTime != "morning") return false;
+        else if (time.getHours() >= 12 && time.getHours() < 18 && filterTime != "afternoon") return false;
+        else if (time.getHours() >= 18 && time.getHours() < 21 && filterTime != "evening") return false;
+        else if (time.getHours() >= 21 && time.getHours() < 24 && filterTime != "night") return false;
+        else if (time.getHours() >= 0 && time.getHours() < 6 && filterTime != "midnight") return false;
       }
       if (filterPrivacy != null && filterPrivacy != "") {
         if (event.privacy != filterPrivacy) {
@@ -208,9 +176,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
       <h3>Event Filter</h3>
       <div>
         <FormControl sx={{ m: 1, minWidth: 240 }}>
-          <InputLabel id="filter-event-category-label">
-            Event Category
-          </InputLabel>
+          <InputLabel id="filter-event-category-label">Event Category</InputLabel>
           <Select
             labelId="filter-event-category-label"
             id="filter-event-category"
@@ -249,9 +215,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           </Select>
         </FormControl>
         <FormControl sx={{ m: 1, minWidth: 240 }}>
-          <InputLabel id="filter-event-location-label">
-            Event Location
-          </InputLabel>
+          <InputLabel id="filter-event-location-label">Event Location</InputLabel>
           <Select
             labelId="filter-event-location-label"
             id="filter-event-location"
@@ -305,9 +269,7 @@ function EventCardDeck(props) {
     if (props.searchKey != null && props.searchKey != "") {
       setDisplayedEventList(
         filteredEventList.filter((event) => {
-          return event.name
-            .toLowerCase()
-            .includes(props.searchKey.toLowerCase());
+          return event.name.toLowerCase().includes(props.searchKey.toLowerCase());
         })
       );
     }

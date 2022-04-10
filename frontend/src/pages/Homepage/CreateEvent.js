@@ -1,5 +1,5 @@
 //@ts-check
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useContext } from "react";
 import { useState } from "react";
 import {
   TextField,
@@ -24,9 +24,11 @@ import PrivacyButtonGroup from "../../components/PrivacyButtonGroup";
 import SubmitIconButton from "../../components/SubmitIconButton";
 import ImageIcon from "@mui/icons-material/Image";
 import post from "../../lib/post";
+import put from "../../lib/put";
 import { categoryPhotos } from "../../lib/sharedResource";
 import CoordinateChooser from "../../components/CoordinateChooser";
-
+import GeneralContext from "../../store/general-context";
+import AuthContext from "../../store/auth-context";
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -59,7 +61,10 @@ const style = {
 };
 
 function CreateEvent(props) {
-  const handleClose = () => props.setShowCreateEvent(false);
+  const handleClose = () => {
+    props.setShowCreateEvent(false);
+    generalCtx.handleSelectEvent(null);
+  };
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
   const [category, setCategory] = useState("");
@@ -75,7 +80,7 @@ function CreateEvent(props) {
   const [creating, setCreating] = useState(false);
   const [createFailed, setCreateFailed] = useState(undefined);
   const [coordinate, setCoordinate] = useState({ lat: null, lng: null });
-
+  const generalCtx = useContext(GeneralContext);
   const validateTitle = (title) => {};
 
   const handleChangePrivacy = (event, newPrivacy) => {
@@ -144,6 +149,37 @@ function CreateEvent(props) {
       }
     });
   };
+  const updateEvent = () => {
+    let duration = endTime - startTime;
+    let data = {
+      id: parseInt(generalCtx.eventIdSelected),
+      name: title,
+      category: category,
+      time: startTime,
+      duration: duration,
+      location: location,
+      max_participants: quota,
+      photo: eventPic,
+      privacy: privacy,
+      remarks: remarks,
+      coordinate_lat: coordinate.lat,
+      coordinate_lon: coordinate.lng,
+    };
+    console.log("updating...");
+    console.log(data);
+    setCreating(true);
+    put("https://rfriend.herokuapp.com/api/event", data).then((result) => {
+      setCreating(false);
+      if (result.status != 201) {
+        setCreateFailed(true);
+      } else {
+        setCreateFailed(false);
+        setTimeout(() => {
+          handleClose();
+        }, 1000);
+      }
+    });
+  };
 
   const displayCustomEventPicIfAvailable = useMemo(() => {
     if (eventPic === "") {
@@ -152,12 +188,13 @@ function CreateEvent(props) {
 
     return eventPic;
   }, [eventPic, category]);
-
+  console.log(generalCtx.eventIdSelected);
+  console.log(generalCtx.eventIdSelected !== null);
   return (
     <Modal
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
-      open={props.showCreateEvent}
+      open={props.showCreateEvent || generalCtx.eventIdSelected !== null}
       onClose={handleClose}
       closeAfterTransition
       BackdropComponent={Backdrop}
@@ -166,7 +203,7 @@ function CreateEvent(props) {
       }}
       sx={{ overflow: "scroll" }}
     >
-      <Slide in={props.showCreateEvent}>
+      <Slide in={props.showCreateEvent || generalCtx.eventIdSelected !== null}>
         <Box sx={style}>
           <Box
             sx={{
@@ -227,8 +264,7 @@ function CreateEvent(props) {
                 value={quota}
                 onChange={(e) => {
                   console.log(e.target.value);
-                  if (parseInt(e.target.value) > 0)
-                    setQuota(parseInt(e.target.value));
+                  if (parseInt(e.target.value) > 0) setQuota(parseInt(e.target.value));
                 }}
               />
               <TextField
@@ -253,12 +289,7 @@ function CreateEvent(props) {
             >
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="Category">Category</InputLabel>
-                <Select
-                  labelId="Category"
-                  value={category}
-                  onChange={handleChangeCategory}
-                  label="Category"
-                >
+                <Select labelId="Category" value={category} onChange={handleChangeCategory} label="Category">
                   <MenuItem value={"dining"}>dining</MenuItem>
                   <MenuItem value={"sports"}>sports</MenuItem>
                   <MenuItem value={"study"}>study</MenuItem>
@@ -283,10 +314,7 @@ function CreateEvent(props) {
                   <MenuItem value={30}>Thirty</MenuItem>
                 </Select>
               </FormControl> */}
-              <PrivacyButtonGroup
-                value={privacy}
-                onChange={handleChangePrivacy}
-              />
+              <PrivacyButtonGroup value={privacy} onChange={handleChangePrivacy} />
             </Box>
 
             <Box
@@ -367,7 +395,7 @@ function CreateEvent(props) {
               <SubmitButton
                 loading={creating}
                 error={createFailed}
-                onClick={createEvent}
+                onClick={generalCtx.eventIdSelected === null ? createEvent : updateEvent}
               >
                 Submit
               </SubmitButton>
