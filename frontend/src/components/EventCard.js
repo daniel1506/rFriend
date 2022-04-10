@@ -66,7 +66,7 @@ function SwitchCardIMG(category, url) {
 }
 
 export default function EventCard(props) {
-  const isHost = "2074" == props.ownerId;
+  const isHost = (localStorage.getItem("id") == props.ownerId);
   const [expanded, setExpanded] = React.useState(false);
 
   const handleExpandClick = () => {
