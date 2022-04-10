@@ -28,7 +28,7 @@ class EventCardSettingBtn extends React.Component {
     if (link == "Delete Event") {
       deleteReq("/api/event/" + this.props.eventId, { event_id: this.props.eventId });
     }
-    this.handleClose();
+    this.setState({ anchorEl: null });
   };
 
   render() {
