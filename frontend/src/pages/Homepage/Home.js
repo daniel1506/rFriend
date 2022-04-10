@@ -23,14 +23,15 @@ export default function Home() {
   const generalCtx = useContext(GeneralContext);
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
-      setEventList(r.event.filter((event) => {
-        if(event.isEventLiked) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      }));
+      setEventList(
+        r.event.filter((event) => {
+          if (event.isEventLiked) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+      );
     });
   }, [generalCtx.eventEventModified]);
 
@@ -42,27 +43,25 @@ export default function Home() {
             <Calendar />
           </Grid>
           <Grid item xs={4}>
-            <Stack spacing={2}>
-              {eventList.map((e, index) => {
-                return (
-                  <EventCard
-                    key={e.id}
-                    eventId={e.id}
-                    eventName={e.name}
-                    hostId={e.ownerId}
-                    eventTime={e.startsAt}
-                    isJoined={e.isEventJoined}
-                    isLiked={e.isEventLiked}
-                    photoUrl={e.photoUrl}
-                    host={e.owner}
-                    eventLocation={e.location}
-                    eventCategory={e.category}
-                    maxParticipants={e.maxParticipants}
-                    eventRemark={e.remarks}
-                  />
-                );
-              })}
-            </Stack>
+            {eventList.map((e, index) => {
+              return (
+                <EventCard
+                  key={e.id}
+                  eventId={e.id}
+                  eventName={e.name}
+                  hostId={e.ownerId}
+                  eventTime={e.startsAt}
+                  isJoined={e.isEventJoined}
+                  isLiked={e.isEventLiked}
+                  photoUrl={e.photoUrl}
+                  host={e.owner}
+                  eventLocation={e.location}
+                  eventCategory={e.category}
+                  maxParticipants={e.maxParticipants}
+                  eventRemark={e.remarks}
+                />
+              );
+            })}
           </Grid>
         </Grid>
       </Box>

@@ -98,7 +98,7 @@ export default function EventCard(props) {
   }
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ width: 345 }}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="avatar" src={props.host.profileUrl}>

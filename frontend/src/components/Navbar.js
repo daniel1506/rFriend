@@ -34,6 +34,7 @@ import get from "../lib/get";
 import AddFriendField from "./AddFriendField";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ViewListIcon from "@mui/icons-material/ViewList";
 import GeneralContext from "../store/general-context";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -137,10 +138,51 @@ export default function Navbar(props) {
             </ListItemIcon>
             <ListItemText primary={"Create event"} />
           </ListItem>
+          <Divider />
+          <Typography variant="caption" sx={{ ml: "5px" }}>
+            Browse Events
+          </Typography>
+          <ListItem
+            button
+            onClick={() => {
+              generalCtx.handleChangeView("gridView");
+            }}
+          >
+            <ListItemIcon>
+              <ViewListIcon sx={{ height: 40, width: 40 }} />
+            </ListItemIcon>
+            <ListItemText>Grid view</ListItemText>
+          </ListItem>
+          <ListItem
+            button
+            onClick={() => {
+              generalCtx.handleChangeView("mapView");
+            }}
+          >
+            <ListItemIcon>
+              <TravelExploreIcon sx={{ height: 40, width: 40 }} />
+            </ListItemIcon>
+            <ListItemText>Map view</ListItemText>
+          </ListItem>
+          <Divider />
+          <ListItem
+            button
+            onClick={() => {
+              generalCtx.handleChangeView("myEvents");
+            }}
+          >
+            <ListItemIcon>
+              <CalendarMonthIcon sx={{ height: 40, width: 40 }} />
+            </ListItemIcon>
+            <ListItemText>My Events</ListItemText>
+          </ListItem>
+          <Divider />
+          <Typography variant="caption" sx={{ ml: "5px" }}>
+            Friends
+          </Typography>
           <ListItem>
             <AddFriendField />
           </ListItem>
-          <Divider />
           <FriendList />
         </List>
       </Box>
