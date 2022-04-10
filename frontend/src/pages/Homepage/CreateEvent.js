@@ -129,9 +129,9 @@ function CreateEvent(props) {
       duration: duration,
       location: location,
       max_participants: quota,
-      photo: eventPic,
       privacy: privacy,
       remarks: remarks,
+      ...(eventPic !== "" && { photo: eventPic }),
       ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
       ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
@@ -162,6 +162,7 @@ function CreateEvent(props) {
       photo: eventPic,
       privacy: privacy,
       remarks: remarks,
+      ...(eventPic !== "" && { photo: eventPic }),
       ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
       ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
