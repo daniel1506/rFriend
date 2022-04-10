@@ -132,8 +132,8 @@ function CreateEvent(props) {
       photo: eventPic,
       privacy: privacy,
       remarks: remarks,
-      coordinate_lat: coordinate.lat,
-      coordinate_lon: coordinate.lng,
+      ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
+      ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
     console.log(data);
     setCreating(true);
@@ -162,8 +162,8 @@ function CreateEvent(props) {
       photo: eventPic,
       privacy: privacy,
       remarks: remarks,
-      coordinate_lat: coordinate.lat,
-      coordinate_lon: coordinate.lng,
+      ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
+      ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
     console.log("updating...");
     console.log(data);
