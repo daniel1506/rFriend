@@ -127,7 +127,9 @@ export default function EventCard(props) {
         alt="Category Image"
       />
       <CardContent>
-        <Typography variant="body2" color="text.secondary"></Typography>
+        <Typography variant="h6" color="text.secondary">
+          {props.eventName}
+        </Typography>
       </CardContent>
       <CardActions disableSpacing>
         <IconButton
@@ -163,29 +165,23 @@ export default function EventCard(props) {
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Typography>
-            <EventIcon /> {props.eventName}
-          </Typography>
-          <Typography>
+          <Typography sx={{ display: "flex" }}>
             <CalendarMonthIcon /> {new Date(props.eventTime).toLocaleDateString()}
           </Typography>
-          <Typography>
+          <Typography sx={{ display: "flex" }}>
             <AccessTimeIcon /> {new Date(props.eventTime).toLocaleTimeString()}
           </Typography>
-          <Typography>
+          <Typography sx={{ display: "flex" }}>
             <LocationOnIcon /> {props.eventLocation}
           </Typography>
-          <Typography>
+          <Typography sx={{ display: "flex" }}>
             <CategoryIcon /> {props.eventCategory.charAt(0).toUpperCase() + props.eventCategory.slice(1)}
           </Typography>
-          <Typography>
-            <PeopleIcon /> Maximum participants: {props.maxParticipants}
+          <Typography sx={{ display: "flex" }}>
+            <PeopleIcon /> Quota: {props.maxParticipants}
           </Typography>
-          <Typography paragraph>
+          <Typography sx={{ display: "flex" }}>
             <EventNoteIcon /> Remark: {props.eventRemark}
-          </Typography>
-          <Typography>
-            <CommentIcon /> Comment:{" "}
           </Typography>
           <CommentSection />
         </CardContent>

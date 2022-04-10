@@ -43,34 +43,10 @@ export default function CommentSection() {
   const classes = useStyles();
   return (
     <>
-      <MessageLeft
-        message="ABCD"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User A"
-        avatarDisp={true}
-      />
-      <MessageLeft
-        message="ABCD"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User B"
-        avatarDisp={false}
-      />
-      <MessageRight
-        message="EFCG"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User C"
-        avatarDisp={true}
-      />
-      <MessageRight
-        message="ABCE"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User C"
-        avatarDisp={false}
-      />
+      <MessageLeft message="ABCD" timestamp="MM/DD 00:00" photoURL="" displayName="User A" avatarDisp={true} />
+      <MessageLeft message="ABCD" timestamp="MM/DD 00:00" photoURL="" displayName="User B" avatarDisp={false} />
+      <MessageRight message="EFCG" timestamp="MM/DD 00:00" photoURL="" displayName="User C" avatarDisp={true} />
+      <MessageRight message="ABCE" timestamp="MM/DD 00:00" photoURL="" displayName="User C" avatarDisp={false} />
       <TextInput />
     </>
   );

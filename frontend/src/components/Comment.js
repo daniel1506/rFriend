@@ -4,9 +4,10 @@ import { styled } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import { deepOrange } from "@mui/material/colors";
 import TextField from "@mui/material/TextField";
-import SendIcon from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
-
+import { FormControl, InputLabel, OutlinedInput, InputAdornment } from "@material-ui/core";
+import SubmitIconButton from "./SubmitIconButton";
+import SendIcon from "@mui/icons-material/Send";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     messageRow: {
@@ -127,11 +128,7 @@ export const MessageLeft = (props) => {
   return (
     <>
       <div className={classes.messageRow}>
-        <Avatar
-          alt={displayName}
-          className={classes.orange}
-          src={photoURL}
-        ></Avatar>
+        <Avatar alt={displayName} className={classes.orange} src={photoURL}></Avatar>
         <div>
           <div className={classes.displayName}>{displayName}</div>
           <div className={classes.messageBlue}>
@@ -160,16 +157,21 @@ export const TextInput = () => {
   const classes = useStyles();
   return (
     <>
-      <form className={classes.wrapForm} noValidate autoComplete="off">
-        <TextField
-          id="standard-text"
-          label="Enter Comment"
-          className={classes.wrapText}
+      <FormControl variant="outlined" fullWidth>
+        <InputLabel htmlFor="addFriend">Comment</InputLabel>
+        <OutlinedInput
+          id="addFriend"
+          type="number"
+          label="Comment" //without label attribute, the label will overlap with the border of input field visually
+          endAdornment={
+            <InputAdornment position="end">
+              <SubmitIconButton error={undefined} loading={false}>
+                <SendIcon />
+              </SubmitIconButton>
+            </InputAdornment>
+          }
         />
-        <Button variant="contained" color="primary" className={classes.button}>
-          <SendIcon />
-        </Button>
-      </form>
+      </FormControl>
     </>
   );
 };
