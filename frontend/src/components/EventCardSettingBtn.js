@@ -51,11 +51,7 @@ class EventCardSettingBtn extends React.Component {
 
     return (
       <div>
-        <IconButton
-          aria-owns={open ? "menu-appbar" : null}
-          aria-haspopup="true"
-          onClick={this.handleMenu}
-        >
+        <IconButton aria-owns={open ? "menu-appbar" : null} aria-haspopup="true" onClick={this.handleMenu}>
           {<Wrapper />}
         </IconButton>
         <Menu
