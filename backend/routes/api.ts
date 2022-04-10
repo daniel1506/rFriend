@@ -28,6 +28,7 @@ userRouter.put("/profile", authMiddleware, userController.validateProfile, userC
 userRouter.get("/browse", authMiddleware, userController.browseEvent);
 userRouter.put("/join", authMiddleware, userController.validateEvent, userController.joinEvent);
 userRouter.put("/save", authMiddleware, userController.validateEvent, userController.saveEvent);
+userRouter.put("/unsave", authMiddleware, userController.validateEvent, userController.unsaveEvent);
 userRouter.post("/comment", authMiddleware, userController.validateComment, userController.postComment);
 
 userRouter.post("/forget_pw", userController.forgetPassword);
@@ -53,6 +54,7 @@ friendRouter.post("/", friendController.get);
 friendRouter.put("/request", friendController.validate, friendController.request);
 friendRouter.put("/accept", friendController.validate, friendController.accept);
 friendRouter.delete("/", friendController.validate, friendController.remove);
+friendRouter.delete("/request", friendController.validate, friendController.deleteRequest);
 
 // -----------------------------------------------------------------------------
 

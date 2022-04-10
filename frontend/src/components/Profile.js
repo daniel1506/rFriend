@@ -84,6 +84,8 @@ export default function Profile(props) {
   const handleClose = () => props.setShowProfile(false);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
+  const [submittingProPicFailed, setSubmittingProPicFailed] =
+    React.useState(undefined);
   const [resetting, setResetting] = React.useState(false);
   const [resetFailed, setResetFailed] = React.useState(undefined);
   const [email, setEmail] = React.useState("");
@@ -128,18 +130,20 @@ export default function Profile(props) {
   const uploadImage = async (e) => {
     const file = e.target.files[0];
     const profile = await convertBase64(file);
-    console.log(profile);
     const data = { profile };
-    setSubmittingProPic(true);
     console.log(data);
+    setSubmittingProPicFailed(undefined);
+    setSubmittingProPic(true);
     put("https://rfriend.herokuapp.com/api/user/profile", data)
       .then((result) => {
         setSubmittingProPic(false);
         console.log(result);
         if (result.status != 200) {
+          setSubmittingProPicFailed(true);
         } else {
           let timestamp = new Date().getTime(); //to force browser download image again from the url
           console.log(result.profileURL + `?t=${timestamp}`);
+          setSubmittingProPicFailed(false);
           setProfilePicUrl(result.profileURL + `?t=${timestamp}`);
         }
       })
@@ -236,7 +240,7 @@ export default function Profile(props) {
                               }}
                               disabled={submittingProPic}
                             />
-                            <IconButton
+                            {/* <IconButton
                               color="primary"
                               component="span"
                               disabled={submittingProPic}
@@ -244,7 +248,14 @@ export default function Profile(props) {
                             >
                               {!submittingProPic && <EditIcon />}
                               {submittingProPic && <LoadingIcon />}
-                            </IconButton>
+                            </IconButton> */}
+                            <SubmitIconButton
+                              component="span"
+                              error={submittingProPicFailed}
+                              loading={submittingProPic}
+                            >
+                              <EditIcon />
+                            </SubmitIconButton>
                           </label>
                         }
                         overlap="circular"

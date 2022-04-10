@@ -1,41 +1,32 @@
-import React from "react";
+//@ts-check
+import React, { useCallback, useMemo } from "react";
 import { useState } from "react";
-import VerticalFlex from "../../layout/VerticalFlex";
 import {
   TextField,
-  Checkbox,
   Select,
   MenuItem,
   Modal,
   Backdrop,
   Slide,
-  Grid,
   Box,
   InputLabel,
   FormControl,
-  TextareaAutosize,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-  IconButton,
   Input,
   Avatar,
 } from "@mui/material";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import StaticTimePicker from "@mui/lab/StaticTimePicker";
 import TimePicker from "./TimePicker";
-import HorizontalFlex from "../../layout/HorizontalFlex";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import SubmitButton from "../../components/SubmitButton";
 import CloseButton from "../../components/CloseButton";
 import SquareToggleButton from "../../components/SquareToggleButton";
-import PersonIcon from "@mui/icons-material/Person";
 import PrivacyButtonGroup from "../../components/PrivacyButtonGroup";
 import SubmitIconButton from "../../components/SubmitIconButton";
 import ImageIcon from "@mui/icons-material/Image";
 import post from "../../lib/post";
+import { categoryPhotos } from "../../lib/sharedResource";
+import CoordinateChooser from "../../components/CoordinateChooser";
+
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -45,15 +36,12 @@ const style = {
   marginRight: "auto",
   top: "50%",
   bottom: "50%",
+  transform: "translateX(0%) translateY(-50%) !important",
+  height: "min-content",
   marginBottom: "auto",
-  "@media (min-width: 0px)": {
-    marginTop: "-340px",
-    height: "680px",
-  },
+  "@media (min-width: 0px)": {},
   "@media (min-width: 600px)": {
-    marginTop: "-255px",
     width: "400px",
-    height: "510px",
   },
 
   // "@media (max-width: 1025px)": {
@@ -69,11 +57,12 @@ const style = {
   borderRadius: 10,
   p: 4,
 };
+
 function CreateEvent(props) {
   const handleClose = () => props.setShowCreateEvent(false);
-  const [title, setTitle] = useState(null);
+  const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
-  const [category, setCategory] = useState(false);
+  const [category, setCategory] = useState("");
   const [notification, setNotification] = useState(false);
   const [quota, setQuota] = useState(1);
   const [eventPic, setEventPic] = useState("");
@@ -82,12 +71,22 @@ function CreateEvent(props) {
   const [endTime, setEndTime] = useState(0);
   const [location, setLocation] = useState("");
   const [privacy, setPrivacy] = useState("friend");
-  const [maxParticipants, setMaxParticipants] = useState(1);
   const [remarks, setRemarks] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createFailed, setCreateFailed] = useState(undefined);
+  const [coordinate, setCoordinate] = useState({ lat: null, lng: null });
+
   const validateTitle = (title) => {};
+
   const handleChangePrivacy = (event, newPrivacy) => {
+    console.log(newPrivacy);
     setPrivacy(newPrivacy);
   };
+
+  const handleChangeCategory = (e) => {
+    setCategory(e.target.value);
+  };
+
   const convertBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -102,6 +101,7 @@ function CreateEvent(props) {
       };
     });
   };
+
   const saveImage = async (e) => {
     try {
       const file = e.target.files[0];
@@ -114,20 +114,45 @@ function CreateEvent(props) {
       console.log(err);
     }
   };
+
   const createEvent = () => {
-    let duration;
+    let duration = endTime - startTime;
     let data = {
       name: title,
       category: category,
       time: startTime,
       duration: duration,
       location: location,
-      max_participants: maxParticipants,
+      max_participants: quota,
       photo: eventPic,
+      privacy: privacy,
       remarks: remarks,
+      coordinate_lat: coordinate.lat,
+      coordinate_lon: coordinate.lng,
     };
-    post("https://rfriend.herokuapp.com/api/event", data);
+    console.log(data);
+    setCreating(true);
+    post("https://rfriend.herokuapp.com/api/event", data).then((result) => {
+      setCreating(false);
+      if (result.status != 201) {
+        setCreateFailed(true);
+      } else {
+        setCreateFailed(false);
+        setTimeout(() => {
+          handleClose();
+        }, 1000);
+      }
+    });
   };
+
+  const displayCustomEventPicIfAvailable = useMemo(() => {
+    if (eventPic === "") {
+      return categoryPhotos[category];
+    }
+
+    return eventPic;
+  }, [eventPic, category]);
+
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -154,7 +179,7 @@ function CreateEvent(props) {
           >
             <Avatar
               variant="square"
-              src={eventPic}
+              src={displayCustomEventPicIfAvailable}
               style={{ width: "100%", height: "150px" }}
               sx={{ borderRadius: 3 }}
             >
@@ -175,15 +200,15 @@ function CreateEvent(props) {
                 type="text"
                 label="title*"
                 onChange={(e) => {
-                  props.setTitle(e.target.value);
                   validateTitle(e.target.value);
+                  setTitle(e.target.value);
                 }}
               />
               <TextField
                 type="text"
                 label="location"
                 onChange={(e) => {
-                  props.setLocation(e.target.value);
+                  setLocation(e.target.value);
                 }}
               />
             </Box>
@@ -201,7 +226,9 @@ function CreateEvent(props) {
                 type="number"
                 value={quota}
                 onChange={(e) => {
-                  if (e.target.value > 0) setQuota(e.target.value);
+                  console.log(e.target.value);
+                  if (parseInt(e.target.value) > 0)
+                    setQuota(parseInt(e.target.value));
                 }}
               />
               <TextField
@@ -209,6 +236,9 @@ function CreateEvent(props) {
                 type="text"
                 InputLabelProps={{
                   shrink: true,
+                }}
+                onChange={(e) => {
+                  setRemarks(e.target.value);
                 }}
               />
             </Box>
@@ -226,14 +256,15 @@ function CreateEvent(props) {
                 <Select
                   labelId="Category"
                   value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                  }}
+                  onChange={handleChangeCategory}
                   label="Category"
                 >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
+                  <MenuItem value={"dining"}>dining</MenuItem>
+                  <MenuItem value={"sports"}>sports</MenuItem>
+                  <MenuItem value={"study"}>study</MenuItem>
+                  <MenuItem value={"work"}>work</MenuItem>
+                  <MenuItem value={"leisure"}>leisure</MenuItem>
+                  <MenuItem value={"others"}>others</MenuItem>
                 </Select>
               </FormControl>
 
@@ -267,7 +298,7 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TimePicker />
+              <TimePicker label="Start time" setTime={setStartTime} />
               <SquareToggleButton
                 selected={notification}
                 onChange={() => {
@@ -287,7 +318,7 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TimePicker />
+              <TimePicker label="End time" setTime={setEndTime} />
               <label htmlFor="icon-button-file">
                 <Input
                   inputProps={{ accept: "image/*" }}
@@ -318,6 +349,9 @@ function CreateEvent(props) {
                 </SubmitIconButton>
               </label>
             </Box>
+            <Box sx={{ height: 250 }}>
+              <CoordinateChooser setChosenCoord={setCoordinate} />
+            </Box>
             <Box
               sx={{
                 display: "flex",
@@ -330,7 +364,13 @@ function CreateEvent(props) {
               <CloseButton onClick={handleClose} sx={{ flexGrow: 0 }}>
                 Cancel
               </CloseButton>
-              <SubmitButton>Submit</SubmitButton>
+              <SubmitButton
+                loading={creating}
+                error={createFailed}
+                onClick={createEvent}
+              >
+                Submit
+              </SubmitButton>
             </Box>
           </Box>
         </Box>

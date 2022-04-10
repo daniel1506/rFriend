@@ -25,6 +25,7 @@ function AddFriendField() {
   const addFriend = () => {
     let data = { target_user_id: friendId };
     setAdding(true);
+    setAddFailed(undefined);
     console.log(data);
     put("https://rfriend.herokuapp.com/api/friend/request", data)
       .then((result) => {

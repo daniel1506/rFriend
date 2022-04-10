@@ -5,6 +5,8 @@ import AuthContext from "../../store/auth-context";
 import CreateEvent from "./CreateEvent";
 import Profile from "../../components/Profile";
 import MapsView from "./MapsView";
+import Home from "./Home";
+import GeneralContext from "../../store/general-context";
 
 function Homepage() {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -15,12 +17,14 @@ function Homepage() {
     authCtx.logout();
   };
 
+  const { isMapView } = useContext(GeneralContext);
+
   return (
     <>
       <Navbar onLogout={onLogout} setShowCreateEvent={setShowCreateEvent} setShowProfile={setShowProfile} />
       <CreateEvent showCreateEvent={showCreateEvent} setShowCreateEvent={setShowCreateEvent} />
       <Profile setShowProfile={setShowProfile} showProfile={showProfile} admin />
-      <MapsView />
+      {isMapView ? <MapsView /> : <Home />}
     </>
   );
 }

@@ -1,7 +1,7 @@
 // import { NextFunction, query, Request, Response } from "express";
 import { NextFunction, Request, Response } from "express";
 // import { body, param, validationResult } from "express-validator";
-import { body, param, query, validationResult } from "express-validator";
+import { body, query, validationResult } from "express-validator";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
 import { generateFriendsList, generateFOFList } from "../services/friendService";
@@ -10,12 +10,13 @@ import bcrypt from "bcrypt";
 import { generateJWT, JWTpayload } from "../services/authService";
 import { eventPrivacy, EventPrivacyType } from "../types/sharedTypes";
 
-import { PutObjectCommand, PutObjectCommandInput, HeadObjectCommand, HeadObjectCommandInput } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, HeadObjectCommandInput } from "@aws-sdk/client-s3";
 import { s3Client } from "../AWS/s3Cient";
 
 import jwt from "jsonwebtoken";
 
 import { sendEmail, generateForgetPasswordEmail, sendVerifyEmailEmail } from "../services/emailService";
+import photoUploadS3 from "../AWS/photoUploader";
 
 // -----------------------------------------------------------------------------
 
@@ -147,32 +148,24 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
       return next(new HttpException(401, "Cannot find user"));
     }
 
+    let response_content: { name: string; email: string; profile_url: string | null } = {
+      name: user.name,
+      email: user.email,
+      profile_url: null,
+    };
 
-    let response_content: {name: string, email: string, profile_url: string|null} = {
-                                                                                        name: user.name,
-                                                                                        email: user.email,
-                                                                                        profile_url: null
-                                                                                    };
-
-    
     const params: HeadObjectCommandInput = {
       Bucket: process.env.BUCKET_NAME,
-      Key: "img" + String(id) //if any sub folder-> path/of/the/folder.ext
+      Key: "img" + String(id), //if any sub folder-> path/of/the/folder.ext
     };
     try {
-          const header = await s3Client.send(new HeadObjectCommand(params));
-          
-          response_content["profile_url"] = getProfileUrl(id);
-          res.send(response_content);
-    } 
-    catch (err) {
-          
-          res.send(response_content);
+      const header = await s3Client.send(new HeadObjectCommand(params));
+
+      response_content["profile_url"] = getProfileUrl(id);
+      res.send(response_content);
+    } catch (err) {
+      res.send(response_content);
     }
-    
-
-    
-
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
@@ -277,7 +270,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
   try {
     // use updateMany since profileUrl may be null, and hence not unique. However, it is unique if exists
     user = await prisma.user.updateMany({
-      where: { resetPasswordToken: token }, 
+      where: { resetPasswordToken: token },
       data: {
         password: hash,
         resetPasswordToken: null,
@@ -302,45 +295,36 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     return next(new HttpException(422, "Invalid input"));
   }
 
-  
   const { profile } = req.body;
   let user_id: number = req.id;
 
-  /* 
-    find out the type of the image
-    Note that profile has the format: image/jpeg;base64,xxxx.....
-  */
-  let type: string = profile.split("/")[1].split(";")[0];
   let key: string = "img" + String(user_id);
-
-  // turn the string into binary data. The image cannot be shown without doing this
-  const encoded_image: Buffer = Buffer.from(profile.split(",")[1], "base64");
-
-  // Set the parameters.
-  const bucketParams: PutObjectCommandInput = {
-    Bucket: process.env.BUCKET_NAME,
-    // Specify the name of the new object. For example, 'index.html'.
-    // To create a directory for the object, use '/'. For example, 'myApp/package.json'.
-    Key: key,
-    Body: encoded_image, // Content of the new object.
-    ContentEncoding: "base64",
-    ContentType: "image/" + type,
-    ACL: "public-read", // for public access
-  };
 
   // Create and upload the object to the S3 bucket.
   try {
-    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+    photoUploadS3(key, profile);
 
-    console.log("Successfully uploaded object: " + bucketParams.Bucket + "/" + bucketParams.Key);
+    console.log("Successfully uploaded object: " + process.env.BUCKET_NAME + "/" + key);
 
     // generate an url for the image
-    let profileURL: String =
+    let profileURL: string =
       "https://" + process.env.BUCKET_NAME + ".s3." + process.env.REGION + ".amazonaws.com/" + key;
 
-    res.status(200).send({ profileURL: profileURL });
-
     // Store the url into the database
+    let user;
+
+    try {
+      user = await prisma.user.update({
+        where: {
+          id: user_id,
+        },
+        data: { profileUrl: profileURL },
+      });
+    } catch (e) {
+      return next(prismaErrorHandler(e));
+    }
+
+    res.status(200).send({ profileURL: profileURL });
   } catch (err) {
     return next(new HttpException(500, "Error in AWS: " + err));
   }
@@ -398,13 +382,14 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
           },
         ],
       },
-      include: { comments: true },
+      include: {
+        owner: { select: { name: true, profileUrl: true } },
+        comments: { include: { owner: { select: { name: true, profileUrl: true } } } },
+      },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
-
-  let x = JSON.stringify(result);
 
   result.forEach((event: any) => {
     if (joinedEvent.includes(event.id)) {
@@ -530,6 +515,56 @@ export const saveEvent = async (req: Request, res: Response, next: NextFunction)
 
 // -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
+
+export const unsaveEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, "Invalid input"));
+  }
+
+  const user_id = req.id;
+  const event_id = req.body.event_id;
+
+  let event;
+  try {
+    event = await prisma.event.findUnique({
+      where: {
+        id: event_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!event) {
+    return next(new HttpException(404, "Event not found"));
+  }
+
+  let unsave;
+  try {
+    unsave = await prisma.event.update({
+      where: {
+        id: event_id,
+      },
+      data: {
+        followers: { disconnect: { id: user_id } },
+      },
+      include: {
+        followers: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ followers: [...unsave.followers] });
+};
+
+// -----------------------------------------------------------------------------
+
 export const validateComment = [body("event_id").isInt(), body("comment").exists()];
 
 export const postComment = async (req: Request, res: Response, next: NextFunction) => {
@@ -560,7 +595,7 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
   try {
     newComment = await prisma.eventComment.create({
       data: {
-        userId: user_id,
+        ownerId: user_id,
         eventId: event_id,
         text: comment,
       },
@@ -580,15 +615,41 @@ export const postComment = async (req: Request, res: Response, next: NextFunctio
           connect: { id: newComment.id },
         },
       },
-      include: {
-        comments: true,
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let user;
+  try {
+    user = await prisma.user.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        comments: {
+          connect: { id: newComment.id },
+        },
       },
     });
   } catch (e) {
     return next(prismaErrorHandler(e));
   }
 
-  res.status(201).send({ comments: event.comments });
+  let eventComments;
+
+  try {
+    eventComments = await prisma.eventComment.findMany({
+      where: {
+        eventId: event_id,
+      },
+      include: { owner: { select: { name: true, profileUrl: true } } },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ comments: eventComments });
 };
 
 // -----------------------------------------------------------------------------
