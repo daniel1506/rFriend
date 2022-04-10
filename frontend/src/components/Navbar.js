@@ -41,6 +41,7 @@ import get from "../lib/get";
 import AddFriendField from "./AddFriendField";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import GeneralContext from "../store/general-context";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -84,6 +85,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Navbar(props) {
   //get context by itself here, make the module more self-contained, reduce coupling
   const authCtx = useContext(AuthContext);
+  const generalCtx = useContext(GeneralContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorEl2, setAnchorEl2] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -91,7 +93,6 @@ export default function Navbar(props) {
   const isPageMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [isMapView, setIsMapView] = React.useState(false);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -226,18 +227,16 @@ export default function Navbar(props) {
       </MenuItem> */}
       <MenuItem
         onClick={() => {
-          setIsMapView((prev) => {
-            return !prev;
-          });
+          generalCtx.handleChangeView();
         }}
         sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
       >
-        {isMapView && (
+        {generalCtx.isMapView && (
           <Button color="inherit" startIcon={<TravelExploreIcon />}>
             Map view
           </Button>
         )}
-        {!isMapView && (
+        {!generalCtx.isMapView && (
           <Button color="inherit" startIcon={<CalendarMonthIcon />}>
             {" "}
             Calendar view
@@ -379,27 +378,23 @@ export default function Navbar(props) {
           >
             {!props.admin && (
               <>
-                {isMapView && (
+                {generalCtx.isMapView && (
                   <Button
                     color="inherit"
                     startIcon={<TravelExploreIcon />}
                     onClick={() => {
-                      setIsMapView((prev) => {
-                        return !prev;
-                      });
+                      generalCtx.handleChangeView();
                     }}
                   >
                     Map view
                   </Button>
                 )}
-                {!isMapView && (
+                {!generalCtx.isMapView && (
                   <Button
                     color="inherit"
                     startIcon={<CalendarMonthIcon />}
                     onClick={() => {
-                      setIsMapView((prev) => {
-                        return !prev;
-                      });
+                      generalCtx.handleChangeView();
                     }}
                   >
                     Calendar view
