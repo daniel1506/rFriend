@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Paper } from "@mui/material";
 import TableCell from "@material-ui/core/TableCell";
-import { darken, fade, lighten } from "@material-ui/core/styles/colorManipulator";
+import { darken, alpha, lighten } from "@material-ui/core/styles/colorManipulator";
 import Typography from "@material-ui/core/Typography";
 import { ViewState, EditingState } from "@devexpress/dx-react-scheduler";
 import classNames from "clsx";
@@ -26,6 +26,7 @@ import { owners } from "./calendar-data/tasks";
 import { TurnedIn } from "@mui/icons-material";
 import EventCardModal from "../../components/EventCardModal";
 import { Box } from "@material-ui/core";
+import CalendarEvent from './CalendarEvent';
 
 const Header = ({ children, appointmentData, ...restProps }) => (
   //<StyledAppointmentTooltipHeader
@@ -40,7 +41,7 @@ const Header = ({ children, appointmentData, ...restProps }) => (
       alignContent: "center",
     }}
   >
-    <EventCardModal />
+    <EventCardModal appointmentData={appointmentData}/>
   </Box>
   //</StyledAppointmentTooltipHeader>
 );
@@ -129,8 +130,8 @@ const resources = [
 const getBorder = (theme) =>
   `1px solid ${
     theme.palette.type === "light"
-      ? lighten(fade(theme.palette.divider, 1), 0.88)
-      : darken(fade(theme.palette.divider, 1), 0.68)
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -159,7 +160,7 @@ const styles = (theme) => ({
       backgroundColor: "white",
     },
     "&:focus": {
-      backgroundColor: fade(theme.palette.primary.main, 0.15),
+      backgroundColor: alpha(theme.palette.primary.main, 0.15),
       outline: 0,
     },
   },
@@ -315,11 +316,16 @@ export default class Calendar extends React.PureComponent {
     });
   }
 
+  setCalendarEvent = (events) => {
+    this.setState({ data: events });
+  };
+
   render() {
     const { data } = this.state;
 
     return (
       <Paper>
+        <CalendarEvent setCalendarEvent={this.setCalendarEvent}/>
         <Scheduler data={data}>
           <EditingState onCommitChanges={this.commitChanges} />
           <ViewState defaultCurrentDate={new Date()} />

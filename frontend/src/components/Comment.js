@@ -10,7 +10,7 @@ import SubmitIconButton from "./SubmitIconButton";
 import SendIcon from "@mui/icons-material/Send";
 import GeneralContext from "../store/general-context";
 import { Container } from "@mui/material";
-import post from "../lib/get.js";
+import post from "../lib/post.js";
 const useStyles = makeStyles((theme) =>
   createStyles({
     messageRow: {

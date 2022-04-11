@@ -74,7 +74,7 @@ const eventDetailItemStyle = (theme) => ({
 });
 
 export default function EventCard(props) {
-  console.log(props.hostId);
+  //console.log(props.hostId);
   const generalCtx = useContext(GeneralContext);
   const isHost = localStorage.getItem("id") == props.hostId;
   const [expanded, setExpanded] = React.useState(false);
@@ -102,7 +102,7 @@ export default function EventCard(props) {
       });
     }
   }
-
+  //console.log(props.participants);
   return (
     <Card sx={{ width: 345 }}>
       <CardHeader
@@ -175,9 +175,6 @@ export default function EventCard(props) {
         <IconButton aria-label="add to favorites" onClick={likeEventHandler}>
           {props.isLiked ? <FavoriteIcon sx={{ color: pink[500] }} /> : <FavoriteIcon />}
         </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton>
         <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
           <ExpandMoreIcon />
         </ExpandMore>
@@ -188,7 +185,7 @@ export default function EventCard(props) {
             <CategoryIcon /> {props.eventCategory.charAt(0).toUpperCase() + props.eventCategory.slice(1)}
           </Typography>
           <Typography sx={eventDetailItemStyle}>
-            <PeopleIcon /> Quota: {props.maxParticipants}
+            <PeopleIcon /> Quota: {'/' + props.maxParticipants}
           </Typography>
           <CommentSection eventComment={props.eventComment} eventId={props.eventId} />
         </CardContent>

@@ -286,9 +286,10 @@ function EventCardDeck(props) {
                   host={e.owner}
                   eventLocation={e.location}
                   eventCategory={e.category}
+                  participants={e.participants}
                   maxParticipants={e.maxParticipants}
                   eventRemark={e.remarks}
-                  eventComment={e.comment}
+                  eventComment={e.comments}
                 />
               </Box>
             </Grid>

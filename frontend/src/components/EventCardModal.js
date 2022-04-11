@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, {useEffect} from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -6,6 +6,7 @@ import Modal from "@mui/material/Modal";
 import EventCard from "./EventCard.js";
 import { IconButton } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import get from '../lib/get';
 const style = {
   position: "absolute",
   top: "50%",
@@ -20,8 +21,22 @@ const style = {
 
 export default function EventCardModal(props) {
   const [open, setOpen] = React.useState(false);
+  const [eventInfo, setEventInfo] = React.useState(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  useEffect(() => {
+    get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
+      setEventInfo(
+        r.event.filter((event) => {
+          if (event.id == props.appointmentData.id) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+      );
+    });
+  }, []);
 
   return (
     <div>
@@ -34,15 +49,22 @@ export default function EventCardModal(props) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <EventCard
-          eventName={props.eventName}
-          hostName={props.hostName}
-          eventTime={props.eventTime}
-          eventLocation={props.eventLocation}
-          eventCategory={props.eventCategory}
-          maxParticipants={props.maxParticipants}
-          eventRemark={props.eventRemark}
-        />
+        {eventInfo?<EventCard
+          eventId={eventInfo.id}
+          eventName={eventInfo.name}
+          hostId={eventInfo.ownerId}
+          eventTime={eventInfo.startsAt}
+          isJoined={eventInfo.isEventJoined}
+          isLiked={eventInfo.isEventLiked}
+          photoUrl={eventInfo.photoUrl}
+          host={eventInfo.owner}
+          eventLocation={eventInfo.location}
+          eventCategory={eventInfo.category}
+          participants={eventInfo.participants}
+          maxParticipants={eventInfo.maxParticipants}
+          eventRemark={eventInfo.remarks}
+          eventComment={eventInfo.comments}
+        />:<></>}
       </Modal>
     </div>
   );
