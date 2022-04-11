@@ -8,6 +8,9 @@ import Button from "@mui/material/Button";
 import { FormControl, InputLabel, OutlinedInput, InputAdornment } from "@mui/material";
 import SubmitIconButton from "./SubmitIconButton";
 import SendIcon from "@mui/icons-material/Send";
+import GeneralContext from "../../store/general-context";
+import { Container } from "@mui/material";
+import post from "../lib/get.js";
 const useStyles = makeStyles((theme) =>
   createStyles({
     messageRow: {
@@ -153,8 +156,27 @@ export const MessageRight = (props) => {
   );
 };
 
-export const TextInput = () => {
+export const TextInput = (props) => {
+  const generalCtx = React.useContext(GeneralContext);
   const classes = useStyles();
+  const [commentInput, setCommentInput] = React.useState("");
+
+  const handleCommentInputOnChange = (event) => {
+    setCommentInput(event.target.value);
+  };
+  
+  function submitComment(){
+    if(commentInput != null && commentInput != '') {
+      post("https://rfriend.herokuapp.com/api/user/comment", {
+        event_id: props.eventId,
+        comment: commentInput,
+      }).then(() => {
+        generalCtx.handleEventModified();
+      });
+    } 
+    setCommentInput('');
+  }
+  
   return (
     <>
       <FormControl variant="outlined" fullWidth>
@@ -162,10 +184,12 @@ export const TextInput = () => {
         <OutlinedInput
           id="addFriend"
           type="text"
+          value={commentInput}
+          onChange={handleCommentInputOnChange}
           label="Comment" //without label attribute, the label will overlap with the border of input field visually
           endAdornment={
             <InputAdornment position="end">
-              <SubmitIconButton error={undefined} loading={false}>
+              <SubmitIconButton error={undefined} loading={false} onClick={submitComment}>
                 <SendIcon />
               </SubmitIconButton>
             </InputAdornment>
