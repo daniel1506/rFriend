@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-export default function CommentSection() {
+export default function CommentSection(props) {
   const classes = useStyles();
   return (
     <>
