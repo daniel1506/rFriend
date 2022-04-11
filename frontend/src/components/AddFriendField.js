@@ -37,7 +37,7 @@ function AddFriendField() {
   };
   return (
     <>
-      <FormControl sx={{ width: "25ch" }} variant="outlined">
+      <FormControl sx={{ my: 1, width: "25ch" }} variant="outlined">
         <InputLabel htmlFor="addFriend">Add friend by id</InputLabel>
         <OutlinedInput
           id="addFriend"
