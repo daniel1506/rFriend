@@ -9,6 +9,7 @@ import Paper from "@mui/material/Paper";
 import Calendar from "./Calendar.js";
 import get from "../../lib/get";
 import GeneralContext from "../../store/general-context.js";
+import { Container } from "@mui/material";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -36,7 +37,7 @@ export default function Home() {
   }, [generalCtx.eventEventModified]);
 
   return (
-    <>
+    <Container>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
           <Grid item xs={8}>
@@ -65,6 +66,6 @@ export default function Home() {
           </Grid>
         </Grid>
       </Box>
-    </>
+    </Container>
   );
 }

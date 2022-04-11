@@ -32,6 +32,7 @@ import EventCard from "../../components/EventCard.js";
 import get from "../../lib/get.js";
 import { StaticDatePicker } from "@mui/lab";
 import GeneralContext from "../../store/general-context";
+import { Container } from "@mui/material";
 //var eventList = GetEvents('https://rfrconsole.log(r.event)iend.herokuapp.com/api/user/browse').then((r)=>{});
 //console.log(GetEvents('https://rfriend.herokuapp.com/api/user/browse'));
 //var filteredEvents = Events;
@@ -268,7 +269,7 @@ function EventCardDeck(props) {
   }
 
   return (
-    <>
+    <Container>
       <Grid container spacing={"20px"}>
         {displayedEventList.map((e, index) => {
           return (
@@ -293,7 +294,7 @@ function EventCardDeck(props) {
           );
         })}
       </Grid>
-    </>
+    </Container>
   );
 }
 
