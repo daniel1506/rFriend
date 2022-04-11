@@ -376,7 +376,7 @@ export default function Navbar(props) {
             sx={{ display: { xs: "none", sm: "block" } }}
           /> */}
           {rFriendIcon}
-          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
+          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" }, ml: "12px" }}>
             rFriend
           </Typography>
           <Search>
