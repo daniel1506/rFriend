@@ -208,7 +208,6 @@ export async function forgetPassword(req: Request, res: Response, next: NextFunc
       data: { resetPasswordToken: token },
     });
 
-    
     if (!user) {
       return next(new HttpException(400, "Cannot update token for forget password."));
     }
@@ -237,13 +236,14 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
   if (!errors.isEmpty()) {
     return next(new HttpException(422, "Invalid input"));
   }
-  console.log("new test ---------------------------")  //delete
+  console.log("new test ---------------------------"); //delete
   const { password, token } = req.body;
 
   // check if the forget password token is valid (i.e. not yet expired and exists in the DB)
   try {
     jwt.verify(token, process.env.JWT_SECRET_FORGET_PW!);
-  } catch (e) {console.log("expired")  //delete
+  } catch (e) {
+    console.log("expired"); //delete
     return next(new HttpException(401, "Forget password token expired"));
   }
 
@@ -253,9 +253,10 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
     user = await prisma.user.findFirst({
       where: { resetPasswordToken: token },
     });
-    console.log(user);    //  delete
+    console.log(user); //  delete
     // first check if the email exist
-    if (!user) {console.log("invalid token")  //delete
+    if (!user) {
+      console.log("invalid token"); //delete
       return next(new HttpException(401, "Invalid forget password token"));
     }
   } catch (e) {
@@ -266,7 +267,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
   // hash password
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
-  console.log("resetting")  //delete
+  console.log("resetting"); //delete
   try {
     // use updateMany since profileUrl may be null, and hence not unique. However, it is unique if exists
     user = await prisma.user.updateMany({
@@ -385,6 +386,8 @@ export const browseEvent = async (req: Request, res: Response, next: NextFunctio
       include: {
         owner: { select: { name: true, profileUrl: true } },
         comments: { include: { owner: { select: { name: true, profileUrl: true } } } },
+        participants: { select: { name: true, profileUrl: true } },
+        followers: { select: { name: true, profileUrl: true } },
       },
     });
   } catch (e) {

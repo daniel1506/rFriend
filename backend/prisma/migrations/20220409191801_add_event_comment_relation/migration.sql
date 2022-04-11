@@ -6,7 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `eventcomment` DROP COLUMN `userId`,
+ALTER TABLE `EventComment` DROP COLUMN `userId`,
     ADD COLUMN `ownerId` INTEGER NOT NULL;
 
 -- AddForeignKey
