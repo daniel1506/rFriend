@@ -183,7 +183,7 @@ export default function EventCard(props) {
           <Typography sx={{ display: "flex" }}>
             <EventNoteIcon /> Remark: {props.eventRemark}
           </Typography>
-          <CommentSection />
+          <CommentSection eventComment={props.eventComment}/>
         </CardContent>
       </Collapse>
     </Card>
