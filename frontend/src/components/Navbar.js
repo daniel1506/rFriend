@@ -262,7 +262,7 @@ export default function Navbar(props) {
         </IconButton>
         <p>Notifications</p>
       </MenuItem> */}
-      <MenuItem
+      {/* <MenuItem
         onClick={() => {
           generalCtx.handleChangeView();
         }}
@@ -279,7 +279,7 @@ export default function Navbar(props) {
             Calendar view
           </Button>
         )}
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem
         onClick={() => {
           props.setShowProfile(true);
