@@ -11,14 +11,20 @@ import EventCard from "../../components/EventCard";
 
 const EventRender = ({ event }) => (
   <>
-    {Object.entries(event).map(([key, value]) => {
-      return (
-        <div key={key}>
-          <h2>{key}</h2>
-          <p>{String(value)}</p>
-        </div>
-      );
-    })}
+    <h3>{event.name}</h3>
+    <div>
+      {new Date(event.startsAt).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })}{" "}
+    </div>
+    <div>at {event.location}</div>
+    <div>by {event.owner.name}</div>
   </>
 );
 
@@ -50,6 +56,7 @@ const Marker = (options) => {
       markerOnClickListener = marker.addListener("click", () => {
         options.infoWindow.setContent(content);
         options.infoWindow.open(marker.get("map"), marker);
+        options.setSelectedEvent(options.event);
       });
     }
 
@@ -71,13 +78,19 @@ const mapLoadingRender = (status) => {
   return null;
 };
 
-const Map = ({ center, zoom, style, markers }) => {
+const Map = ({ center, zoom, style, markers, setSelectedEvent }) => {
   const ref = useRef();
   const [mapObj, setMapObj] = useState();
   const infoWindow = useMemo(() => new window.google.maps.InfoWindow(), []);
 
   useEffect(() => {
-    setMapObj(new window.google.maps.Map(ref.current, { center, zoom }));
+    setMapObj(
+      new window.google.maps.Map(ref.current, {
+        center,
+        zoom,
+        mapTypeControl: false,
+      })
+    );
   }, []);
 
   return (
@@ -91,6 +104,7 @@ const Map = ({ center, zoom, style, markers }) => {
           clickable={true}
           event={m.event}
           infoWindow={infoWindow}
+          setSelectedEvent={setSelectedEvent}
         />
       ))}
     </div>
@@ -132,6 +146,7 @@ const MapsView = () => {
   const center = useMemo(() => ({ lat: 22.41963752639907, lng: 114.20674324035645 }), []);
   const zoom = useMemo(() => 15, []);
   const [markers, setMarkers] = useState([]); // google.maps.Marker
+  const [selectedEvent, setSelectedEvent] = useState(null); // event obj
 
   const { data: events } = useSWR(getUrl("/api/user/browse"), get);
 
@@ -153,29 +168,39 @@ const MapsView = () => {
     }
   }, [events]);
 
+  useEffect(() => console.log(selectedEvent), [selectedEvent]);
+
   return (
     <Container sx={rootContainerStyle}>
       <Box sx={mapContainerStyle}>
         <Wrapper apiKey={process.env.REACT_APP_MAPS_API_KEY} render={mapLoadingRender}>
-          <Map center={center} zoom={zoom} style={{ height: "100%" }} markers={markers}></Map>
+          <Map
+            center={center}
+            zoom={zoom}
+            style={{ height: "100%" }}
+            markers={markers}
+            setSelectedEvent={setSelectedEvent}
+          ></Map>
         </Wrapper>
       </Box>
-      <Box sx={eventCardContainerStyle}>
-        <EventCard
-          eventId="123"
-          eventName="haha"
-          hostId="123"
-          eventTime="123"
-          isJoined={true}
-          isLiked={true}
-          photoUrl="https://images.unsplash.com/photo-1649533585079-14e843c0f6c4"
-          host="haha"
-          eventLocation="haha"
-          eventCategory="dining"
-          maxParticipants={5}
-          eventRemark="haha"
-        />
-      </Box>
+      {selectedEvent && (
+        <Box sx={eventCardContainerStyle}>
+          <EventCard
+            eventId={selectedEvent.id}
+            eventName={selectedEvent.name}
+            hostId={selectedEvent.ownerId}
+            eventTime={selectedEvent.startsAt}
+            isJoined={selectedEvent.isEventJoined}
+            isLiked={selectedEvent.isEventLiked}
+            photoUrl={selectedEvent.photoUrl}
+            host={selectedEvent.owner}
+            eventLocation={selectedEvent.location}
+            eventCategory={selectedEvent.category}
+            maxParticipants={selectedEvent.maxParticipants}
+            eventRemark={selectedEvent.remarks}
+          />
+        </Box>
+      )}
     </Container>
   );
 };
