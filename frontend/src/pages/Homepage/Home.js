@@ -59,6 +59,7 @@ export default function Home() {
                 eventCategory={e.category}
                 maxParticipants={e.maxParticipants}
                 eventRemark={e.remarks}
+                eventComment={e.comment}
               />
             );
           })}
