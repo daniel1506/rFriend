@@ -398,7 +398,7 @@ export default function Navbar(props) {
               gap: 2,
             }}
           >
-            {!props.admin && (
+            {/* {!props.admin && (
               <>
                 {generalCtx.isMapView && (
                   <Button
@@ -423,7 +423,7 @@ export default function Navbar(props) {
                   </Button>
                 )}
               </>
-            )}
+            )} */}
             <NameShowCase
               color="inherit"
               variant="text"
