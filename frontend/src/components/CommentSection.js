@@ -1,9 +1,10 @@
 import React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { MessageLeft, MessageRight, TextInput } from "./Comment.js";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     paper: {
       width: "80vw",
@@ -43,6 +44,7 @@ export default function CommentSection() {
   const classes = useStyles();
   return (
     <>
+      <Typography sx={{ pt: 2, pb: 1 }}>Comments:</Typography>
       <MessageLeft message="ABCD" timestamp="MM/DD 00:00" photoURL="" displayName="User A" avatarDisp={true} />
       <MessageLeft message="ABCD" timestamp="MM/DD 00:00" photoURL="" displayName="User B" avatarDisp={false} />
       <MessageRight message="EFCG" timestamp="MM/DD 00:00" photoURL="" displayName="User C" avatarDisp={true} />

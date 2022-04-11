@@ -67,6 +67,12 @@ function SwitchCardIMG(category, url) {
   }
 }
 
+const eventDetailItemStyle = (theme) => ({
+  display: "flex",
+  gap: 1,
+  color: theme.palette.text.secondary,
+});
+
 export default function EventCard(props) {
   console.log(props.hostId);
   const generalCtx = useContext(GeneralContext);
@@ -118,6 +124,7 @@ export default function EventCard(props) {
         }
         title={props.eventName}
         subheader={props.host.name}
+        titleTypographyProps={{ fontWeight: "bold", variant: "body1" }}
       />
       <CardMedia
         component="img"
@@ -126,9 +133,21 @@ export default function EventCard(props) {
         image={SwitchCardIMG(props.eventCategory, props.photoUrl)}
         alt="Category Image"
       />
-      <CardContent>
-        <Typography variant="h6" color="text.secondary">
-          {props.eventName}
+      <CardContent sx={{ pb: 1 }}>
+        {props.eventRemark && <Typography sx={{ ...eventDetailItemStyle, pb: 1 }}>{props.eventRemark}</Typography>}
+        <Typography sx={eventDetailItemStyle}>
+          <CalendarMonthIcon />{" "}
+          {new Date(props.eventTime).toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })}
+        </Typography>
+        <Typography sx={eventDetailItemStyle}>
+          <LocationOnIcon /> {props.eventLocation}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
@@ -164,26 +183,14 @@ export default function EventCard(props) {
         </ExpandMore>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          <Typography sx={{ display: "flex" }}>
-            <CalendarMonthIcon /> {new Date(props.eventTime).toLocaleDateString()}
-          </Typography>
-          <Typography sx={{ display: "flex" }}>
-            <AccessTimeIcon /> {new Date(props.eventTime).toLocaleTimeString()}
-          </Typography>
-          <Typography sx={{ display: "flex" }}>
-            <LocationOnIcon /> {props.eventLocation}
-          </Typography>
-          <Typography sx={{ display: "flex" }}>
+        <CardContent sx={{ pt: 1 }}>
+          <Typography sx={eventDetailItemStyle}>
             <CategoryIcon /> {props.eventCategory.charAt(0).toUpperCase() + props.eventCategory.slice(1)}
           </Typography>
-          <Typography sx={{ display: "flex" }}>
+          <Typography sx={eventDetailItemStyle}>
             <PeopleIcon /> Quota: {props.maxParticipants}
           </Typography>
-          <Typography sx={{ display: "flex" }}>
-            <EventNoteIcon /> Remark: {props.eventRemark}
-          </Typography>
-          <CommentSection eventComment={props.eventComment}/>
+          <CommentSection eventComment={props.eventComment} />
         </CardContent>
       </Collapse>
     </Card>
