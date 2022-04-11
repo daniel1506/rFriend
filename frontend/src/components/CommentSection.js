@@ -48,7 +48,7 @@ export default function CommentSection() {
       {props.eventComment.map((comment) => {
           return (<MessageLeft key={comment.id} message={comment.text} timestamp={new Date(comment.createdAt).toString()} photoURL={comment.photoUrl} displayName={comment.userId} avatarDisp={true} />)
       }))}
-      <TextInput />
+      <TextInput eventId={props.eventId}/>
     </>
   );
 }
