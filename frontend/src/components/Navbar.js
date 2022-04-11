@@ -76,6 +76,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const drawerIconSize = 28;
+
 export default function Navbar(props) {
   //get context by itself here, make the module more self-contained, reduce coupling
   const authCtx = useContext(AuthContext);
@@ -134,12 +136,12 @@ export default function Navbar(props) {
             }}
           >
             <ListItemIcon>
-              <AddCircleIcon sx={{ height: 40, width: 40 }} color="info" />
+              <AddCircleIcon sx={{ height: drawerIconSize, width: drawerIconSize }} color="info" />
             </ListItemIcon>
             <ListItemText primary={"Create event"} />
           </ListItem>
-          <Divider />
-          <Typography variant="caption" sx={{ ml: "5px" }}>
+          <Divider sx={{ my: 1 }} />
+          <Typography variant="caption" sx={{ ml: 2, textTransform: "uppercase", py: 1, display: "block" }}>
             Browse Events
           </Typography>
           <ListItem
@@ -149,7 +151,7 @@ export default function Navbar(props) {
             }}
           >
             <ListItemIcon>
-              <ViewListIcon sx={{ height: 40, width: 40 }} />
+              <ViewListIcon sx={{ height: drawerIconSize, width: drawerIconSize }} />
             </ListItemIcon>
             <ListItemText>Grid view</ListItemText>
           </ListItem>
@@ -160,11 +162,11 @@ export default function Navbar(props) {
             }}
           >
             <ListItemIcon>
-              <TravelExploreIcon sx={{ height: 40, width: 40 }} />
+              <TravelExploreIcon sx={{ height: drawerIconSize, width: drawerIconSize }} />
             </ListItemIcon>
             <ListItemText>Map view</ListItemText>
           </ListItem>
-          <Divider />
+          <Divider sx={{ my: 1 }} />
           <ListItem
             button
             onClick={() => {
@@ -172,12 +174,12 @@ export default function Navbar(props) {
             }}
           >
             <ListItemIcon>
-              <CalendarMonthIcon sx={{ height: 40, width: 40 }} />
+              <CalendarMonthIcon sx={{ height: drawerIconSize, width: drawerIconSize }} />
             </ListItemIcon>
             <ListItemText>My Events</ListItemText>
           </ListItem>
-          <Divider />
-          <Typography variant="caption" sx={{ ml: "5px" }}>
+          <Divider sx={{ my: 1 }} />
+          <Typography variant="caption" sx={{ ml: 2, textTransform: "uppercase", pt: 1, display: "block" }}>
             Friends
           </Typography>
           <ListItem>

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
-  Input,
-} from "@mui/material";
+import { FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Input } from "@mui/material";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import AuthContext from "../store/auth-context";
 import GeneralContext from "../store/general-context";
@@ -44,20 +37,15 @@ function AddFriendField() {
   };
   return (
     <>
-      <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
-        <InputLabel htmlFor="addFriend">Type friend id</InputLabel>
+      <FormControl sx={{ width: "25ch" }} variant="outlined">
+        <InputLabel htmlFor="addFriend">Add friend by id</InputLabel>
         <OutlinedInput
           id="addFriend"
           type="number"
-          label="Type friend id" //without label attribute, the label will overlap with the border of input field visually
+          label="Add friend by id" //without label attribute, the label will overlap with the border of input field visually
           endAdornment={
             <InputAdornment position="end">
-              <SubmitIconButton
-                error={addFailed}
-                loading={adding}
-                edge="end"
-                onClick={addFriend}
-              >
+              <SubmitIconButton error={addFailed} loading={adding} edge="end" onClick={addFriend}>
                 <GroupAddIcon />
               </SubmitIconButton>
             </InputAdornment>
