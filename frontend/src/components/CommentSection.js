@@ -45,10 +45,9 @@ export default function CommentSection() {
   return (
     <>
       <Typography sx={{ pt: 2, pb: 1 }}>Comments:</Typography>
-      <MessageLeft message="ABCD" timestamp="MM/DD 00:00" photoURL="" displayName="User A" avatarDisp={true} />
-      <MessageLeft message="ABCD" timestamp="MM/DD 00:00" photoURL="" displayName="User B" avatarDisp={false} />
-      <MessageRight message="EFCG" timestamp="MM/DD 00:00" photoURL="" displayName="User C" avatarDisp={true} />
-      <MessageRight message="ABCE" timestamp="MM/DD 00:00" photoURL="" displayName="User C" avatarDisp={false} />
+      {props.eventComment.map((comment) => {
+          return (<MessageLeft key={comment.id} message={comment.text} timestamp={new Date(comment.createdAt).toString()} photoURL={comment.photoUrl} displayName={comment.userId} avatarDisp={true} />)
+      }))}
       <TextInput />
     </>
   );
