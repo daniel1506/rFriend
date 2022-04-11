@@ -102,7 +102,6 @@ export default function EventCard(props) {
       });
     }
   }
-  //console.log(props.participants);
   return (
     <Card sx={{ width: 345 }}>
       <CardHeader
@@ -185,7 +184,7 @@ export default function EventCard(props) {
             <CategoryIcon /> {props.eventCategory.charAt(0).toUpperCase() + props.eventCategory.slice(1)}
           </Typography>
           <Typography sx={eventDetailItemStyle}>
-            <PeopleIcon /> Quota: {'/' + props.maxParticipants}
+            <PeopleIcon /> Quota: {props.participants.length + '/' + props.maxParticipants}
           </Typography>
           <CommentSection eventComment={props.eventComment} eventId={props.eventId} />
         </CardContent>
