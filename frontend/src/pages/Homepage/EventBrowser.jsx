@@ -288,6 +288,7 @@ function EventCardDeck(props) {
                   eventCategory={e.category}
                   maxParticipants={e.maxParticipants}
                   eventRemark={e.remarks}
+                  eventComment={e.comment}
                 />
               </Box>
             </Grid>
