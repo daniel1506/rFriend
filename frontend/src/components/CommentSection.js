@@ -41,13 +41,14 @@ const useStyles = makeStyles((theme) =>
 );
 
 export default function CommentSection(props) {
+  const hasComment = (props.eventComment != null);
   const classes = useStyles();
   return (
     <>
       <Typography sx={{ pt: 2, pb: 1 }}>Comments:</Typography>
-      {props.eventComment.map((comment) => {
-          return (<MessageLeft key={comment.id} message={comment.text} timestamp={new Date(comment.createdAt).toString()} photoURL={comment.photoUrl} displayName={comment.userId} avatarDisp={true} />)
-      }))}
+      {hasComment?props.eventComment.map((comment) => {
+          return (<MessageLeft key={comment.id} message={comment.text} timestamp={new Date(comment.createdAt).toString()} photoURL={comment.owner.profileUrl} displayName={comment.owner.name} avatarDisp={true} />)
+      }):<></>}
       <TextInput eventId={props.eventId}/>
     </>
   );
