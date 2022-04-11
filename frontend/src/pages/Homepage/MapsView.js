@@ -4,6 +4,8 @@ import { Wrapper, Status } from "@googlemaps/react-wrapper";
 import useSWR from "swr";
 import get from "../../lib/get";
 import getUrl from "../../lib/getUrl";
+import { Box, Container } from "@mui/material";
+import EventCard from "../../components/EventCard";
 
 // -----------------------------------------------------------------------------
 
@@ -97,6 +99,35 @@ const Map = ({ center, zoom, style, markers }) => {
 
 // -----------------------------------------------------------------------------
 
+const rootContainerStyle = (theme) => ({
+  paddingTop: "16px",
+  height: "calc(100% - 80px)",
+  display: "flex",
+  gap: "16px",
+  flexDirection: "row",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+  },
+});
+
+const mapContainerStyle = (theme) => ({
+  flexGrow: 1,
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    height: "30%",
+  },
+});
+
+const eventCardContainerStyle = (theme) => ({
+  flexShrink: 0,
+  width: 345,
+  margin: "0 auto",
+  overflow: "scroll",
+  [theme.breakpoints.down("md")]: {
+    height: "70%",
+  },
+});
+
 const MapsView = () => {
   const center = useMemo(() => ({ lat: 22.41963752639907, lng: 114.20674324035645 }), []);
   const zoom = useMemo(() => 15, []);
@@ -123,9 +154,29 @@ const MapsView = () => {
   }, [events]);
 
   return (
-    <Wrapper apiKey={process.env.REACT_APP_MAPS_API_KEY} render={mapLoadingRender}>
-      <Map center={center} zoom={zoom} style={{ height: "50%" }} markers={markers}></Map>
-    </Wrapper>
+    <Container sx={rootContainerStyle}>
+      <Box sx={mapContainerStyle}>
+        <Wrapper apiKey={process.env.REACT_APP_MAPS_API_KEY} render={mapLoadingRender}>
+          <Map center={center} zoom={zoom} style={{ height: "100%" }} markers={markers}></Map>
+        </Wrapper>
+      </Box>
+      <Box sx={eventCardContainerStyle}>
+        <EventCard
+          eventId="123"
+          eventName="haha"
+          hostId="123"
+          eventTime="123"
+          isJoined={true}
+          isLiked={true}
+          photoUrl="https://images.unsplash.com/photo-1649533585079-14e843c0f6c4"
+          host="haha"
+          eventLocation="haha"
+          eventCategory="dining"
+          maxParticipants={5}
+          eventRemark="haha"
+        />
+      </Box>
+    </Container>
   );
 };
 
