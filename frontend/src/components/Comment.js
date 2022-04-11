@@ -5,10 +5,10 @@ import Avatar from "@mui/material/Avatar";
 import { deepOrange } from "@mui/material/colors";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { FormControl, InputLabel, OutlinedInput, InputAdornment } from "@material-ui/core";
+import { FormControl, InputLabel, OutlinedInput, InputAdornment } from "@mui/material";
 import SubmitIconButton from "./SubmitIconButton";
 import SendIcon from "@mui/icons-material/Send";
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     messageRow: {
       display: "flex",
