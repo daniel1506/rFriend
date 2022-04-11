@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import ReactDOMServer from "react-dom/server";
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 import useSWR from "swr";
@@ -6,6 +6,7 @@ import get from "../../lib/get";
 import getUrl from "../../lib/getUrl";
 import { Box, Container } from "@mui/material";
 import EventCard from "../../components/EventCard";
+import GeneralContext from "../../store/general-context";
 
 // -----------------------------------------------------------------------------
 
@@ -56,7 +57,7 @@ const Marker = (options) => {
       markerOnClickListener = marker.addListener("click", () => {
         options.infoWindow.setContent(content);
         options.infoWindow.open(marker.get("map"), marker);
-        options.setSelectedEvent(options.event);
+        options.setSelectedEventId(options.event.id);
       });
     }
 
@@ -78,7 +79,7 @@ const mapLoadingRender = (status) => {
   return null;
 };
 
-const Map = ({ center, zoom, style, markers, setSelectedEvent }) => {
+const Map = ({ center, zoom, style, markers, setSelectedEventId }) => {
   const ref = useRef();
   const [mapObj, setMapObj] = useState();
   const infoWindow = useMemo(() => new window.google.maps.InfoWindow(), []);
@@ -104,7 +105,7 @@ const Map = ({ center, zoom, style, markers, setSelectedEvent }) => {
           clickable={true}
           event={m.event}
           infoWindow={infoWindow}
-          setSelectedEvent={setSelectedEvent}
+          setSelectedEventId={setSelectedEventId}
         />
       ))}
     </div>
@@ -147,9 +148,17 @@ const MapsView = () => {
   const zoom = useMemo(() => 15, []);
   const [markers, setMarkers] = useState([]); // google.maps.Marker
   const [selectedEvent, setSelectedEvent] = useState(null); // event obj
+  const [selectedEventId, setSelectedEventId] = useState(null); // number
 
-  const { data: events } = useSWR(getUrl("/api/user/browse"), get);
+  const { eventEventModified } = useContext(GeneralContext);
+  const { data: events, mutate } = useSWR(getUrl("/api/user/browse"), get);
 
+  // refresh data upon context notification
+  useEffect(() => {
+    mutate();
+  }, [eventEventModified, mutate]);
+
+  // construct data for displaying markers
   useEffect(() => {
     if (events) {
       setMarkers(
@@ -168,7 +177,12 @@ const MapsView = () => {
     }
   }, [events]);
 
-  useEffect(() => console.log(selectedEvent), [selectedEvent]);
+  // update selected event on id change or event data change
+  useEffect(() => {
+    if (events) {
+      setSelectedEvent(events.event.filter((event) => event.id === selectedEventId)[0]);
+    }
+  }, [events, selectedEventId]);
 
   return (
     <Container sx={rootContainerStyle}>
@@ -179,7 +193,7 @@ const MapsView = () => {
             zoom={zoom}
             style={{ height: "100%" }}
             markers={markers}
-            setSelectedEvent={setSelectedEvent}
+            setSelectedEventId={setSelectedEventId}
           ></Map>
         </Wrapper>
       </Box>
