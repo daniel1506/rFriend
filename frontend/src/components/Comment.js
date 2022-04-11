@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import { FormControl, InputLabel, OutlinedInput, InputAdornment } from "@mui/material";
 import SubmitIconButton from "./SubmitIconButton";
 import SendIcon from "@mui/icons-material/Send";
-import GeneralContext from "../../store/general-context";
+import GeneralContext from "../store/general-context";
 import { Container } from "@mui/material";
 import post from "../lib/get.js";
 const useStyles = makeStyles((theme) =>
