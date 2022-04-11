@@ -38,34 +38,50 @@ export default function Home() {
 
   return (
     <Container>
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
-          <Grid item xs={8}>
-            <Calendar />
-          </Grid>
-          <Grid item xs={4}>
-            {eventList.map((e, index) => {
-              return (
-                <EventCard
-                  key={e.id}
-                  eventId={e.id}
-                  eventName={e.name}
-                  hostId={e.ownerId}
-                  eventTime={e.startsAt}
-                  isJoined={e.isEventJoined}
-                  isLiked={e.isEventLiked}
-                  photoUrl={e.photoUrl}
-                  host={e.owner}
-                  eventLocation={e.location}
-                  eventCategory={e.category}
-                  maxParticipants={e.maxParticipants}
-                  eventRemark={e.remarks}
-                />
-              );
-            })}
-          </Grid>
+      <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
+        <Grid item xs={8}>
+          <Calendar />
         </Grid>
-      </Box>
+        <Grid container item xs={4} sx={{ gap: 2, overflow: "scroll" }} className="example">
+          {eventList.map((e, index) => {
+            return (
+              <EventCard
+                key={e.id}
+                eventId={e.id}
+                eventName={e.name}
+                hostId={e.ownerId}
+                eventTime={e.startsAt}
+                isJoined={e.isEventJoined}
+                isLiked={e.isEventLiked}
+                photoUrl={e.photoUrl}
+                host={e.owner}
+                eventLocation={e.location}
+                eventCategory={e.category}
+                maxParticipants={e.maxParticipants}
+                eventRemark={e.remarks}
+              />
+            );
+          })}
+        </Grid>
+      </Grid>
     </Container>
   );
 }
+//-----------------------------------------------
+const rootContainerStyle = (theme) => ({
+  paddingTop: "16px",
+  height: "calc(100% - 80px)",
+  display: "flex",
+  gap: "16px",
+  flexDirection: "row",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+  },
+});
+const mapContainerStyle = (theme) => ({
+  flexGrow: 1,
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    height: "30%",
+  },
+});

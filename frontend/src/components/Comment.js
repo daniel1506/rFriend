@@ -161,7 +161,7 @@ export const TextInput = () => {
         <InputLabel htmlFor="addFriend">Comment</InputLabel>
         <OutlinedInput
           id="addFriend"
-          type="number"
+          type="text"
           label="Comment" //without label attribute, the label will overlap with the border of input field visually
           endAdornment={
             <InputAdornment position="end">
