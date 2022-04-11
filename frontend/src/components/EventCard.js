@@ -190,7 +190,7 @@ export default function EventCard(props) {
           <Typography sx={eventDetailItemStyle}>
             <PeopleIcon /> Quota: {props.maxParticipants}
           </Typography>
-          <CommentSection eventComment={props.eventComment} />
+          <CommentSection eventComment={props.eventComment} eventId={props.eventId} />
         </CardContent>
       </Collapse>
     </Card>
