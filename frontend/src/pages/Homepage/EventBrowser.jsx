@@ -183,7 +183,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           <MenuItem value="sports">Sports</MenuItem>
           <MenuItem value="study">Study</MenuItem>
           <MenuItem value="work">Work</MenuItem>
-          <MenuItem value="other">Other</MenuItem>
+          <MenuItem value="others">Others</MenuItem>
         </Select>
       </FormControl>
       <FormControl sx={{ margin: "10px", width: 240 }}>

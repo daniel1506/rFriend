@@ -61,10 +61,10 @@ function SwitchCardIMG(category, url) {
       return "https://outwittrade.com/wp-content/uploads/2020/04/study.jpg";
     case "work":
       return "https://fr8wff00-a.akamaihd.net/philippines/wp-content/uploads/2021/05/Work-From-Home-Jobs-5.png";
-    case "other":
+    case "others":
       return "http://www.bmi.bund.de/SharedDocs/bilder/DE/schmuckbilder/service/veranstaltungen/events-01.jpg?__blob=poster&v=4";
     default:
-      return "other";
+      return "others";
   }
 }
 
@@ -84,9 +84,16 @@ export default function EventCard(props) {
     setExpanded(!expanded);
   };
 
-  //function joinEventHandler() {
-  //  joinEvent(props.eventId);
-  //}
+  function joinEventHandler() {
+    if(props.maxParticipants == props.participants.length){
+      alert('The event is fulled');
+    }
+    put("https://rfriend.herokuapp.com/api/user/join", {
+      event_id: props.eventId,
+    }).then(() => {
+      generalCtx.handleEventModified();
+    });
+  }
 
   function likeEventHandler() {
     if (!props.isLiked) {
@@ -162,13 +169,7 @@ export default function EventCard(props) {
         <CardActions disableSpacing>
           <IconButton
             aria-label="add to calendar"
-            onClick={() => {
-              put("https://rfriend.herokuapp.com/api/user/join", {
-                event_id: props.eventId,
-              }).then(() => {
-                generalCtx.handleEventModified();
-              });
-            }}
+            onClick={joinEventHandler}
           >
             {props.isJoined ? (
               <EventAvailableIcon color="secondary" />
