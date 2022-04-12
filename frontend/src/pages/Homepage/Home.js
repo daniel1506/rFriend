@@ -35,7 +35,7 @@ export default function Home() {
   return (
     <Container sx={{ pt: 2 }}>
       <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
-        <Grid item xs={8}>
+        <Grid item xs={12} sm={12} md={10}>
           <Calendar />
         </Grid>
       </Grid>
