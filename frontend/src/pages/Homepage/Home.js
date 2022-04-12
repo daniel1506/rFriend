@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useContext } from "react";
 import { styled } from "@mui/material/styles";
-import EventCard from "../../components/EventCard.js";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Calendar from "./Calendar.js";
 import get from "../../lib/get";
@@ -41,29 +37,6 @@ export default function Home() {
       <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
         <Grid item xs={8}>
           <Calendar />
-        </Grid>
-        <Grid container item xs={4} sx={{ gap: 2, overflow: "scroll" }} className="example">
-          {eventList.map((e, index) => {
-            return (
-              <EventCard
-                key={e.id}
-                eventId={e.id}
-                eventName={e.name}
-                hostId={e.ownerId}
-                eventTime={e.startsAt}
-                isJoined={e.isEventJoined}
-                isLiked={e.isEventLiked}
-                photoUrl={e.photoUrl}
-                host={e.owner}
-                eventLocation={e.location}
-                eventCategory={e.category}
-                participants={e.participants}
-                maxParticipants={e.maxParticipants}
-                eventRemark={e.remarks}
-                eventComment={e.comment}
-              />
-            );
-          })}
         </Grid>
       </Grid>
     </Container>

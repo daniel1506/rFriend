@@ -8,6 +8,7 @@ import MapsView from "./MapsView";
 import Home from "./Home";
 import EventBrowser from "./EventBrowser";
 import GeneralContext from "../../store/general-context";
+import LikedEvents from "./LikedEvents";
 
 function Homepage() {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -32,8 +33,8 @@ function Homepage() {
       <Profile setShowProfile={setShowProfile} showProfile={showProfile} admin />
       {viewSelected === "mapView" && <MapsView />}
       {viewSelected === "myEvents" && <Home />}
-      {viewSelected === "" && <Home />}
-      {viewSelected === "gridView" && <EventBrowser searchKey={searchWord} />}
+      {viewSelected === "likedEvents" && <LikedEvents />}
+      {(viewSelected === "gridView" || viewSelected === "") && <EventBrowser searchKey={searchWord} />}
     </>
   );
 }
