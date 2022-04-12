@@ -32,8 +32,7 @@ function Homepage() {
       <Profile setShowProfile={setShowProfile} showProfile={showProfile} admin />
       {viewSelected === "mapView" && <MapsView />}
       {viewSelected === "myEvents" && <Home />}
-      {viewSelected === "" && <Home />}
-      {viewSelected === "gridView" && <EventBrowser searchKey={searchWord} />}
+      {(viewSelected === "gridView" || viewSelected === "") && <EventBrowser searchKey={searchWord} />}
     </>
   );
 }
