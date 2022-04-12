@@ -35,6 +35,7 @@ import GeneralContext from "../store/general-context.js";
 import { DirectionsTransitFilledTwoTone } from "@mui/icons-material";
 import Profile from "./Profile.js";
 import { useContext } from "react";
+import { Grow } from "@mui/material";
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -85,8 +86,8 @@ export default function EventCard(props) {
   };
 
   function joinEventHandler() {
-    if(props.maxParticipants == props.participants.length && !props.isJoined){
-      alert('The event is fulled');
+    if (props.maxParticipants == props.participants.length && !props.isJoined) {
+      alert("The event is fulled");
     }
     put("https://rfriend.herokuapp.com/api/user/join", {
       event_id: props.eventId,
@@ -112,95 +113,98 @@ export default function EventCard(props) {
   }
   return (
     <>
-      <Card sx={{ width: 345 }}>
-        <CardHeader
-          avatar={
-            <Avatar
-              sx={{ bgcolor: red[500] }}
-              aria-label="avatar"
-              src={props.host.profileUrl}
-              onClick={() => {
-                setShowProfile(true);
-              }}
-            >
-              {props.host.name}
-            </Avatar>
-          }
-          action={
-            //<IconButton aria-label="settings">
-            // <MoreVertIcon />
-            //</IconButton>
-            isHost?<EventCardSettingBtn
-              key={props.eventId}
-              iconType={MoreVertIcon}
-              items={isHost ? ["Edit Event", "Delete Event"] : ["Discard Event"]}
-              eventId={props.eventId}
-            />:<></>
-          }
-          title={props.eventName}
-          subheader={props.host.name}
-          titleTypographyProps={{ fontWeight: "bold", variant: "body1" }}
-          style={{ cursor: "pointer" }}
-        />
-        <CardMedia
-          component="img"
-          height="194"
-          //image=".\assets\images\cards\category_dining.jpg"
-          image={SwitchCardIMG(props.eventCategory, props.photoUrl)}
-          alt="Category Image"
-        />
-        <CardContent sx={{ pb: 1 }}>
-          {props.eventRemark && <Typography sx={{ ...eventDetailItemStyle, pb: 1 }}>{props.eventRemark}</Typography>}
-          <Typography sx={eventDetailItemStyle}>
-            <CalendarMonthIcon />{" "}
-            {new Date(props.eventTime).toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
-          </Typography>
-          <Typography sx={eventDetailItemStyle}>
-            <LocationOnIcon /> {props.eventLocation}
-          </Typography>
-        </CardContent>
-        <CardActions disableSpacing>
-          <IconButton
-            aria-label="add to calendar"
-            onClick={joinEventHandler}
-          >
-            {props.isJoined ? (
-              <EventAvailableIcon color="secondary" />
-            ) : (
-              <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                <path
-                  style={{ fill: "rgba(0, 0, 0, 0.54)" }}
-                  d="M224 232C237.3 232 248 242.7 248 256V304H296C309.3 304 320 314.7 320 328C320 341.3 309.3 352 296 352H248V400C248 413.3 237.3 424 224 424C210.7 424 200 413.3 200 400V352H152C138.7 352 128 341.3 128 328C128 314.7 138.7 304 152 304H200V256C200 242.7 210.7 232 224 232zM152 64H296V24C296 10.75 306.7 0 320 0C333.3 0 344 10.75 344 24V64H384C419.3 64 448 92.65 448 128V448C448 483.3 419.3 512 384 512H64C28.65 512 0 483.3 0 448V128C0 92.65 28.65 64 64 64H104V24C104 10.75 114.7 0 128 0C141.3 0 152 10.75 152 24V64zM48 448C48 456.8 55.16 464 64 464H384C392.8 464 400 456.8 400 448V192H48V448z"
+      <Grow in={true}>
+        <Card sx={{ width: 345 }}>
+          <CardHeader
+            avatar={
+              <Avatar
+                sx={{ bgcolor: red[500] }}
+                aria-label="avatar"
+                src={props.host.profileUrl}
+                onClick={() => {
+                  setShowProfile(true);
+                }}
+              >
+                {props.host.name}
+              </Avatar>
+            }
+            action={
+              //<IconButton aria-label="settings">
+              // <MoreVertIcon />
+              //</IconButton>
+              isHost ? (
+                <EventCardSettingBtn
+                  key={props.eventId}
+                  iconType={MoreVertIcon}
+                  items={isHost ? ["Edit Event", "Delete Event"] : ["Discard Event"]}
+                  eventId={props.eventId}
                 />
-              </svg>
-            )}
-          </IconButton>
-          <IconButton aria-label="add to favorites" onClick={likeEventHandler}>
-            {props.isLiked ? <FavoriteIcon sx={{ color: pink[500] }} /> : <FavoriteIcon />}
-          </IconButton>
-          <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
-            <ExpandMoreIcon />
-          </ExpandMore>
-        </CardActions>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent sx={{ pt: 1 }}>
+              ) : (
+                <></>
+              )
+            }
+            title={props.eventName}
+            subheader={props.host.name}
+            titleTypographyProps={{ fontWeight: "bold", variant: "body1" }}
+            style={{ cursor: "pointer" }}
+          />
+          <CardMedia
+            component="img"
+            height="194"
+            //image=".\assets\images\cards\category_dining.jpg"
+            image={SwitchCardIMG(props.eventCategory, props.photoUrl)}
+            alt="Category Image"
+          />
+          <CardContent sx={{ pb: 1 }}>
+            {props.eventRemark && <Typography sx={{ ...eventDetailItemStyle, pb: 1 }}>{props.eventRemark}</Typography>}
             <Typography sx={eventDetailItemStyle}>
-              <CategoryIcon /> {props.eventCategory.charAt(0).toUpperCase() + props.eventCategory.slice(1)}
+              <CalendarMonthIcon />{" "}
+              {new Date(props.eventTime).toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })}
             </Typography>
             <Typography sx={eventDetailItemStyle}>
-              <PeopleIcon /> Quota: {props.participants.length + "/" + props.maxParticipants}
+              <LocationOnIcon /> {props.eventLocation}
             </Typography>
-            <CommentSection eventComment={props.eventComment} eventId={props.eventId} />
           </CardContent>
-        </Collapse>
-      </Card>
+          <CardActions disableSpacing>
+            <IconButton aria-label="add to calendar" onClick={joinEventHandler}>
+              {props.isJoined ? (
+                <EventAvailableIcon color="secondary" />
+              ) : (
+                <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <path
+                    style={{ fill: "rgba(0, 0, 0, 0.54)" }}
+                    d="M224 232C237.3 232 248 242.7 248 256V304H296C309.3 304 320 314.7 320 328C320 341.3 309.3 352 296 352H248V400C248 413.3 237.3 424 224 424C210.7 424 200 413.3 200 400V352H152C138.7 352 128 341.3 128 328C128 314.7 138.7 304 152 304H200V256C200 242.7 210.7 232 224 232zM152 64H296V24C296 10.75 306.7 0 320 0C333.3 0 344 10.75 344 24V64H384C419.3 64 448 92.65 448 128V448C448 483.3 419.3 512 384 512H64C28.65 512 0 483.3 0 448V128C0 92.65 28.65 64 64 64H104V24C104 10.75 114.7 0 128 0C141.3 0 152 10.75 152 24V64zM48 448C48 456.8 55.16 464 64 464H384C392.8 464 400 456.8 400 448V192H48V448z"
+                  />
+                </svg>
+              )}
+            </IconButton>
+            <IconButton aria-label="add to favorites" onClick={likeEventHandler}>
+              {props.isLiked ? <FavoriteIcon sx={{ color: pink[500] }} /> : <FavoriteIcon />}
+            </IconButton>
+            <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
+              <ExpandMoreIcon />
+            </ExpandMore>
+          </CardActions>
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <CardContent sx={{ pt: 1 }}>
+              <Typography sx={eventDetailItemStyle}>
+                <CategoryIcon /> {props.eventCategory.charAt(0).toUpperCase() + props.eventCategory.slice(1)}
+              </Typography>
+              <Typography sx={eventDetailItemStyle}>
+                <PeopleIcon /> Quota: {props.participants.length + "/" + props.maxParticipants}
+              </Typography>
+              <CommentSection eventComment={props.eventComment} eventId={props.eventId} />
+            </CardContent>
+          </Collapse>
+        </Card>
+      </Grow>
       <Profile id={props.hostId} showProfile={showProfile} setShowProfile={setShowProfile} admin />
     </>
   );

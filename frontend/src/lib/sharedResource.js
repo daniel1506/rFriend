@@ -5,6 +5,5 @@ export let categoryPhotos = {
   work: "https://fr8wff00-a.akamaihd.net/philippines/wp-content/uploads/2021/05/Work-From-Home-Jobs-5.png",
   leisure:
     "https://www.china-briefing.com/news/wp-content/uploads/2018/09/China-Brefing-Chinas-New-Gaming-Regulations-What-it-Means-for-Investors.jpg",
-  others:
-    "https://www.seekpng.com/png/detail/9-98301_png-question-marks-transparent-background-question-mark-clipart.png",
+  others: "https://sv2109.com/sites/default/files/field/image/bigstock-events-7444309_0.jpg",
 };
