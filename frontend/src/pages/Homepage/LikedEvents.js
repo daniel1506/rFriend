@@ -46,6 +46,7 @@ const LikedEvents = () => {
                     host={event.owner}
                     eventLocation={event.location}
                     eventCategory={event.category}
+                    participants={event.participants}
                     maxParticipants={event.maxParticipants}
                     eventRemark={event.remarks}
                     eventComment={event.comment}
