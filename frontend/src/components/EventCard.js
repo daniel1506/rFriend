@@ -85,7 +85,7 @@ export default function EventCard(props) {
   };
 
   function joinEventHandler() {
-    if(props.maxParticipants == props.participants.length){
+    if(props.maxParticipants == props.participants.length && !props.isJoined){
       alert('The event is fulled');
     }
     put("https://rfriend.herokuapp.com/api/user/join", {
