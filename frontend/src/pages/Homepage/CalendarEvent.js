@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import get from '../../lib/get';
+import GeneralContext from "../../store/general-context";
 
 export default function CalendarEvent({setCalendarEvent}) {
+    const generalCtx = React.useContext(GeneralContext);
     const [eventList, setEventList] = React.useState([]);
     const [events, setEvents] = React.useState([]);
 
@@ -27,7 +29,7 @@ export default function CalendarEvent({setCalendarEvent}) {
             return true;
         }
         return false;
-    }))});}, []);
+    }))});}, [generalCtx.eventEventModified]);
     useEffect(() => {handleEvents()}, [eventList]);
 
     return(<></>);
