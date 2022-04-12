@@ -62,7 +62,7 @@ function SwitchCardIMG(category, url) {
     case "work":
       return "https://fr8wff00-a.akamaihd.net/philippines/wp-content/uploads/2021/05/Work-From-Home-Jobs-5.png";
     case "others":
-      return "http://www.bmi.bund.de/SharedDocs/bilder/DE/schmuckbilder/service/veranstaltungen/events-01.jpg?__blob=poster&v=4";
+      return "http://www.bmi.bund.de/SharedDocs/bilder/DE/schmuckbilder/service/veranstaltungen/events-01.jpg?__blob=poster&v=4.jpg";
     default:
       return "others";
   }
