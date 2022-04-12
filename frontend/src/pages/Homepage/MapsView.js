@@ -210,6 +210,7 @@ const MapsView = () => {
             host={selectedEvent.owner}
             eventLocation={selectedEvent.location}
             eventCategory={selectedEvent.category}
+            participants={selectedEvent.participants}
             maxParticipants={selectedEvent.maxParticipants}
             eventRemark={selectedEvent.remarks}
           />
