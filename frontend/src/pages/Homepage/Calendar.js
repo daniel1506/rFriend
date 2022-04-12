@@ -1,4 +1,5 @@
 import * as React from "react";
+import { styled } from '@mui/material/styles';
 import { Paper } from "@mui/material";
 import TableCell from "@material-ui/core/TableCell";
 import { darken, alpha, lighten } from "@material-ui/core/styles/colorManipulator";
@@ -28,20 +29,23 @@ import EventCardModal from "../../components/EventCardModal";
 import { Box } from "@material-ui/core";
 import CalendarEvent from './CalendarEvent';
 
+const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => ({
+}));
+
 const Header = ({ children, appointmentData, ...restProps }) => (
   //<StyledAppointmentTooltipHeader
   //  {...restProps}
   //  appointmentData={appointmentData}
   //>
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "end",
-      alignContent: "center",
-    }}
-  >
-    <EventCardModal appointmentData={appointmentData}/>
+   <Box
+     sx={{
+       display: "flex",
+       flexDirection: "row",
+       justifyContent: "end",
+       alignContent: "center",
+     }}
+   >
+    <EventCardModal appointmentData={appointmentData} children={children} {...restProps}/>
   </Box>
   //</StyledAppointmentTooltipHeader>
 );
