@@ -14,7 +14,7 @@ export default function BasicDateTimePicker(props) {
         label="DateTimePicker"
         value={value}
         onChange={(newValue) => {
-          let unixTimeStamp = Math.floor(newValue.getTime() / 1000);
+          let unixTimeStamp = Math.floor(newValue.getTime());
           console.log(typeof newValue);
           console.log(unixTimeStamp);
           props.setTime(unixTimeStamp);

@@ -73,8 +73,8 @@ function CreateEvent(props) {
   const [quota, setQuota] = useState(1);
   const [eventPic, setEventPic] = useState("");
   const [eventPicFailed, setEventPicFailed] = useState(undefined);
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
+  const [startTime, setStartTime] = useState(Number(new Date()));
+  const [endTime, setEndTime] = useState(Number(new Date().setSeconds(new Date().getSeconds() + 3600)));
   const [location, setLocation] = useState("");
   const [privacy, setPrivacy] = useState("friend");
   const [remarks, setRemarks] = useState("");
@@ -122,11 +122,11 @@ function CreateEvent(props) {
   };
 
   const createEvent = () => {
-    let duration = endTime - startTime;
+    let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
     let data = {
       name: title,
       category: category,
-      time: startTime,
+      time: Number(startTime) / 1000,
       duration: duration,
       location: location,
       max_participants: quota,
@@ -196,6 +196,12 @@ function CreateEvent(props) {
       setQuota(result.event.maxParticipants);
       setEventPic(result.event.photoUrl);
       setRemarks(result.event.remarks);
+      setStartTime(result.event.startsAt);
+      const endTimeStamp = (startsAt) => {
+        let dateObject = new Date(Date.parse(startsAt));
+        return dateObject.setSeconds(dateObject.getSeconds() + result.event.duration);
+      };
+      setEndTime(Number(endTimeStamp(result.event.startsAt)));
     });
   }, [generalCtx.eventIdSelected]);
   const displayCustomEventPicIfAvailable = useMemo(() => {
@@ -352,7 +358,7 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TimePicker label="Start time" setTime={setStartTime} />
+              <TimePicker label="Start time" value={startTime} setTime={setStartTime} />
               <SquareToggleButton
                 selected={notification}
                 onChange={() => {
@@ -373,7 +379,7 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TimePicker label="End time" setTime={setEndTime} />
+              <TimePicker label="End time" value={endTime} setTime={setEndTime} />
               <label htmlFor="icon-button-file">
                 <Input
                   inputProps={{ accept: "image/*" }}
