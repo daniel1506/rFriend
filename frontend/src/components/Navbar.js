@@ -379,18 +379,20 @@ export default function Navbar(props) {
           <Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" }, ml: "12px" }}>
             rFriend
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder={props.admin ? "Search username" : "Search event"}
-              inputProps={{ "aria-label": "search" }}
-              onChange={(e) => {
-                props.handleSearch(e.target.value);
-              }}
-            />
-          </Search>
+          {(generalCtx.viewSelected === "gridView" || generalCtx.viewSelected === "" || props.admin === true) && (
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder={props.admin ? "Search username" : "Search event"}
+                inputProps={{ "aria-label": "search" }}
+                onChange={(e) => {
+                  props.handleSearch(e.target.value);
+                }}
+              />
+            </Search>
+          )}
           <Box sx={{ flexGrow: 1 }} />
           <Box
             sx={{
