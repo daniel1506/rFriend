@@ -205,7 +205,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           <MenuItem value="midnight">Midnight</MenuItem>
         </Select>
       </FormControl>
-      <FormControl sx={{ margin: "10px", width: 240 }}>
+      {/* <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-location-label">Event Location</InputLabel>
         <Select
           labelId="filter-event-location-label"
@@ -222,7 +222,7 @@ function EventFilter({ eventList, sendFilteredEvents }) {
           <MenuItem value="nt">New Territory</MenuItem>
           <MenuItem value="online">Online</MenuItem>
         </Select>
-      </FormControl>
+      </FormControl> */}
       <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-privacy-label">Event Privacy</InputLabel>
         <Select
