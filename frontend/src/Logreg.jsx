@@ -1,14 +1,5 @@
 //@ts-check
-import {
-  Button,
-  ButtonGroup,
-  Slide,
-  TextField,
-  Grid,
-  FormControl,
-  Alert,
-  Grow,
-} from "@mui/material";
+import { Button, ButtonGroup, Slide, TextField, Grid, FormControl, Alert, Grow } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import VerticalFlex from "./layout/VerticalFlex";
 import LoginIcon from "@mui/icons-material/Login";
@@ -97,13 +88,13 @@ function Logreg() {
     let data = { email, password };
     console.log(data);
     post("https://rfriend.herokuapp.com/api/user/login", data)
-      .then((data) => {
-        console.log("Response:", data);
-        if (data.status != 200) {
+      .then((result) => {
+        console.log("Response:", result);
+        if (result.status != 200) {
           setFail(true);
-          setFailMessage(data.message);
+          setFailMessage(result.message);
         } else {
-          authCtx.login(data.token, data.id, data.email, data.name, data.role);
+          authCtx.login(result.token, result.id, result.email, result.name, result.role, result.verified_at);
         }
       })
       .then(() => {
@@ -115,11 +106,7 @@ function Logreg() {
   };
   return (
     <>
-      <ButtonGroup
-        variant="contained"
-        aria-label="outlined primary button group"
-        className="regloggroup"
-      >
+      <ButtonGroup variant="contained" aria-label="outlined primary button group" className="regloggroup">
         <Button className="reglog" onClick={handleLog}>
           <LoginIcon />
           Login
@@ -129,18 +116,8 @@ function Logreg() {
           Register
         </Button>
       </ButtonGroup>
-      <ForgetPassword
-        handleForget={handleForget}
-        forgetChecked={forgetChecked}
-        emailError={emailError}
-      />
-      <Slide
-        direction="up"
-        in={logChecked}
-        mountOnEnter
-        unmountOnExit
-        className="info-input-container"
-      >
+      <ForgetPassword handleForget={handleForget} forgetChecked={forgetChecked} emailError={emailError} />
+      <Slide direction="up" in={logChecked} mountOnEnter unmountOnExit className="info-input-container">
         {/* login form */}
         <form onSubmit={log}>
           <VerticalFlex gap="10px">
@@ -154,13 +131,7 @@ function Logreg() {
           </VerticalFlex>
         </form>
       </Slide>
-      <Slide
-        direction="up"
-        in={regChecked}
-        mountOnEnter
-        unmountOnExit
-        className="info-input-container"
-      >
+      <Slide direction="up" in={regChecked} mountOnEnter unmountOnExit className="info-input-container">
         {/* reg form */}
         <form onSubmit={reg}>
           {!emailSuccess && (
