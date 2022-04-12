@@ -197,6 +197,7 @@ function CreateEvent(props) {
       setEventPic(result.event.photoUrl);
       setRemarks(result.event.remarks);
       setStartTime(result.event.startsAt);
+      setCoordinate({ lat: result.event.coordinateLat, lng: result.event.coordinateLon });
       const endTimeStamp = (startsAt) => {
         let dateObject = new Date(Date.parse(startsAt));
         return dateObject.setSeconds(dateObject.getSeconds() + result.event.duration);
