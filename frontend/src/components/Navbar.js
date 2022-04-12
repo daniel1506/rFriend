@@ -22,7 +22,7 @@ import Button from "@mui/material/Button";
 import NameShowCase from "./NameShowCase";
 import AuthContext from "../store/auth-context";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Avatar from "@mui/material/Avatar";
 import FriendShowCase from "./FriendShowCase";
 import FriendList from "./FriendList";
@@ -167,6 +167,7 @@ export default function Navbar(props) {
             <ListItemText>Map view</ListItemText>
           </ListItem>
           <Divider sx={{ my: 1 }} />
+
           <ListItem
             button
             onClick={() => {
@@ -178,6 +179,19 @@ export default function Navbar(props) {
             </ListItemIcon>
             <ListItemText>My Events</ListItemText>
           </ListItem>
+
+          <ListItem
+            button
+            onClick={() => {
+              generalCtx.handleChangeView("likedEvents");
+            }}
+          >
+            <ListItemIcon>
+              <FavoriteIcon sx={{ height: drawerIconSize, width: drawerIconSize }} />
+            </ListItemIcon>
+            <ListItemText>Liked Events</ListItemText>
+          </ListItem>
+
           <Divider sx={{ my: 1 }} />
           <Typography variant="caption" sx={{ ml: 2, textTransform: "uppercase", pt: 1, display: "block" }}>
             Friends
