@@ -1,5 +1,5 @@
 //@ts-check
-import React, { useCallback, useMemo, useContext } from "react";
+import React, { useCallback, useMemo, useContext, useEffect } from "react";
 import { useState } from "react";
 import {
   TextField,
@@ -29,6 +29,7 @@ import { categoryPhotos } from "../../lib/sharedResource";
 import CoordinateChooser from "../../components/CoordinateChooser";
 import GeneralContext from "../../store/general-context";
 import AuthContext from "../../store/auth-context";
+import get from "../../lib/get";
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -182,7 +183,21 @@ function CreateEvent(props) {
       }
     });
   };
-
+  useEffect(() => {
+    console.log("get");
+    console.log(generalCtx.eventIdSelected);
+    get(`https://rfriend.herokuapp.com/api/event/${generalCtx.eventIdSelected}`).then((result) => {
+      console.log("got");
+      console.log(result);
+      setTitle(result.event.name);
+      setCategory(result.event.category);
+      setLocation(result.event.location);
+      setPrivacy(result.event.privacy);
+      setQuota(result.event.maxParticipants);
+      setEventPic(result.event.photoUrl);
+      setRemarks(result.event.remarks);
+    });
+  }, [generalCtx.eventIdSelected]);
   const displayCustomEventPicIfAvailable = useMemo(() => {
     if (eventPic === "") {
       return categoryPhotos[category];
@@ -238,6 +253,10 @@ function CreateEvent(props) {
                 helperText={titleError ? "Must fill in" : ""}
                 type="text"
                 label="title*"
+                value={title}
+                InputLabelProps={{
+                  shrink: title !== "",
+                }}
                 onChange={(e) => {
                   validateTitle(e.target.value);
                   setTitle(e.target.value);
@@ -246,6 +265,10 @@ function CreateEvent(props) {
               <TextField
                 type="text"
                 label="location"
+                InputLabelProps={{
+                  shrink: location !== "",
+                }}
+                value={location}
                 onChange={(e) => {
                   setLocation(e.target.value);
                 }}
@@ -273,8 +296,9 @@ function CreateEvent(props) {
                 label="remark"
                 type="text"
                 InputLabelProps={{
-                  shrink: true,
+                  shrink: remarks !== "",
                 }}
+                value={remarks}
                 onChange={(e) => {
                   setRemarks(e.target.value);
                 }}
@@ -335,6 +359,7 @@ function CreateEvent(props) {
                   setNotification((prev) => !prev);
                 }}
                 color="primary"
+                sx={{ visibility: "hidden" }}
               >
                 <NotificationsIcon />
               </SquareToggleButton>
