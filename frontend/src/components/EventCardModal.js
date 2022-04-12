@@ -8,6 +8,8 @@ import { IconButton } from "@mui/material";
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import get from '../lib/get';
+import GeneralContext from "../store/general-context";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -21,6 +23,7 @@ const style = {
 };
 
 export default function EventCardModal(props, {children, ...restProps}) {
+  const generalCtx = React.useContext(GeneralContext);
   const [open, setOpen] = React.useState(false);
   const [eventInfo, setEventInfo] = React.useState([{}]);
   const [isEventReady, setIsEventReady] = React.useState(false);
@@ -39,7 +42,7 @@ export default function EventCardModal(props, {children, ...restProps}) {
         })
       );
     });
-  }, []);
+  }, [generalCtx.eventEventModified]);
   useEffect(()=>{if (eventInfo != null) {setIsEventReady(true)}},[eventInfo]);
   return (
     <>
