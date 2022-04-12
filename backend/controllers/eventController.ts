@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 import photoUploadS3 from "../AWS/photoUploader";
 import prisma, { prismaErrorHandler } from "../common/dbClient";
 import HttpException from "../common/httpException";
@@ -96,7 +96,7 @@ export const upsert = async (req: Request, res: Response, next: NextFunction) =>
 
 // -----------------------------------------------------------------------------
 
-export const validateGet = [body("id").isInt().toInt()];
+export const validateGet = [param("id").isInt().toInt()];
 
 export const get = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -105,7 +105,7 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   const userId = req.id;
-  const id = req.body.id as number;
+  const id = req.params.id as unknown as number;
 
   // check if event exists
   let event = null;

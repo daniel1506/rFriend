@@ -61,7 +61,7 @@ friendRouter.delete("/request", friendController.validate, friendController.dele
 const eventRouter = express.Router();
 router.use("/event", authMiddleware, eventRouter);
 
-eventRouter.get("/", eventController.validateGet, eventController.get);
+eventRouter.get("/:id", eventController.validateGet, eventController.get);
 eventRouter.put("/", eventController.validateUpsert, eventController.upsert);
 eventRouter.post("/", eventController.validateUpsert, eventController.upsert);
 eventRouter.delete("/", eventController.validateRemove, eventController.remove);
