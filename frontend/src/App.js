@@ -9,6 +9,7 @@ import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ConfirmEmail from "./pages/ConfirmEmail/ConfirmEmail";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ConfirmReset from "./pages/ConfirmReset/ConfirmReset";
+import AskVerify from "./pages/AskVerify";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 function App() {
@@ -22,19 +23,22 @@ function App() {
         <Route path="/verify" element={<VerifyEmail />} /> */}
         <Route path="/reset-password/:token" element={<ConfirmReset />} />
         {!authCtx.isLoggedIn && <Route path="/verify/:token" element={<ConfirmEmail />} />}
-        {authCtx.isLoggedIn && authCtx.role == "USER" && (
+        {authCtx.isLoggedIn && authCtx.role == "USER" && authCtx.verified_at !== null && (
           <Route path="/homepage" element={<Homepage />} /> //need to login and have user role to view user page
         )}
-        {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
+        {authCtx.isLoggedIn && authCtx.role == "ADMIN" && authCtx.verified_at !== null && (
           <Route path="/admin" element={<Admin />} /> //need to login and have admin role to view admin page
         )}
-        {authCtx.isLoggedIn && authCtx.role == "USER" && (
+        {authCtx.isLoggedIn && authCtx.role == "USER" && authCtx.verified_at !== null && (
           <Route path="*" element={<Navigate to="/homepage" />} /> //if an user wants to go to any irrevalent path, redirect it to home page
         )}
-        {authCtx.isLoggedIn && authCtx.role == "ADMIN" && (
+        {authCtx.isLoggedIn && authCtx.role == "ADMIN" && authCtx.verified_at !== null && (
           <Route path="*" element={<Navigate to="/admin" />} /> //if an admin wants to go to any irrevalent path, redirect it to admin page
         )}
-        {!authCtx.isLoggedIn && (
+        {authCtx.isLoggedIn && authCtx.role == "USER" && authCtx.verified_at === null && (
+          <Route path="*" element={<AskVerify />} /> //if an admin wants to go to any irrevalent path, redirect it to admin page
+        )}
+        {(!authCtx.isLoggedIn || authCtx.verified_at === null) && (
           <Route path="*" element={<Auth />} /> //if a unlogin user wants to go any irrevalent path, redirent it to login page
         )}
       </Routes>
