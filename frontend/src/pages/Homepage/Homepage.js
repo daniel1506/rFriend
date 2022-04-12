@@ -18,7 +18,6 @@ function Homepage() {
   const onLogout = () => {
     authCtx.logout();
   };
-
   const { viewSelected } = useContext(GeneralContext);
   console.log(viewSelected);
   return (

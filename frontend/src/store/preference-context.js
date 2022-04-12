@@ -1,30 +1,36 @@
 //mode is for recording user's preference on light mode or dark mode
 import React, { useState } from "react";
-
+import { createTheme } from "@mui/material/styles";
 const PrefContext = React.createContext({
   //no actual effect, since you can see we will declare them in the later part, so the code here only for readability and intelSense
-  mode: "",
+  theme: {},
 });
 
 export const PrefContextProvider = (props) => {
   const storedMode = localStorage.getItem("mode");
-  const [mode, setMode] = useState(storedMode);
+  let mode = "";
+  if (storedMode === undefined || "light") {
+    mode = "light";
+  }
+  const [theme, setTheme] = useState(createTheme({ palette: { mode: mode } }));
+  const switchModeHandler = () => {
+    console.log(theme);
+    if (theme.palette.mode === "light") {
+      setTheme(createTheme({ palette: { mode: "dark" } }));
+    } else {
+      setTheme(createTheme({ palette: { mode: "light" } }));
+    }
 
-  const switchModeHandler = (mode) => {
-    setMode(mode);
     //store to localStorage so that user doesn't need to login next time
-    localStorage.setItem("mode", mode);
+    localStorage.setItem("mode", theme.palette.mode);
   };
-  //provide an interface for components to use i.e. authCtx.xxx
+  //provide an interface for components to use i.e. prefCtx.xxx
   const contextValue = {
-    mode: mode,
+    switchMode: switchModeHandler,
+    theme: theme,
   };
 
-  return (
-    <PrefContext.Provider value={contextValue}>
-      {props.children}
-    </PrefContext.Provider>
-  );
+  return <PrefContext.Provider value={contextValue}>{props.children}</PrefContext.Provider>;
 };
 
 export default PrefContext;
