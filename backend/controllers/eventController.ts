@@ -64,7 +64,7 @@ export const upsert = async (req: Request, res: Response, next: NextFunction) =>
     coordinateLat,
     coordinateLon,
     remarks,
-    photoUrl,
+    ...(photoBase64 && { photoUrl }),
   };
 
   let result;
