@@ -164,7 +164,9 @@ function EventFilter({ eventList, sendFilteredEvents }) {
 
   return (
     <div className="div-filter shadow">
-      <Typography variant="h6">Event Filter</Typography>
+      <Typography variant="h6" sx={{ padding: "10px" }}>
+        Event Filter
+      </Typography>
 
       <FormControl sx={{ margin: "10px", width: 240 }}>
         <InputLabel id="filter-event-category-label">Event Category</InputLabel>
