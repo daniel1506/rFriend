@@ -16,6 +16,7 @@ function AskVerify() {
         color="warning"
         onClick={() => {
           redirectToMailBox(authCtx.email);
+          authCtx.logout();
         }}
       >
         Check your email
