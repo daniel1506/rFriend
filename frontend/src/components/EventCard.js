@@ -127,6 +127,7 @@ export default function EventCard(props) {
                 onClick={() => {
                   setShowProfile(true);
                 }}
+                style={{ cursor: "pointer" }}
               >
                 {props.host.name}
               </Avatar>
@@ -149,7 +150,6 @@ export default function EventCard(props) {
             title={props.eventName}
             subheader={props.host.name}
             titleTypographyProps={{ fontWeight: "bold", variant: "body1" }}
-            style={{ cursor: "pointer" }}
           />
           <CardMedia
             component="img"
