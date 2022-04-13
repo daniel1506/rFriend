@@ -7,7 +7,7 @@ import getUrl from "../../lib/getUrl";
 import { Box, Container } from "@mui/material";
 import EventCard from "../../components/EventCard";
 import GeneralContext from "../../store/general-context";
-
+import "../../css/custom.css";
 // -----------------------------------------------------------------------------
 
 const EventRender = ({ event }) => (
@@ -213,7 +213,7 @@ const MapsView = () => {
         </Wrapper>
       </Box>
       {selectedEvent && (
-        <Box sx={eventCardContainerStyle}>
+        <Box sx={eventCardContainerStyle} className="example">
           <EventCard
             eventId={selectedEvent.id}
             eventName={selectedEvent.name}
