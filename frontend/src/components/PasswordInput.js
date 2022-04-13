@@ -18,7 +18,13 @@ function PasswordInput(props) {
   };
   //-------------------------------------------------------------- */
   return (
-    <FormControl variant="outlined" sx={{ width: "210px" }}>
+    <FormControl
+      variant="outlined"
+      sx={{ width: "210px" }}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <InputLabel htmlFor="outlined-adornment-password" color={passwordError && "error"}>
         {props.label ? props.label : "password"}
       </InputLabel>
@@ -49,7 +55,7 @@ function PasswordInput(props) {
             </IconButton>
           </InputAdornment>
         }
-        label="password"
+        label={props.label ? props.label : "password"}
       />
       <FormHelperText id="outlined-weight-helper-text" sx={{ color: "#d32f2f" }}>
         {passwordError && !props.noHelperText ? "Must has at least 8 characters" : ""}
