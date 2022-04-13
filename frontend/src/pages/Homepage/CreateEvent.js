@@ -154,6 +154,7 @@ function CreateEvent(props) {
   };
   const updateEvent = () => {
     let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
+    let isEventPicChanged = !eventPic.includes("http");
     let data = {
       id: parseInt(generalCtx.eventIdSelected),
       name: title,
@@ -164,7 +165,7 @@ function CreateEvent(props) {
       max_participants: quota,
       privacy: privacy,
       remarks: remarks,
-      ...(eventPic !== "" && eventPic !== null && { photo: eventPic }),
+      ...(eventPic !== "" && eventPic !== null && isEventPicChanged && { photo: eventPic }),
       ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
       ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
@@ -207,7 +208,7 @@ function CreateEvent(props) {
     });
   }, [generalCtx.eventIdSelected]);
   const displayCustomEventPicIfAvailable = useMemo(() => {
-    if (eventPic === "") {
+    if (eventPic === "" || eventPic === null) {
       return categoryPhotos[category];
     }
 
