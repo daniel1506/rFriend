@@ -64,7 +64,7 @@ function SwitchCardIMG(category, url) {
     case "work":
       return "https://fr8wff00-a.akamaihd.net/philippines/wp-content/uploads/2021/05/Work-From-Home-Jobs-5.png";
     case "others":
-      return "https://ak.picdn.net/shutterstock/videos/6441428/thumb/1.jpg";
+      return "https://sv2109.com/sites/default/files/field/image/bigstock-events-7444309_0.jpg";
     default:
       return "others";
   }
