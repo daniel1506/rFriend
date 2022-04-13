@@ -122,17 +122,18 @@ function CreateEvent(props) {
   };
 
   const createEvent = () => {
+    console.log("creating event");
     let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
     let data = {
       name: title,
       category: category,
-      time: Number(startTime) / 1000,
-      duration: duration,
+      time: Math.round(Number(startTime) / 1000),
+      duration: Math.round(duration),
       location: location,
       max_participants: quota,
       privacy: privacy,
       remarks: remarks,
-      ...(eventPic !== "" && { photo: eventPic }),
+      ...(eventPic !== "" && eventPic !== null && { photo: eventPic }),
       ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
       ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
@@ -152,18 +153,18 @@ function CreateEvent(props) {
     });
   };
   const updateEvent = () => {
-    let duration = endTime - startTime;
+    let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
     let data = {
       id: parseInt(generalCtx.eventIdSelected),
       name: title,
       category: category,
-      time: startTime,
+      time: Number(startTime) / 1000,
       duration: duration,
       location: location,
       max_participants: quota,
       privacy: privacy,
       remarks: remarks,
-      ...(eventPic !== "" && { photo: eventPic }),
+      ...(eventPic !== "" && eventPic !== null && { photo: eventPic }),
       ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
       ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
@@ -196,7 +197,7 @@ function CreateEvent(props) {
       setQuota(result.event.maxParticipants);
       setEventPic(result.event.photoUrl);
       setRemarks(result.event.remarks);
-      setStartTime(result.event.startsAt);
+      setStartTime(Date.parse(result.event.startsAt));
       setCoordinate({ lat: result.event.coordinateLat, lng: result.event.coordinateLon });
       const endTimeStamp = (startsAt) => {
         let dateObject = new Date(Date.parse(startsAt));
