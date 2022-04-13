@@ -154,7 +154,15 @@ function CreateEvent(props) {
   };
   const updateEvent = () => {
     let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
-    let isEventPicChanged = !eventPic.includes("http");
+    let isEventPicChanged = true;
+    if (eventPic === null) {
+      isEventPicChanged = false;
+    }
+    if (eventPic !== null) {
+      if (eventPic.includes("http")) {
+        isEventPicChanged = false;
+      }
+    }
     let data = {
       id: parseInt(generalCtx.eventIdSelected),
       name: title,
