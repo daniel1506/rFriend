@@ -414,7 +414,7 @@ function CreateEvent(props) {
               </label>
             </Box>
             <Box sx={{ height: 250 }}>
-              <CoordinateChooser setChosenCoord={setCoordinate} />
+              <CoordinateChooser chosenCoord={coordinate} setChosenCoord={setCoordinate} />
             </Box>
             <Box
               sx={{
