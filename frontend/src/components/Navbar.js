@@ -149,6 +149,7 @@ export default function Navbar(props) {
           </Typography>
           <ListItem
             button
+            selected={generalCtx.viewSelected === "gridView" || generalCtx.viewSelected === ""}
             onClick={() => {
               generalCtx.handleChangeView("gridView");
             }}
@@ -160,6 +161,7 @@ export default function Navbar(props) {
           </ListItem>
           <ListItem
             button
+            selected={generalCtx.viewSelected === "mapView"}
             onClick={() => {
               generalCtx.handleChangeView("mapView");
             }}
@@ -173,6 +175,7 @@ export default function Navbar(props) {
 
           <ListItem
             button
+            selected={generalCtx.viewSelected === "myEvents"}
             onClick={() => {
               generalCtx.handleChangeView("myEvents");
             }}
@@ -185,6 +188,7 @@ export default function Navbar(props) {
 
           <ListItem
             button
+            selected={generalCtx.viewSelected === "likedEvents"}
             onClick={() => {
               generalCtx.handleChangeView("likedEvents");
             }}
