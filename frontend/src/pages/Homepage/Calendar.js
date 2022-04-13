@@ -349,7 +349,7 @@ export default class Calendar extends React.PureComponent {
             showDeleteButton
             //showOpenButton
           />
-          <AppointmentForm />
+          {/* <AppointmentForm /> */}
           <DragDropProvider />
         </Scheduler>
       </Paper>
