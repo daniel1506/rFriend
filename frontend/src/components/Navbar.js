@@ -375,8 +375,8 @@ export default function Navbar(props) {
     </svg>
   );
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={props.admin ? { background: "black" } : {}}>
+    <Box sx={{ flexGrow: 1, marginBottom: "64px" }}>
+      <AppBar position="fixed" sx={props.admin ? { background: "black" } : {}}>
         <Toolbar>
           <IconButton
             size="large"
