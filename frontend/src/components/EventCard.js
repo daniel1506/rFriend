@@ -36,7 +36,7 @@ import { DirectionsTransitFilledTwoTone } from "@mui/icons-material";
 import Profile from "./Profile.js";
 import { useContext } from "react";
 import { Grow } from "@mui/material";
-
+import { categoryPhotos } from "../lib/sharedResource";
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -54,17 +54,17 @@ function SwitchCardIMG(category, url) {
   }
   switch (category) {
     case "dining":
-      return "https://media.winefolly.com/wine-tasting-dinner.jpg";
+      return categoryPhotos.dining;
     case "leisure":
-      return "https://www.china-briefing.com/news/wp-content/uploads/2018/09/China-Brefing-Chinas-New-Gaming-Regulations-What-it-Means-for-Investors.jpg";
+      return categoryPhotos.leisure;
     case "sports":
-      return "https://www.beachvillas.com/travel/wp-content/uploads/2020/11/Return_of_Sports.jpg";
+      return categoryPhotos.sports;
     case "study":
-      return "https://outwittrade.com/wp-content/uploads/2020/04/study.jpg";
+      return categoryPhotos.study;
     case "work":
-      return "https://fr8wff00-a.akamaihd.net/philippines/wp-content/uploads/2021/05/Work-From-Home-Jobs-5.png";
+      return categoryPhotos.work;
     case "others":
-      return "https://sv2109.com/sites/default/files/field/image/bigstock-events-7444309_0.jpg";
+      return categoryPhotos.others;
     default:
       return "others";
   }
