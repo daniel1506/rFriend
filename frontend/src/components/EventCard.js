@@ -36,6 +36,7 @@ import { DirectionsTransitFilledTwoTone } from "@mui/icons-material";
 import Profile from "./Profile.js";
 import { useContext } from "react";
 import { Grow } from "@mui/material";
+
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -63,7 +64,7 @@ function SwitchCardIMG(category, url) {
     case "work":
       return "https://fr8wff00-a.akamaihd.net/philippines/wp-content/uploads/2021/05/Work-From-Home-Jobs-5.png";
     case "others":
-      return "http://www.bmi.bund.de/SharedDocs/bilder/DE/schmuckbilder/service/veranstaltungen/events-01.jpg?__blob=poster&v=4.jpg";
+      return "https://ak.picdn.net/shutterstock/videos/6441428/thumb/1.jpg";
     default:
       return "others";
   }
