@@ -11,7 +11,7 @@ import "../../css/custom.css";
 // -----------------------------------------------------------------------------
 
 const EventRender = ({ event }) => (
-  <>
+  <div style={{ color: "black" }}>
     <h3>{event.name}</h3>
     <div>
       {new Date(event.startsAt).toLocaleDateString("en-US", {
@@ -26,7 +26,7 @@ const EventRender = ({ event }) => (
     </div>
     <div>at {event.location}</div>
     <div>by {event.owner.name}</div>
-  </>
+  </div>
 );
 
 // -----------------------------------------------------------------------------
