@@ -160,21 +160,36 @@ const MapsView = () => {
 
   // construct data for displaying markers
   useEffect(() => {
+    let waitForGoogle;
     if (events) {
-      setMarkers(
-        events.event.flatMap((event) => {
-          if (event.coordinateLat !== null && event.coordinateLon !== null) {
-            return {
-              position: new window.google.maps.LatLng(parseFloat(event.coordinateLat), parseFloat(event.coordinateLon)),
-              title: event.name,
-              event,
-            };
-          } else {
-            return [];
-          }
-        })
-      );
+      waitForGoogle = setInterval(() => {
+        if (window.google) {
+          setMarkers(
+            events.event.flatMap((event) => {
+              if (event.coordinateLat !== null && event.coordinateLon !== null) {
+                return {
+                  position: new window.google.maps.LatLng(
+                    parseFloat(event.coordinateLat),
+                    parseFloat(event.coordinateLon)
+                  ),
+                  title: event.name,
+                  event,
+                };
+              } else {
+                return [];
+              }
+            })
+          );
+          clearInterval(waitForGoogle);
+        }
+      }, 500);
     }
+
+    return () => {
+      if (waitForGoogle) {
+        clearInterval(waitForGoogle);
+      }
+    };
   }, [events]);
 
   // update selected event on id change or event data change
