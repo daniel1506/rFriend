@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src\pages\Homepage\Calendar.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src\pages\Homepage\Calendar.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.17</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">358</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.39</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.15</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import * as React from &quot;react&quot;;
+import { styled } from &#039;@mui/material/styles&#039;;
+import { Paper } from &quot;@mui/material&quot;;
+import TableCell from &quot;@material-ui/core/TableCell&quot;;
+import { darken, alpha, lighten } from &quot;@material-ui/core/styles/colorManipulator&quot;;
+import Typography from &quot;@material-ui/core/Typography&quot;;
+import { ViewState, EditingState } from &quot;@devexpress/dx-react-scheduler&quot;;
+import classNames from &quot;clsx&quot;;
+import {
+  Scheduler,
+  MonthView,
+  Appointments,
+  Toolbar,
+  DateNavigator,
+  AppointmentTooltip,
+  AppointmentForm,
+  EditRecurrenceMenu,
+  Resources,
+  DragDropProvider,
+} from &quot;@devexpress/dx-react-scheduler-material-ui&quot;;
+import WbSunny from &quot;@mui/icons-material/WbSunny&quot;;
+import FilterDrama from &quot;@mui/icons-material/FilterDrama&quot;;
+import Opacity from &quot;@mui/icons-material/Opacity&quot;;
+import ColorLens from &quot;@mui/icons-material/ColorLens&quot;;
+import { withStyles } from &quot;@material-ui/core/styles&quot;;
+import { owners } from &quot;./calendar-data/tasks&quot;;
+import { TurnedIn } from &quot;@mui/icons-material&quot;;
+import EventCardModal from &quot;../../components/EventCardModal&quot;;
+import { Box } from &quot;@material-ui/core&quot;;
+import CalendarEvent from &#039;./CalendarEvent&#039;;
+
+const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() =&gt; ({
+}));
+
+const Header = ({ children, appointmentData, ...restProps }) =&gt; (
+  //&lt;StyledAppointmentTooltipHeader
+  //  {...restProps}
+  //  appointmentData={appointmentData}
+  //&gt;
+   &lt;Box
+     sx={{
+       display: &quot;flex&quot;,
+       flexDirection: &quot;row&quot;,
+       justifyContent: &quot;end&quot;,
+       alignContent: &quot;center&quot;,
+     }}
+   &gt;
+    &lt;EventCardModal appointmentData={appointmentData} children={children} {...restProps}/&gt;
+  &lt;/Box&gt;
+  //&lt;/StyledAppointmentTooltipHeader&gt;
+);
+
+const appointments = [
+  {
+    id: 0,
+    title: &quot;3310 Project Meeting&quot;,
+    startDate: new Date(2022, 3, 19, 22, 0),
+    endDate: new Date(2022, 3, 19, 24, 0),
+    allDay: true,
+    ownerId: 1,
+  },
+  {
+    id: 1,
+    title: &quot;Monthly Planning&quot;,
+    startDate: new Date(2018, 5, 28, 9, 30),
+    endDate: new Date(2018, 5, 28, 11, 30),
+    ownerId: 1,
+  },
+  {
+    id: 2,
+    title: &quot;Recruiting students&quot;,
+    startDate: new Date(2018, 6, 9, 12, 0),
+    endDate: new Date(2018, 6, 9, 13, 0),
+    ownerId: 2,
+  },
+  {
+    id: 3,
+    title: &quot;Oil Painting&quot;,
+    startDate: new Date(2018, 6, 18, 14, 30),
+    endDate: new Date(2018, 6, 18, 15, 30),
+    ownerId: 2,
+  },
+  {
+    id: 4,
+    title: &quot;Open Day&quot;,
+    startDate: new Date(2018, 6, 20, 12, 0),
+    endDate: new Date(2018, 6, 20, 13, 35),
+    ownerId: 6,
+  },
+  {
+    id: 5,
+    title: &quot;Watercolor Landscape&quot;,
+    startDate: new Date(2018, 6, 6, 13, 0),
+    endDate: new Date(2018, 6, 6, 14, 0),
+    rRule: &quot;FREQ=WEEKLY;BYDAY=FR;UNTIL=20180816&quot;,
+    exDate: &quot;20180713T100000Z,20180727T100000Z&quot;,
+    ownerId: 2,
+  },
+  {
+    id: 6,
+    title: &quot;Meeting of Instructors&quot;,
+    startDate: new Date(2018, 5, 28, 12, 0),
+    endDate: new Date(2018, 5, 28, 12, 30),
+    rRule: &quot;FREQ=WEEKLY;BYDAY=TH;UNTIL=20180727&quot;,
+    exDate: &quot;20180705T090000Z,20180719T090000Z&quot;,
+    ownerId: 5,
+  },
+  {
+    id: 7,
+    title: &quot;Oil Painting for Beginners&quot;,
+    startDate: new Date(2018, 6, 3, 11, 0),
+    endDate: new Date(2018, 6, 3, 12, 0),
+    rRule: &quot;FREQ=WEEKLY;BYDAY=TU;UNTIL=20180801&quot;,
+    exDate: &quot;20180710T080000Z,20180724T080000Z&quot;,
+    ownerId: 3,
+  },
+  {
+    id: 8,
+    title: &quot;Watercolor Workshop&quot;,
+    startDate: new Date(2018, 6, 9, 11, 0),
+    endDate: new Date(2018, 6, 9, 12, 0),
+    ownerId: 3,
+  },
+];
+
+const resources = [
+  {
+    fieldName: &quot;ownerId&quot;,
+    title: &quot;Owners&quot;,
+    instances: owners,
+  },
+];
+
+const getBorder = (theme) =&gt;
+  `1px solid ${
+    theme.palette.type === &quot;light&quot;
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
+  }`;
+
+const DayScaleCell = (props) =&gt; (
+  &lt;MonthView.DayScaleCell {...props} style={{ textAlign: &quot;center&quot;, fontWeight: &quot;bold&quot; }} /&gt;
+);
+
+const styles = (theme) =&gt; ({
+  cell: {
+    color: &quot;#78909C!important&quot;,
+    position: &quot;relative&quot;,
+    userSelect: &quot;none&quot;,
+    verticalAlign: &quot;top&quot;,
+    padding: 0,
+    height: 100,
+    borderLeft: getBorder(theme),
+    &quot;&amp;:first-child&quot;: {
+      borderLeft: &quot;none&quot;,
+    },
+    &quot;&amp;:last-child&quot;: {
+      paddingRight: 0,
+    },
+    &quot;tr:last-child &amp;&quot;: {
+      borderBottom: &quot;none&quot;,
+    },
+    &quot;&amp;:hover&quot;: {
+      backgroundColor: &quot;white&quot;,
+    },
+    &quot;&amp;:focus&quot;: {
+      backgroundColor: alpha(theme.palette.primary.main, 0.15),
+      outline: 0,
+    },
+  },
+  content: {
+    display: &quot;flex&quot;,
+    justifyContent: &quot;center&quot;,
+    width: &quot;100%&quot;,
+    height: &quot;100%&quot;,
+    position: &quot;absolute&quot;,
+    alignItems: &quot;center&quot;,
+  },
+  text: {
+    padding: &quot;0.5em&quot;,
+    textAlign: &quot;center&quot;,
+  },
+  opacity: {
+    opacity: &quot;0.5&quot;,
+  },
+  appointment: {
+    borderRadius: &quot;10px&quot;,
+    &quot;&amp;:hover&quot;: {
+      opacity: 0.6,
+    },
+  },
+  apptContent: {
+    &quot;&amp;&gt;div&gt;div&quot;: {
+      whiteSpace: &quot;normal !important&quot;,
+      lineHeight: 1.2,
+    },
+  },
+  flexibleSpace: {
+    flex: &quot;none&quot;,
+  },
+  flexContainer: {
+    display: &quot;flex&quot;,
+    alignItems: &quot;center&quot;,
+  },
+  tooltipContent: {
+    padding: theme.spacing(3, 1),
+    paddingTop: 0,
+    backgroundColor: theme.palette.background.paper,
+    boxSizing: &quot;border-box&quot;,
+    width: &quot;400px&quot;,
+  },
+  tooltipText: {
+    ...theme.typography.body2,
+    display: &quot;inline-block&quot;,
+  },
+  title: {
+    ...theme.typography.h6,
+    color: theme.palette.text.secondary,
+    fontWeight: theme.typography.fontWeightBold,
+    overflow: &quot;hidden&quot;,
+    textOverflow: &quot;ellipsis&quot;,
+    whiteSpace: &quot;nowrap&quot;,
+  },
+  icon: {
+    color: theme.palette.action.active,
+    verticalAlign: &quot;middle&quot;,
+  },
+  circle: {
+    width: theme.spacing(4.5),
+    height: theme.spacing(4.5),
+    verticalAlign: &quot;super&quot;,
+  },
+  textCenter: {
+    textAlign: &quot;center&quot;,
+  },
+  dateAndTitle: {
+    lineHeight: 1.1,
+  },
+  titleContainer: {
+    paddingBottom: theme.spacing(2),
+  },
+  container: {
+    paddingBottom: theme.spacing(1.5),
+  },
+});
+
+// #FOLD_BLOCK
+const CellBase = React.memo(
+  ({
+    classes,
+    startDate,
+    formatDate,
+    otherMonth,
+    // #FOLD_BLOCK
+  }) =&gt; {
+    const iconId = Math.abs(Math.floor(Math.sin(startDate.getDate()) * 10) % 3);
+    const isFirstMonthDay = startDate.getDate() === 1;
+    const formatOptions = isFirstMonthDay ? { day: &quot;numeric&quot;, month: &quot;long&quot; } : { day: &quot;numeric&quot; };
+    return (
+      &lt;TableCell
+        tabIndex={0}
+        className={classNames({
+          [classes.cell]: true,
+          [classes.rainBack]: iconId === 0,
+          [classes.sunBack]: iconId === 1,
+          [classes.cloudBack]: iconId === 2,
+          [classes.opacity]: otherMonth,
+        })}
+      &gt;
+        &lt;div className={classes.content}&gt;&lt;/div&gt;
+        &lt;div className={classes.text}&gt;{formatDate(startDate, formatOptions)}&lt;/div&gt;
+      &lt;/TableCell&gt;
+    );
+  }
+);
+
+const TimeTableCell = withStyles(styles, { name: &quot;Cell&quot; })(CellBase);
+
+const Appointment = withStyles(styles, { name: &quot;Appointment&quot; })(({ classes, ...restProps }) =&gt; (
+  &lt;Appointments.Appointment {...restProps} className={classes.appointment} /&gt;
+));
+
+const AppointmentContent = withStyles(styles, { name: &quot;AppointmentContent&quot; })(({ classes, ...restProps }) =&gt; (
+  &lt;Appointments.AppointmentContent {...restProps} className={classes.apptContent} /&gt;
+));
+
+const FlexibleSpace = withStyles(styles, { name: &quot;ToolbarRoot&quot; })(({ classes, ...restProps }) =&gt; (
+  &lt;Toolbar.FlexibleSpace {...restProps} className={classes.flexibleSpace}&gt;&lt;/Toolbar.FlexibleSpace&gt;
+));
+
+export default class Calendar extends React.PureComponent {
+  // #FOLD_BLOCK
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: appointments,
+    };
+
+    this.commitChanges = this.commitChanges.bind(this);
+  }
+
+  // #FOLD_BLOCK
+  commitChanges({ added, changed, deleted }) {
+    this.setState((state) =&gt; {
+      let { data } = state;
+      if (added) {
+        const startingAddedId = data.length &gt; 0 ? data[data.length - 1].id + 1 : 0;
+        data = [...data, { id: startingAddedId, ...added }];
+      }
+      if (changed) {
+        data = data.map((appointment) =&gt;
+          changed[appointment.id] ? { ...appointment, ...changed[appointment.id] } : appointment
+        );
+      }
+      if (deleted !== undefined) {
+        data = data.filter((appointment) =&gt; appointment.id !== deleted);
+      }
+      return { data };
+    });
+  }
+
+  setCalendarEvent = (events) =&gt; {
+    this.setState({ data: events });
+  };
+
+  render() {
+    const { data } = this.state;
+
+    return (
+      &lt;Paper&gt;
+        &lt;CalendarEvent setCalendarEvent={this.setCalendarEvent}/&gt;
+        &lt;Scheduler data={data}&gt;
+          &lt;EditingState onCommitChanges={this.commitChanges} /&gt;
+          &lt;ViewState defaultCurrentDate={new Date()} /&gt;
+
+          &lt;MonthView timeTableCellComponent={TimeTableCell} dayScaleCellComponent={DayScaleCell} /&gt;
+
+          &lt;Appointments appointmentComponent={Appointment} appointmentContentComponent={AppointmentContent} /&gt;
+          &lt;Resources data={resources} /&gt;
+
+          &lt;Toolbar flexibleSpaceComponent={FlexibleSpace} /&gt;
+          &lt;DateNavigator /&gt;
+
+          &lt;EditRecurrenceMenu /&gt;
+          &lt;AppointmentTooltip
+            headerComponent={Header}
+            showCloseButton
+            showDeleteButton
+            //showOpenButton
+          /&gt;
+          {/* &lt;AppointmentForm /&gt; */}
+          &lt;DragDropProvider /&gt;
+        &lt;/Scheduler&gt;
+      &lt;/Paper&gt;
+    );
+  }
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src\pages\Homepage\CreateEvent.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src\pages\Homepage\CreateEvent.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">64.62</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">454</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">45.29</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.68</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">//@ts-check
+import React, { useCallback, useMemo, useContext, useEffect } from &quot;react&quot;;
+import { useState } from &quot;react&quot;;
+import {
+  TextField,
+  Select,
+  MenuItem,
+  Modal,
+  Backdrop,
+  Slide,
+  Box,
+  InputLabel,
+  FormControl,
+  Input,
+  Avatar,
+} from &quot;@mui/material&quot;;
+import TimePicker from &quot;./TimePicker&quot;;
+import NotificationsIcon from &quot;@mui/icons-material/Notifications&quot;;
+import PhotoCamera from &quot;@mui/icons-material/PhotoCamera&quot;;
+import SubmitButton from &quot;../../components/SubmitButton&quot;;
+import CloseButton from &quot;../../components/CloseButton&quot;;
+import SquareToggleButton from &quot;../../components/SquareToggleButton&quot;;
+import PrivacyButtonGroup from &quot;../../components/PrivacyButtonGroup&quot;;
+import SubmitIconButton from &quot;../../components/SubmitIconButton&quot;;
+import ImageIcon from &quot;@mui/icons-material/Image&quot;;
+import post from &quot;../../lib/post&quot;;
+import put from &quot;../../lib/put&quot;;
+import { categoryPhotos } from &quot;../../lib/sharedResource&quot;;
+import CoordinateChooser from &quot;../../components/CoordinateChooser&quot;;
+import GeneralContext from &quot;../../store/general-context&quot;;
+import AuthContext from &quot;../../store/auth-context&quot;;
+import get from &quot;../../lib/get&quot;;
+const style = {
+  //control the style of the modal container
+  position: &quot;absolute&quot;,
+  left: &quot;0&quot;,
+  right: &quot;0&quot;,
+  marginLeft: &quot;auto&quot;,
+  marginRight: &quot;auto&quot;,
+  top: &quot;50%&quot;,
+  bottom: &quot;50%&quot;,
+  transform: &quot;translateX(0%) translateY(-50%) !important&quot;,
+  height: &quot;min-content&quot;,
+  marginBottom: &quot;auto&quot;,
+  &quot;@media (min-width: 0px)&quot;: {},
+  &quot;@media (min-width: 600px)&quot;: {
+    width: &quot;400px&quot;,
+  },
+
+  // &quot;@media (max-width: 1025px)&quot;: {
+  //   height: &quot;700px&quot;,
+  //   marginTop: &quot;-350px&quot;,
+  // },
+  // &quot;@media (min-width: 1026px)&quot;: {
+  //   height: &quot;500px&quot;,
+  //   marginTop: &quot;-250px&quot;,
+  // },
+  bgcolor: &quot;background.paper&quot;,
+  boxShadow: 24,
+  borderRadius: 10,
+  p: 4,
+};
+
+function CreateEvent(props) {
+  const handleClose = () =&gt; {
+    props.setShowCreateEvent(false);
+    generalCtx.handleSelectEvent(null);
+  };
+  const [title, setTitle] = useState(&quot;&quot;);
+  const [titleError, setTitleError] = useState(false);
+  const [category, setCategory] = useState(&quot;&quot;);
+  const [notification, setNotification] = useState(false);
+  const [quota, setQuota] = useState(1);
+  const [eventPic, setEventPic] = useState(&quot;&quot;);
+  const [eventPicFailed, setEventPicFailed] = useState(undefined);
+  const [startTime, setStartTime] = useState(Number(new Date()));
+  const [endTime, setEndTime] = useState(Number(new Date().setSeconds(new Date().getSeconds() + 3600)));
+  const [location, setLocation] = useState(&quot;&quot;);
+  const [privacy, setPrivacy] = useState(&quot;friend&quot;);
+  const [remarks, setRemarks] = useState(&quot;&quot;);
+  const [creating, setCreating] = useState(false);
+  const [createFailed, setCreateFailed] = useState(undefined);
+  const [coordinate, setCoordinate] = useState({ lat: null, lng: null });
+  const generalCtx = useContext(GeneralContext);
+  const validateTitle = (title) =&gt; {};
+
+  const handleChangePrivacy = (event, newPrivacy) =&gt; {
+    console.log(newPrivacy);
+    setPrivacy(newPrivacy);
+  };
+
+  const handleChangeCategory = (e) =&gt; {
+    setCategory(e.target.value);
+  };
+
+  const convertBase64 = (file) =&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () =&gt; {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) =&gt; {
+        reject(error);
+      };
+    });
+  };
+
+  const saveImage = async (e) =&gt; {
+    try {
+      const file = e.target.files[0];
+      const eventPic = await convertBase64(file);
+      console.log(eventPic);
+      setEventPicFailed(!eventPic.startsWith(&quot;data:image&quot;));
+      setEventPic(eventPic);
+    } catch (err) {
+      setEventPicFailed(true);
+      console.log(err);
+    }
+  };
+
+  const createEvent = () =&gt; {
+    console.log(&quot;creating event&quot;);
+    let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
+    let data = {
+      name: title,
+      category: category,
+      time: Math.round(Number(startTime) / 1000),
+      duration: Math.round(duration),
+      location: location,
+      max_participants: quota,
+      privacy: privacy,
+      remarks: remarks,
+      ...(eventPic !== &quot;&quot; &amp;&amp; eventPic !== null &amp;&amp; { photo: eventPic }),
+      ...(coordinate.lat !== null &amp;&amp; { coordinate_lat: coordinate.lat }),
+      ...(coordinate.lng !== null &amp;&amp; { coordinate_lon: coordinate.lng }),
+    };
+    console.log(data);
+    setCreating(true);
+    post(&quot;https://rfriend.herokuapp.com/api/event&quot;, data).then((result) =&gt; {
+      setCreating(false);
+      if (result.status != 201) {
+        setCreateFailed(true);
+      } else {
+        setCreateFailed(false);
+        generalCtx.handleEventModified();
+        setTimeout(() =&gt; {
+          handleClose();
+        }, 1000);
+      }
+    });
+  };
+  const updateEvent = () =&gt; {
+    let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
+    let isEventPicChanged = true;
+    if (eventPic === null) {
+      isEventPicChanged = false;
+    }
+    if (eventPic !== null) {
+      if (eventPic.includes(&quot;http&quot;)) {
+        isEventPicChanged = false;
+      }
+    }
+    let data = {
+      id: parseInt(generalCtx.eventIdSelected),
+      name: title,
+      category: category,
+      time: Number(startTime) / 1000,
+      duration: duration,
+      location: location,
+      max_participants: quota,
+      privacy: privacy,
+      remarks: remarks,
+      ...(eventPic !== &quot;&quot; &amp;&amp; eventPic !== null &amp;&amp; isEventPicChanged &amp;&amp; { photo: eventPic }),
+      ...(coordinate.lat !== null &amp;&amp; { coordinate_lat: coordinate.lat }),
+      ...(coordinate.lng !== null &amp;&amp; { coordinate_lon: coordinate.lng }),
+    };
+    console.log(&quot;updating...&quot;);
+    console.log(data);
+    setCreating(true);
+    put(&quot;https://rfriend.herokuapp.com/api/event&quot;, data).then((result) =&gt; {
+      setCreating(false);
+      if (result.status != 201) {
+        setCreateFailed(true);
+      } else {
+        setCreateFailed(false);
+        generalCtx.handleEventModified();
+        setTimeout(() =&gt; {
+          handleClose();
+        }, 1000);
+      }
+    });
+  };
+  useEffect(() =&gt; {
+    console.log(&quot;get&quot;);
+    console.log(generalCtx.eventIdSelected);
+    get(`https://rfriend.herokuapp.com/api/event/${generalCtx.eventIdSelected}`).then((result) =&gt; {
+      console.log(&quot;got&quot;);
+      console.log(result);
+      setTitle(result.event.name);
+      setCategory(result.event.category);
+      setLocation(result.event.location);
+      setPrivacy(result.event.privacy);
+      setQuota(result.event.maxParticipants);
+      setEventPic(result.event.photoUrl);
+      setRemarks(result.event.remarks);
+      setStartTime(Date.parse(result.event.startsAt));
+      setCoordinate({ lat: result.event.coordinateLat, lng: result.event.coordinateLon });
+      const endTimeStamp = (startsAt) =&gt; {
+        let dateObject = new Date(Date.parse(startsAt));
+        return dateObject.setSeconds(dateObject.getSeconds() + result.event.duration);
+      };
+      setEndTime(Number(endTimeStamp(result.event.startsAt)));
+    });
+  }, [generalCtx.eventIdSelected]);
+  const displayCustomEventPicIfAvailable = useMemo(() =&gt; {
+    if (eventPic === &quot;&quot; || eventPic === null) {
+      return categoryPhotos[category];
+    }
+
+    return eventPic;
+  }, [eventPic, category]);
+  console.log(generalCtx.eventIdSelected);
+  console.log(generalCtx.eventIdSelected !== null);
+  return (
+    &lt;Modal
+      aria-labelledby=&quot;transition-modal-title&quot;
+      aria-describedby=&quot;transition-modal-description&quot;
+      open={props.showCreateEvent || generalCtx.eventIdSelected !== null}
+      onClose={handleClose}
+      closeAfterTransition
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 500,
+      }}
+      sx={{ overflow: &quot;scroll&quot; }}
+    &gt;
+      &lt;Slide in={props.showCreateEvent || generalCtx.eventIdSelected !== null}&gt;
+        &lt;Box sx={style}&gt;
+          &lt;Box
+            sx={{
+              display: { xs: &quot;flex&quot; },
+              flexDirection: { xs: &quot;column&quot; },
+              aligenItems: &quot;center&quot;,
+              justifyContent: &quot;space-around&quot;,
+              gap: 1,
+            }}
+          &gt;
+            &lt;Avatar
+              variant=&quot;square&quot;
+              src={displayCustomEventPicIfAvailable}
+              style={{ width: &quot;100%&quot;, height: &quot;150px&quot; }}
+              sx={{ borderRadius: 3 }}
+            &gt;
+              &lt;ImageIcon /&gt;
+            &lt;/Avatar&gt;
+            &lt;Box
+              sx={{
+                display: &quot;flex&quot;,
+                flexDirection: { xs: &quot;column&quot;, sm: &quot;row&quot; },
+                aligenItems: &quot;center&quot;,
+                justifyContent: &quot;space-around&quot;,
+                gap: 1,
+              }}
+            &gt;
+              &lt;TextField
+                error={titleError}
+                helperText={titleError ? &quot;Must fill in&quot; : &quot;&quot;}
+                type=&quot;text&quot;
+                label=&quot;title*&quot;
+                value={title}
+                InputLabelProps={{
+                  shrink: title !== &quot;&quot;,
+                }}
+                onChange={(e) =&gt; {
+                  validateTitle(e.target.value);
+                  setTitle(e.target.value);
+                }}
+              /&gt;
+              &lt;TextField
+                type=&quot;text&quot;
+                label=&quot;location&quot;
+                InputLabelProps={{
+                  shrink: location !== &quot;&quot;,
+                }}
+                value={location}
+                onChange={(e) =&gt; {
+                  setLocation(e.target.value);
+                }}
+              /&gt;
+            &lt;/Box&gt;
+            &lt;Box
+              sx={{
+                display: &quot;flex&quot;,
+                flexDirection: { xs: &quot;column&quot;, sm: &quot;row&quot; },
+                aligenItems: &quot;center&quot;,
+                justifyContent: &quot;space-around&quot;,
+                gap: 1,
+              }}
+            &gt;
+              &lt;TextField
+                label=&quot;quota&quot;
+                type=&quot;number&quot;
+                value={quota}
+                onChange={(e) =&gt; {
+                  console.log(e.target.value);
+                  if (parseInt(e.target.value) &gt; 0) setQuota(parseInt(e.target.value));
+                }}
+              /&gt;
+              &lt;TextField
+                label=&quot;remark&quot;
+                type=&quot;text&quot;
+                InputLabelProps={{
+                  shrink: remarks !== &quot;&quot;,
+                }}
+                value={remarks}
+                onChange={(e) =&gt; {
+                  setRemarks(e.target.value);
+                }}
+              /&gt;
+            &lt;/Box&gt;
+            &lt;Box
+              sx={{
+                display: &quot;flex&quot;,
+                flexDirection: { xs: &quot;row&quot; },
+                aligenItems: &quot;center&quot;,
+                justifyContent: &quot;space-around&quot;,
+                gap: 1,
+              }}
+            &gt;
+              &lt;FormControl variant=&quot;standard&quot; sx={{ m: 1, minWidth: 120 }}&gt;
+                &lt;InputLabel id=&quot;Category&quot;&gt;Category&lt;/InputLabel&gt;
+                &lt;Select labelId=&quot;Category&quot; value={category} onChange={handleChangeCategory} label=&quot;Category&quot;&gt;
+                  &lt;MenuItem value={&quot;dining&quot;}&gt;dining&lt;/MenuItem&gt;
+                  &lt;MenuItem value={&quot;sports&quot;}&gt;sports&lt;/MenuItem&gt;
+                  &lt;MenuItem value={&quot;study&quot;}&gt;study&lt;/MenuItem&gt;
+                  &lt;MenuItem value={&quot;work&quot;}&gt;work&lt;/MenuItem&gt;
+                  &lt;MenuItem value={&quot;leisure&quot;}&gt;leisure&lt;/MenuItem&gt;
+                  &lt;MenuItem value={&quot;others&quot;}&gt;others&lt;/MenuItem&gt;
+                &lt;/Select&gt;
+              &lt;/FormControl&gt;
+
+              {/* &lt;FormControl variant=&quot;standard&quot; sx={{ m: 1, minWidth: 120 }}&gt;
+                &lt;InputLabel id=&quot;Privacy&quot;&gt;Privacy*&lt;/InputLabel&gt;
+                &lt;Select
+                  labelId=&quot;Privacy&quot;
+                  value={privacy}
+                  onChange={(e) =&gt; {
+                    setPrivacy(e.target.value);
+                  }}
+                  label=&quot;Privacy&quot;
+                &gt;
+                  &lt;MenuItem value={10}&gt;Ten&lt;/MenuItem&gt;
+                  &lt;MenuItem value={20}&gt;Twenty&lt;/MenuItem&gt;
+                  &lt;MenuItem value={30}&gt;Thirty&lt;/MenuItem&gt;
+                &lt;/Select&gt;
+              &lt;/FormControl&gt; */}
+              &lt;PrivacyButtonGroup value={privacy} onChange={handleChangePrivacy} /&gt;
+            &lt;/Box&gt;
+
+            &lt;Box
+              sx={{
+                display: &quot;flex&quot;,
+                flexDirection: { xs: &quot;row&quot; },
+                justifyContent: &quot;space-around&quot;,
+                aligenItems: &quot;center&quot;,
+                gap: 1,
+              }}
+            &gt;
+              &lt;TimePicker label=&quot;Start time&quot; value={startTime} setTime={setStartTime} /&gt;
+              &lt;SquareToggleButton
+                selected={notification}
+                onChange={() =&gt; {
+                  setNotification((prev) =&gt; !prev);
+                }}
+                color=&quot;primary&quot;
+                sx={{ visibility: &quot;hidden&quot; }}
+              &gt;
+                &lt;NotificationsIcon /&gt;
+              &lt;/SquareToggleButton&gt;
+            &lt;/Box&gt;
+            &lt;Box
+              sx={{
+                display: &quot;flex&quot;,
+                flexDirection: { xs: &quot;row&quot; },
+                justifyContent: &quot;space-around&quot;,
+                aligenItems: &quot;center&quot;,
+                gap: 1,
+              }}
+            &gt;
+              &lt;TimePicker label=&quot;End time&quot; value={endTime} setTime={setEndTime} /&gt;
+              &lt;label htmlFor=&quot;icon-button-file&quot;&gt;
+                &lt;Input
+                  inputProps={{ accept: &quot;image/*&quot; }}
+                  id=&quot;icon-button-file&quot;
+                  type=&quot;file&quot;
+                  sx={{ display: &quot;none&quot; }}
+                  onChange={(e) =&gt; {
+                    saveImage(e);
+                  }}
+                /&gt;
+                {/* &lt;IconButton
+                  color=&quot;primary&quot;
+                  aria-label=&quot;upload picture&quot;
+                  component=&quot;span&quot;
+                  sx={{ width: 54, height: 54 }}
+                &gt;
+                  &lt;PhotoCamera /&gt;
+                &lt;/IconButton&gt; */}
+                &lt;SubmitIconButton
+                  color=&quot;primary&quot;
+                  aria-label=&quot;upload picture&quot;
+                  component=&quot;span&quot;
+                  sx={{ width: 54, height: 54 }}
+                  loading={false}
+                  error={eventPicFailed}
+                &gt;
+                  &lt;PhotoCamera /&gt;
+                &lt;/SubmitIconButton&gt;
+              &lt;/label&gt;
+            &lt;/Box&gt;
+            &lt;Box sx={{ height: 250 }}&gt;
+              &lt;CoordinateChooser chosenCoord={coordinate} setChosenCoord={setCoordinate} /&gt;
+            &lt;/Box&gt;
+            &lt;Box
+              sx={{
+                display: &quot;flex&quot;,
+                flexDirection: { xs: &quot;column-reverse&quot;, sm: &quot;row&quot; },
+                justifyContent: &quot;space-around&quot;,
+                alignItems: &quot;center&quot;,
+                gap: 1,
+              }}
+            &gt;
+              &lt;CloseButton onClick={handleClose} sx={{ flexGrow: 0 }}&gt;
+                Cancel
+              &lt;/CloseButton&gt;
+              &lt;SubmitButton
+                loading={creating}
+                error={createFailed}
+                onClick={generalCtx.eventIdSelected === null ? createEvent : updateEvent}
+              &gt;
+                Submit
+              &lt;/SubmitButton&gt;
+            &lt;/Box&gt;
+          &lt;/Box&gt;
+        &lt;/Box&gt;
+      &lt;/Slide&gt;
+    &lt;/Modal&gt;
+  );
+}
+
+export default CreateEvent;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

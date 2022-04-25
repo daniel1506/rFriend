@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src\pages\Homepage\MapsView.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src\pages\Homepage\MapsView.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">73.93</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">240</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">24.50</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.73</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { useRef, useEffect, useState, useMemo, useContext } from &quot;react&quot;;
+import ReactDOMServer from &quot;react-dom/server&quot;;
+import { Wrapper, Status } from &quot;@googlemaps/react-wrapper&quot;;
+import useSWR from &quot;swr&quot;;
+import get from &quot;../../lib/get&quot;;
+import getUrl from &quot;../../lib/getUrl&quot;;
+import { Box, Container } from &quot;@mui/material&quot;;
+import EventCard from &quot;../../components/EventCard&quot;;
+import GeneralContext from &quot;../../store/general-context&quot;;
+import &quot;../../css/custom.css&quot;;
+// -----------------------------------------------------------------------------
+
+const EventRender = ({ event }) =&gt; (
+  &lt;div style={{ color: &quot;black&quot; }}&gt;
+    &lt;h3&gt;{event.name}&lt;/h3&gt;
+    &lt;div&gt;
+      {new Date(event.startsAt).toLocaleDateString(&quot;en-US&quot;, {
+        weekday: &quot;long&quot;,
+        year: &quot;numeric&quot;,
+        month: &quot;long&quot;,
+        day: &quot;numeric&quot;,
+        hour: &quot;2-digit&quot;,
+        minute: &quot;2-digit&quot;,
+        second: &quot;2-digit&quot;,
+      })}{&quot; &quot;}
+    &lt;/div&gt;
+    &lt;div&gt;at {event.location}&lt;/div&gt;
+    &lt;div&gt;by {event.owner.name}&lt;/div&gt;
+  &lt;/div&gt;
+);
+
+// -----------------------------------------------------------------------------
+
+const Marker = (options) =&gt; {
+  const [marker, setMarker] = useState();
+
+  useEffect(() =&gt; {
+    if (!marker) {
+      setMarker(new window.google.maps.Marker());
+    }
+
+    // remove marker from map on unmount
+    return () =&gt; {
+      if (marker) {
+        marker.setMap(null);
+      }
+    };
+  }, [marker]);
+
+  useEffect(() =&gt; {
+    let markerOnClickListener;
+
+    if (marker) {
+      marker.setOptions(options);
+      const element = &lt;EventRender event={options.event} /&gt;;
+      const content = ReactDOMServer.renderToStaticMarkup(element);
+      markerOnClickListener = marker.addListener(&quot;click&quot;, () =&gt; {
+        options.infoWindow.setContent(content);
+        options.infoWindow.open(marker.get(&quot;map&quot;), marker);
+        options.setSelectedEventId(options.event.id);
+      });
+    }
+
+    return () =&gt; {
+      if (marker &amp;&amp; markerOnClickListener) {
+        window.google.maps.event.removeListener(markerOnClickListener);
+      }
+    };
+  }, [marker, options]);
+
+  return null;
+};
+
+// -----------------------------------------------------------------------------
+
+const mapLoadingRender = (status) =&gt; {
+  if (status === Status.LOADING) return &lt;h3&gt;{status} ..&lt;/h3&gt;;
+  if (status === Status.FAILURE) return &lt;h3&gt;{status} ...&lt;/h3&gt;;
+  return null;
+};
+
+const Map = ({ center, zoom, style, markers, setSelectedEventId }) =&gt; {
+  const ref = useRef();
+  const [mapObj, setMapObj] = useState();
+  const infoWindow = useMemo(() =&gt; new window.google.maps.InfoWindow(), []);
+
+  useEffect(() =&gt; {
+    setMapObj(
+      new window.google.maps.Map(ref.current, {
+        center,
+        zoom,
+        mapTypeControl: false,
+      })
+    );
+  }, []);
+
+  return (
+    &lt;div ref={ref} id=&quot;map&quot; style={style}&gt;
+      {markers.map((m, i) =&gt; (
+        &lt;Marker
+          key={i}
+          position={m.position}
+          map={mapObj}
+          title={m.title}
+          clickable={true}
+          event={m.event}
+          infoWindow={infoWindow}
+          setSelectedEventId={setSelectedEventId}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+};
+
+// -----------------------------------------------------------------------------
+
+const rootContainerStyle = (theme) =&gt; ({
+  paddingTop: &quot;16px&quot;,
+  height: &quot;calc(100% - 80px)&quot;,
+  display: &quot;flex&quot;,
+  gap: &quot;16px&quot;,
+  flexDirection: &quot;row&quot;,
+  [theme.breakpoints.down(&quot;md&quot;)]: {
+    flexDirection: &quot;column&quot;,
+  },
+});
+
+const mapContainerStyle = (theme) =&gt; ({
+  flexGrow: 1,
+  [theme.breakpoints.down(&quot;md&quot;)]: {
+    width: &quot;100%&quot;,
+    height: &quot;30%&quot;,
+  },
+});
+
+const eventCardContainerStyle = (theme) =&gt; ({
+  flexShrink: 0,
+  width: 345,
+  margin: &quot;0 auto&quot;,
+  overflow: &quot;scroll&quot;,
+  [theme.breakpoints.down(&quot;md&quot;)]: {
+    height: &quot;70%&quot;,
+  },
+});
+
+const MapsView = () =&gt; {
+  const center = useMemo(() =&gt; ({ lat: 22.41963752639907, lng: 114.20674324035645 }), []);
+  const zoom = useMemo(() =&gt; 15, []);
+  const [markers, setMarkers] = useState([]); // google.maps.Marker
+  const [selectedEvent, setSelectedEvent] = useState(null); // event obj
+  const [selectedEventId, setSelectedEventId] = useState(null); // number
+
+  const { eventEventModified } = useContext(GeneralContext);
+  const { data: events, mutate } = useSWR(getUrl(&quot;/api/user/browse&quot;), get);
+
+  // refresh data upon context notification
+  useEffect(() =&gt; {
+    mutate();
+  }, [eventEventModified, mutate]);
+
+  // construct data for displaying markers
+  useEffect(() =&gt; {
+    let waitForGoogle;
+    if (events) {
+      waitForGoogle = setInterval(() =&gt; {
+        if (window.google) {
+          setMarkers(
+            events.event.flatMap((event) =&gt; {
+              if (event.coordinateLat !== null &amp;&amp; event.coordinateLon !== null) {
+                return {
+                  position: new window.google.maps.LatLng(
+                    parseFloat(event.coordinateLat),
+                    parseFloat(event.coordinateLon)
+                  ),
+                  title: event.name,
+                  event,
+                };
+              } else {
+                return [];
+              }
+            })
+          );
+          clearInterval(waitForGoogle);
+        }
+      }, 500);
+    }
+
+    return () =&gt; {
+      if (waitForGoogle) {
+        clearInterval(waitForGoogle);
+      }
+    };
+  }, [events]);
+
+  // update selected event on id change or event data change
+  useEffect(() =&gt; {
+    if (events) {
+      setSelectedEvent(events.event.filter((event) =&gt; event.id === selectedEventId)[0]);
+    }
+  }, [events, selectedEventId]);
+
+  return (
+    &lt;Container sx={rootContainerStyle}&gt;
+      &lt;Box sx={mapContainerStyle}&gt;
+        &lt;Wrapper apiKey={process.env.REACT_APP_MAPS_API_KEY} render={mapLoadingRender}&gt;
+          &lt;Map
+            center={center}
+            zoom={zoom}
+            style={{ height: &quot;100%&quot; }}
+            markers={markers}
+            setSelectedEventId={setSelectedEventId}
+          &gt;&lt;/Map&gt;
+        &lt;/Wrapper&gt;
+      &lt;/Box&gt;
+      {selectedEvent &amp;&amp; (
+        &lt;Box sx={eventCardContainerStyle} className=&quot;example&quot;&gt;
+          &lt;EventCard
+            eventId={selectedEvent.id}
+            eventName={selectedEvent.name}
+            hostId={selectedEvent.ownerId}
+            eventTime={selectedEvent.startsAt}
+            isJoined={selectedEvent.isEventJoined}
+            isLiked={selectedEvent.isEventLiked}
+            photoUrl={selectedEvent.photoUrl}
+            host={selectedEvent.owner}
+            eventLocation={selectedEvent.location}
+            eventCategory={selectedEvent.category}
+            participants={selectedEvent.participants}
+            maxParticipants={selectedEvent.maxParticipants}
+            eventRemark={selectedEvent.remarks}
+          /&gt;
+        &lt;/Box&gt;
+      )}
+    &lt;/Container&gt;
+  );
+};
+
+// -----------------------------------------------------------------------------
+
+export default MapsView;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

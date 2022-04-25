@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src\store\auth-context.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src\store\auth-context.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">62.10</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">83</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">32.91</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.64</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import React, { useState } from &quot;react&quot;;
+
+const AuthContext = React.createContext({
+  //we will declare and initialize them in the later part, so the code here only for readability and intelSense, no technical effect
+  //notice everything you get from localStorage will be string, since we rely on localStorage, here everything will be string to let intelSense remind user these thing will be string when we access them.
+  id: &quot;&quot;,
+  email: &quot;&quot;,
+  name: &quot;&quot;,
+  token: &quot;&quot;,
+  role: &quot;&quot;,
+  verified_at: null,
+  isLoggedIn: false,
+  login: (token, id, email, name, role, verified_at) =&gt; {},
+  logout: () =&gt; {},
+});
+
+export const AuthContextProvider = (props) =&gt; {
+  const storedToken = localStorage.getItem(&quot;token&quot;);
+  const storedId = localStorage.getItem(&quot;id&quot;);
+  const storedEmail = localStorage.getItem(&quot;email&quot;);
+  const storedName = localStorage.getItem(&quot;name&quot;);
+  const storedRole = localStorage.getItem(&quot;role&quot;);
+  let storedVerified_at = localStorage.getItem(&quot;verified_at&quot;);
+  if (storedVerified_at === &quot;null&quot;) {
+    storedVerified_at = null;
+  }
+  const [token, setToken] = useState(storedToken);
+  const [id, setId] = useState(storedId);
+  const [email, setEmail] = useState(storedEmail);
+  const [name, setName] = useState(storedName);
+  const [role, setRole] = useState(storedRole);
+  const [verified_at, setVerified_at] = useState(storedVerified_at);
+  const userIsLoggedIn = !!token; //The first ! is just for converting to boolean
+
+  const loginHandler = (token, id, email, name, role, verified_at) =&gt; {
+    //store to localStorage so that user doesn&#039;t need to login next time
+    //localStorage.setIten(&quot;token&quot;) must be earlier than setToken(), since the initial fetch of the home page will use get(), and get() depends on localStorage.set.
+    localStorage.setItem(&quot;token&quot;, token);
+    localStorage.setItem(&quot;id&quot;, id);
+    localStorage.setItem(&quot;email&quot;, email);
+    localStorage.setItem(&quot;name&quot;, name);
+    localStorage.setItem(&quot;role&quot;, role);
+    localStorage.setItem(&quot;verified_at&quot;, verified_at);
+    setToken(token); //will trigger userIsLoggedIn to true and then trigger react router to redirect
+    setId(id);
+    setEmail(email);
+    setName(name);
+    setRole(role);
+    setVerified_at(verified_at);
+  };
+
+  const logoutHandler = () =&gt; {
+    setToken(null);
+    setId(null);
+    setEmail(null);
+    setName(null);
+    setRole(null);
+    setVerified_at(null);
+    localStorage.removeItem(&quot;token&quot;);
+    localStorage.removeItem(&quot;id&quot;);
+    localStorage.removeItem(&quot;email&quot;);
+    localStorage.removeItem(&quot;name&quot;);
+    localStorage.removeItem(&quot;role&quot;);
+    localStorage.removeItem(&quot;verified_at&quot;);
+  };
+
+  //provide an interface for components to use i.e. authCtx.xxx
+  const contextValue = {
+    id: id,
+    email: email,
+    token: token,
+    name: name,
+    role: role,
+    verified_at: verified_at,
+    isLoggedIn: userIsLoggedIn,
+    login: loginHandler,
+    logout: logoutHandler,
+  };
+
+  return &lt;AuthContext.Provider value={contextValue}&gt;{props.children}&lt;/AuthContext.Provider&gt;;
+};
+
+export default AuthContext;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

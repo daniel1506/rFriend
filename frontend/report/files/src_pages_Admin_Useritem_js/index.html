@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src\pages\Admin\Useritem.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src\pages\Admin\Useritem.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">69.77</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">167</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">19.67</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.99</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">//@ts-check
+import { React, useState } from &quot;react&quot;;
+import Typography from &quot;@mui/material/Typography&quot;;
+import Grid from &quot;@mui/material/Grid&quot;;
+import ShortText from &quot;../../components/ShortText&quot;;
+import Button from &quot;@mui/material/Button&quot;;
+import ListItem from &quot;@mui/material/ListItem&quot;;
+import ListItemButton from &quot;@mui/material/ListItemButton&quot;;
+import ListItemText from &quot;@mui/material/ListItemText&quot;;
+import BlockIcon from &quot;@mui/icons-material/Block&quot;;
+import LockResetIcon from &quot;@mui/icons-material/LockReset&quot;;
+import AccountCircleIcon from &quot;@mui/icons-material/AccountCircle&quot;;
+import Card from &quot;@mui/material/Card&quot;;
+import SubmitButton from &quot;../../components/SubmitButton&quot;;
+import { TextField, Box } from &quot;@mui/material&quot;;
+import put from &quot;../../lib/put&quot;;
+import deleteReq from &quot;../../lib/delete&quot;;
+import ResultDisplay from &quot;../../components/ResultDisplay&quot;;
+import { set } from &quot;date-fns&quot;;
+import PasswordInput from &quot;../../components/PasswordInput&quot;;
+import Grow from &quot;@mui/material/Grow&quot;;
+function Useritem(props) {
+  const [newPassword, setNewPassword] = useState(&quot;&quot;);
+  const [resetting, setResetting] = useState(false);
+  const [error, setError] = useState(undefined);
+  const [banning, setBanning] = useState(false);
+  const [banError, setBanError] = useState(undefined);
+  const clearProgress = () =&gt; {
+    setResetting(null);
+    setError(null);
+  };
+  const reset = (user_id, password) =&gt; {
+    //sending request to reset user password
+    const data = { user_id, password };
+    console.log(data);
+    setResetting(true);
+    put(&quot;https://rfriend.herokuapp.com/api/admin&quot;, data)
+      .then((result) =&gt; {
+        console.log(result);
+        if (result.status != 201) setError(true);
+        else setError(false);
+        setResetting(false);
+      })
+      .catch((err) =&gt; {
+        console.log(err);
+      });
+  };
+  const ban = (user_id) =&gt; {
+    //sending request to ban user
+    const data = { user_id };
+    console.log(data);
+    setBanning(true);
+    deleteReq(&quot;https://rfriend.herokuapp.com/api/admin/&quot;, data)
+      .then((result) =&gt; {
+        console.log(result);
+        if (result.status != 201) setBanError(true);
+        else {
+          setBanError(false);
+          props.setBanned((prev) =&gt; {
+            return prev + 1;
+          });
+        }
+        setBanning(false);
+      })
+      .catch((err) =&gt; {
+        console.log(err);
+      });
+  };
+  return (
+    &lt;Grow in={true} timeout={500}&gt;
+      &lt;Card sx={{ marginBottom: 2 }} onClick={props.onClick}&gt;
+        &lt;ListItem disablePadding&gt;
+          &lt;ListItemButton component=&quot;a&quot; href=&quot;#simple-list&quot;&gt;
+            &lt;ListItemText
+              primary={
+                &lt;Grid
+                  container
+                  direction={{ xs: &quot;row&quot; }}
+                  alignItems=&quot;center&quot;
+                  justifyContent={{ xs: &quot;space-between&quot; }}
+                  gap={{ sm: 2, xs: 0 }}
+                &gt;
+                  &lt;Grid item&gt;
+                    &lt;Grid
+                      container
+                      direction={{ xs: &quot;column&quot;, sm: &quot;row&quot; }}
+                      alignItems=&quot;center&quot;
+                      justifyContent={{ xs: &quot;start&quot; }}
+                      gap={{ sm: 2, xs: 0 }}
+                    &gt;
+                      &lt;AccountCircleIcon /&gt;
+                      &lt;ShortText&gt;{props.name}&lt;/ShortText&gt;
+                      &lt;ShortText color=&quot;primary&quot;&gt;{`#${props.userid}`}&lt;/ShortText&gt;
+                    &lt;/Grid&gt;
+                  &lt;/Grid&gt;
+                  &lt;Grid item&gt;
+                    &lt;Grid
+                      container
+                      direction={{ xs: &quot;column&quot;, sm: &quot;row&quot; }}
+                      alignItems={{ xs: &quot;end&quot;, md: &quot;center&quot; }}
+                      justifyContent={{ xs: &quot;end&quot; }}
+                      gap={{ sm: 2, xs: 1 }}
+                    &gt;
+                      &lt;PasswordInput
+                        noHelperText
+                        label=&quot;new password&quot;
+                        setPassword={setNewPassword}
+                        onClick={(e) =&gt; {
+                          e.stopPropagation();
+                        }}
+                      /&gt;
+                      &lt;Box
+                        sx={{
+                          display: &quot;flex&quot;,
+                          flexDirection: { xs: &quot;row&quot; },
+                          alignItems: &quot;center&quot;,
+                        }}
+                      &gt;
+                        &lt;SubmitButton
+                          variant=&quot;contained&quot;
+                          error={error}
+                          color=&quot;warning&quot;
+                          onClick={(e) =&gt; {
+                            e.stopPropagation();
+                            clearProgress();
+                            reset(props.userid, newPassword);
+                          }}
+                          icon={&lt;LockResetIcon /&gt;}
+                          loading={resetting}
+                        &gt;
+                          Reset password
+                        &lt;/SubmitButton&gt;
+                      &lt;/Box&gt;
+                      &lt;Box
+                        sx={{
+                          display: &quot;flex&quot;,
+                          flexDirection: { xs: &quot;row&quot; },
+                          alignItems: &quot;center&quot;,
+                        }}
+                      &gt;
+                        &lt;SubmitButton
+                          variant=&quot;contained&quot;
+                          error={banError}
+                          loading={banning}
+                          color=&quot;error&quot;
+                          onClick={(e) =&gt; {
+                            e.stopPropagation();
+                            ban(props.userid);
+                          }}
+                          icon={&lt;BlockIcon /&gt;}
+                        &gt;
+                          Ban
+                        &lt;/SubmitButton&gt;
+                      &lt;/Box&gt;
+                    &lt;/Grid&gt;
+                  &lt;/Grid&gt;
+                &lt;/Grid&gt;
+              }
+            /&gt;
+          &lt;/ListItemButton&gt;
+        &lt;/ListItem&gt;
+      &lt;/Card&gt;
+    &lt;/Grow&gt;
+  );
+}
+
+export default Useritem;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
