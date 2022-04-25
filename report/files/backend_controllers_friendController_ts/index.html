@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - backend/controllers/friendController.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>backend/controllers/friendController.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">47.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">322</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">56.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.35</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { UploadPartRequest } from &quot;@aws-sdk/client-s3&quot;;
+import { NextFunction, Request, Response, urlencoded } from &quot;express&quot;;
+import { body, validationResult } from &quot;express-validator&quot;;
+import prisma, { prismaErrorHandler } from &quot;../common/dbClient&quot;;
+import HttpException from &quot;../common/httpException&quot;;
+import { getProfileUrl } from &quot;./userController&quot;;
+
+export const validate = [body(&quot;target_user_id&quot;).isInt().toInt()];
+
+export const request = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input&quot;));
+  }
+
+  const { id } = req;
+  const target_user_id = req.body.target_user_id as number;
+
+  if (id === target_user_id) {
+    return next(new HttpException(409, &quot;Cannot send requeset to self&quot;));
+  }
+
+  let isUsersFriends: boolean;
+  try {
+    const usersFriends = await prisma.user.findFirst({
+      where: { id: id },
+      select: {
+        friends: {
+          where: {
+            id: target_user_id,
+          },
+        },
+      },
+    });
+    isUsersFriends = usersFriends?.friends.length !== 0;
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (isUsersFriends) {
+    return next(new HttpException(409, &quot;User is already friends with the target&quot;));
+  }
+
+  let existingFriendRequests;
+  try {
+    existingFriendRequests = await prisma.friendRquest.findFirst({
+      where: {
+        OR: [
+          { fromUser: id, toUser: target_user_id },
+          { fromUser: target_user_id, toUser: id },
+        ],
+        acceptedAt: null,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (existingFriendRequests) {
+    return next(new HttpException(409, &quot;Existing friend request pending&quot;));
+  }
+
+  let newFriendRequest;
+  try {
+    newFriendRequest = await prisma.friendRquest.upsert({
+      where: {
+        fromUser_toUser: {
+          fromUser: id,
+          toUser: target_user_id,
+        },
+      },
+      update: {
+        acceptedAt: null,
+      },
+      create: {
+        fromUser: id,
+        toUser: target_user_id,
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ ...newFriendRequest });
+};
+
+// -----------------------------------------------------------------------------
+
+export const accept = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input&quot;));
+  }
+
+  const { id } = req;
+  const target_user_id = req.body.target_user_id as number;
+
+  let request;
+  try {
+    request = await prisma.friendRquest.update({
+      where: {
+        fromUser_toUser: {
+          fromUser: target_user_id,
+          toUser: id,
+        },
+      },
+      data: {
+        acceptedAt: new Date(),
+      },
+    });
+  } catch (e) {
+    return next(new HttpException(409, &quot;Existing friend request not found&quot;));
+  }
+
+  let user;
+  try {
+    user = await prisma.user.update({
+      where: { id },
+      data: {
+        friends: { connect: { id: target_user_id } },
+      },
+      include: {
+        friends: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.send({ friends: user.friends });
+};
+
+// -----------------------------------------------------------------------------
+
+export const remove = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input&quot;));
+  }
+
+  const { id } = req;
+  const target_user_id = req.body.target_user_id as number;
+
+  let user;
+  try {
+    user = await prisma.user.update({
+      where: { id },
+      data: {
+        friends: { disconnect: { id: target_user_id } },
+        friendsOf: { disconnect: { id: target_user_id } },
+      },
+      include: {
+        friends: {
+          select: { id: true, name: true, email: true },
+        },
+        friendsOf: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let request;
+  try {
+    request = await prisma.friendRquest.deleteMany({
+      where: {
+        OR: [
+          { fromUser: id, toUser: target_user_id },
+          { fromUser: target_user_id, toUser: id },
+        ],
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let friends = [...user!.friends, ...user!.friendsOf];
+  friends = friends.map((friend) =&gt; ({
+    ...friend,
+    profile_url: getProfileUrl(friend.id),
+  }));
+
+  res.send({ friends });
+};
+
+// -----------------------------------------------------------------------------
+
+export const get = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const target_user_id = req.body.target_user_id as number;
+
+  // check if target user exists
+  try {
+    const targetUser = await prisma.user.findFirst({
+      where: { id: target_user_id },
+    });
+
+    if (!targetUser) {
+      return next(new HttpException(404, &quot;User not found&quot;));
+    }
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  // query friends of the target user
+  let user;
+  try {
+    user = await prisma.user.findFirst({
+      where: { id: target_user_id },
+      include: {
+        friends: {
+          select: { id: true, name: true, email: true },
+        },
+        friendsOf: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let pending_requests;
+  try {
+    pending_requests = await prisma.friendRquest.findMany({
+      where: { fromUser: target_user_id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let pending_id = pending_requests.map((request) =&gt; request.toUser);
+  let pending;
+  try {
+    pending = await prisma.user.findMany({
+      where: { id: { in: pending_id } },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let waiting_requests;
+  try {
+    waiting_requests = await prisma.friendRquest.findMany({
+      where: { toUser: target_user_id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let waiting_id = waiting_requests.map((request) =&gt; request.fromUser);
+  let waiting;
+  try {
+    waiting = await prisma.user.findMany({
+      where: { id: { in: waiting_id } },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  let friends = [...user!.friends, ...user!.friendsOf];
+  friends = friends.map((friend) =&gt; ({
+    ...friend,
+    profile_url: getProfileUrl(friend.id),
+  }));
+
+  let pending_users = pending.map((pending_user) =&gt; ({
+    ...pending_user,
+    profile_url: getProfileUrl(pending_user.id),
+  }));
+
+  let waiting_accept = waiting.map((waiting_user) =&gt; ({
+    ...waiting_user,
+    profile_url: getProfileUrl(waiting_user.id),
+  }));
+
+  res.send({ friends, pending_users, waiting_accept });
+};
+
+// -----------------------------------------------------------------------------
+
+export const deleteRequest = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input&quot;));
+  }
+
+  const { id } = req;
+  const target_user_id = req.body.target_user_id as number;
+
+  let request;
+
+  try {
+    request = await prisma.friendRquest.findFirst({
+      where: { fromUser: target_user_id, toUser: id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  if (!request) {
+    return next(new HttpException(404, &quot;Friend request not found&quot;));
+  }
+
+  let result;
+
+  try {
+    result = await prisma.friendRquest.deleteMany({
+      where: { fromUser: target_user_id, toUser: id, acceptedAt: null },
+    });
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.send({ message: &quot;Rejected&quot; });
+};
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
