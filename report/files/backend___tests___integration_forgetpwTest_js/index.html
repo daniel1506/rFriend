@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - backend/__tests__/integration/forgetpwTest.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>backend/__tests__/integration/forgetpwTest.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">53.76</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">233</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">31.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.63</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import request from &quot;supertest&quot;;
+import app from &quot;../../index&quot;;
+import HttpException from &quot;../../common/httpException&quot;;
+
+import { forgetPassword, resetPassword } from &quot;../../controllers/userController&quot;;
+import { sendVerifyEmailEmail } from &quot;../../services/emailService&quot;;
+// import { authMiddleware } from &quot;../../middleware/authMiddleware&quot;;
+import prisma from &quot;../../jest.setup&quot;;
+import jwt from &quot;jsonwebtoken&quot;;
+
+// -----------------------------------------------------------------------------
+
+const userArray = [
+  {
+    id: 1,
+    email: &quot;a@a.com&quot;,
+    name: &quot;user1&quot;,
+    password: &quot;passworda&quot;,
+    profile_url: &quot;https://csci3100project.s3.ap-southeast-1.amazonaws.com/img1&quot;,
+  },
+  {
+    id: 2,
+    email: &quot;b@a.com&quot;,
+    name: &quot;user2&quot;,
+    password: &quot;passwordb&quot;,
+    profile_url: &quot;https://csci3100project.s3.ap-southeast-1.amazonaws.com/img2&quot;,
+  },
+  { id: 3, email: &quot;c@a.com&quot;, name: &quot;user3&quot;, password: &quot;passwordc&quot;, profile_url: null },
+];
+
+const registerUrl = &quot;/api/user/register&quot;;
+const loginUrl = &quot;/api/user/login&quot;;
+// const forgetPasswordUrl = &quot;/api/user/forget_pw&quot;;
+// const resetPasswordUrl = &quot;/api/user/pw_reset&quot;;
+
+// -----------------------------------------------------------------------------
+
+describe(&quot;Forget and Reset Password&quot;, () =&gt; {
+  jest.mock(&quot;../../controllers/userController&quot;);
+  sendVerifyEmailEmail = jest.fn(); // ignore sending verify email
+
+  // register all the users first
+  beforeAll(async () =&gt; {
+    // register all users first
+    for (let i of userArray) {
+      // console.log(i); //  delete
+      let res = await request(app).post(registerUrl).send(i);
+      // console.log(res.body);   // delete
+    }
+  });
+
+  // a function that gives a mock function, which generates and stores a reset pw token with a specified expire time
+  const forgetPassword_mock = (expireTime) =&gt; {
+    return jest.fn(async () =&gt; {
+      const token = jwt.sign(
+        {
+          id: userArray[0].id,
+          email: userArray[0].email,
+        },
+        process.env.JWT_SECRET_FORGET_PW,
+        { expiresIn: expireTime }
+      );
+
+      // store/update the token into the DB
+      try {
+        let user = await prisma.user.update({
+          where: { email: userArray[0].email },
+          data: { resetPasswordToken: token },
+        });
+
+        //   if (!user) {
+        //     return next(new HttpException(400, &quot;Cannot update token for forget password.&quot;));
+        //   }
+        return token;
+      } catch (e) {
+        // return next(prismaErrorHandler(e));
+      }
+    });
+  };
+
+  // wait some time (used in the second test and the third test)
+  function wait(millisecond) {
+    return new Promise((res, rej) =&gt; {
+      setTimeout(() =&gt; {
+        console.log(&quot;wait some time&quot;);
+        res();
+      }, millisecond);
+    });
+  }
+
+  it(&quot;Should be able to login with the new password if the token is valid&quot;, async () =&gt; {
+    let id = userArray[0].id;
+    let name = userArray[0].name;
+    let email = userArray[0].email;
+    let profile_url = userArray[0].profile_url;
+    let new_pw = &quot;newpassword0&quot;;
+
+    let req = { body: { email: email } };
+    let res = { send: jest.fn() };
+    let next = jest.fn();
+
+    forgetPassword = forgetPassword_mock(&quot;1h&quot;);
+    let token = await forgetPassword(req, res, next); // get a token for resetting pw first
+
+    req = { body: { password: new_pw, token: token } };
+    res = { send: jest.fn() };
+    next = jest.fn();
+
+    await resetPassword(req, res, next);
+    expect(res.send).toHaveBeenCalled();
+
+    // login with new password
+    const login = await request(app).post(loginUrl).send({
+      name: name,
+      email: email,
+      password: new_pw,
+    });
+    console.log(login.body); // delete
+    expect(login.status).toBe(200);
+  });
+
+  it(&quot;Should not be able to change the password if the token does not match with the one in the DB&quot;, async () =&gt; {
+    let id = userArray[1].id;
+    let name = userArray[1].name;
+    let email = userArray[1].email;
+    let profile_url = userArray[1].profile_url;
+    let new_pw = &quot;newpassword1&quot;;
+    // use another user to test to avoid the effect of the previous test on the DB
+    let req = { body: { email: email } };
+    let res = { send: jest.fn() };
+    let next = jest.fn();
+
+    forgetPassword = forgetPassword_mock(36000);
+    //  console.log(forgetPassword(req, res, next)); //delete
+    let token = await forgetPassword(req, res, next); // get a token for resetting pw first
+    console.log(&quot;first token is&quot;); // delete
+    console.log(token); // delete
+
+    await wait(1000); // wait for a second to ensure that the next token generated is different
+
+    let token_new = await forgetPassword(req, res, next); // renew the token
+    console.log(&quot;new token is&quot;); // delete
+    console.log(token_new); // delete
+
+    req = { body: { password: new_pw, token: token } }; // try to reset password using the old token
+    res = { send: jest.fn() };
+    next = jest.fn();
+
+    await resetPassword(req, res, next);
+    expect(next).toBeCalledWith(new HttpException(401, &quot;Invalid forget password token&quot;));
+
+    // login with new password
+    const login = await request(app).post(loginUrl).send({
+      name: name,
+      email: email,
+      password: new_pw,
+    });
+    console.log(login.body); // delete
+
+    expect(login.status).toBe(401);
+  });
+
+  it(&quot;Should not be able to change the password if the token expires&quot;, async () =&gt; {
+    let id = userArray[2].id;
+    let name = userArray[2].name;
+    let email = userArray[2].email;
+    let profile_url = userArray[2].profile_url;
+    let new_pw = &quot;newpassword2&quot;;
+
+    // use another user to test to avoid the effect of the previous test on the DB
+    let req = { body: { email: email } };
+    let res = { send: jest.fn() };
+    let next = jest.fn();
+
+    forgetPassword = forgetPassword_mock(&quot;0.5s&quot;); // make the expire time short enough to ensure that it expires immediately after its creation
+    // console.log(&quot;token from last test is &quot;); // delete
+    // console.log(token); // delete
+
+    let token = await forgetPassword(req, res, next); // get a token for resetting pw first
+    await wait(1000); // wait some time to make the token expire
+    console.log(&quot;token is&quot;); // delete
+    console.log(token); // delete
+
+    req = { body: { password: new_pw, token: token } };
+    res = { send: jest.fn() };
+    next = jest.fn();
+
+    await resetPassword(req, res, next);
+    expect(next).toBeCalledWith(new HttpException(401, &quot;Forget password token expired&quot;));
+
+    // login with new password
+    const login = await request(app).post(loginUrl).send({
+      name: name,
+      email: email,
+      password: new_pw,
+    });
+    console.log(login.body); // delete
+
+    expect(login.status).toBe(401);
+  });
+});
+
+// describe(&quot;database testing(delete)&quot;, () =&gt;{
+//     it(&quot;extra test 1&quot;, async () =&gt;{
+//        //  prisma.user.create = jest.spyon();
+//         let user = await prisma.user.create({
+//             data:{
+
+//             name: &quot;New user&quot;,
+//             email: &quot;new@gmail.com&quot;,
+//             password: &quot;hash&quot;,
+//             }
+
+//     }
+//     );
+//     console.log(user);
+//     // expect(prisma.user.create).toHaveBeenCalled();
+// });
+
+//     it(&quot;extra test 2&quot;, async () =&gt;{
+//         let user = await prisma.user.findUnique({
+//             where:{
+
+//                 email: &quot;new@gmail.com&quot;,
+//                 // password: &quot;hash&quot;,
+//             }
+
+//       });
+//       console.log(user);
+//   });
+
+// });
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

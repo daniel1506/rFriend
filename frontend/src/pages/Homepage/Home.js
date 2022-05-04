@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useContext } from "react";
 import { styled } from "@mui/material/styles";
-import EventCard from "../../components/EventCard.js";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Calendar from "./Calendar.js";
 import get from "../../lib/get";
+import GeneralContext from "../../store/general-context.js";
+import { Container } from "@mui/material";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -19,51 +17,46 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Home() {
   const [eventList, setEventList] = React.useState([]);
-
+  const generalCtx = useContext(GeneralContext);
   useEffect(() => {
     get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
-      setEventList(r.event);
+      setEventList(
+        r.event.filter((event) => {
+          if (event.isEventLiked) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+      );
     });
-  }, []);
+  }, [generalCtx.eventEventModified]);
 
   return (
-    <>
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid
-          container
-          spacing={2}
-          direction="row"
-          justifyContent="center"
-          alignItems="flex-start"
-        >
-          <Grid item xs={8}>
-            <Calendar />
-          </Grid>
-          <Grid item xs={4}>
-            <Stack spacing={2}>
-              {eventList.map((e, index) => {
-                return (
-                  <EventCard
-                    key={e.id}
-                    eventId={e.id}
-                    eventName={e.name}
-                    hostId={e.ownerId}
-                    eventTime={e.startsAt}
-                    isJoined={e.isEventJoined}
-                    isLiked={e.isEventLiked}
-                    photoUrl={e.photoUrl}
-                    host={e.owner}
-                    eventLocation={e.location}
-                    eventCategory={e.category}
-                    maxParticipants={e.maxParticipants}
-                    eventRemark={e.remarks}
-                  />
-                );
-              })}
-            </Stack>
-          </Grid>
+    <Container sx={{ pt: 2 }}>
+      <Grid container spacing={2} direction="row" justifyContent="center" alignItems="flex-start">
+        <Grid item xs={12} sm={12} md={10}>
+          <Calendar />
         </Grid>
-      </Box>
-    </>
+      </Grid>
+    </Container>
   );
 }
+//-----------------------------------------------
+const rootContainerStyle = (theme) => ({
+  paddingTop: "16px",
+  height: "calc(100% - 80px)",
+  display: "flex",
+  gap: "16px",
+  flexDirection: "row",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+  },
+});
+const mapContainerStyle = (theme) => ({
+  flexGrow: 1,
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    height: "30%",
+  },
+});

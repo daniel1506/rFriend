@@ -71,10 +71,34 @@ const Map = ({ center, zoom, style, markers, onClick }) => {
 
 // -----------------------------------------------------------------------------
 
-const CoordinateChooser = ({ setChosenCoord }) => {
-  const center = useMemo(() => ({ lat: 22.41963752639907, lng: 114.20674324035645 }), []);
+const CoordinateChooser = ({ chosenCoord, setChosenCoord }) => {
+  const center = useMemo(
+    () => ({ lat: chosenCoord?.lat || 22.41963752639907, lng: chosenCoord?.lng || 114.20674324035645 }),
+    [chosenCoord]
+  );
   const zoom = useMemo(() => 15, []);
   const [markers, setMarkers] = useState([]); // google.maps.Marker
+
+  useEffect(() => {
+    let waitForGoogle;
+    if (chosenCoord?.lat !== null && chosenCoord?.lng !== null) {
+      waitForGoogle = setInterval(() => {
+        if (window.google) {
+          setMarkers([
+            { position: new window.google.maps.LatLng(parseFloat(chosenCoord?.lat), parseFloat(chosenCoord?.lng)) },
+          ]);
+
+          clearInterval(waitForGoogle);
+        }
+      }, 500);
+    }
+
+    return () => {
+      if (waitForGoogle) {
+        clearInterval(waitForGoogle);
+      }
+    };
+  }, [chosenCoord]);
 
   const mapOnClick = useCallback(
     (event) => {

@@ -1,78 +1,80 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import deleteReq from "../lib/delete";
-
+import GeneralContext from "../store/general-context";
 //import { withStyles } from 'material-ui/styles';
 
-class EventCardSettingBtn extends React.Component {
-  state = {
-    anchorEl: null,
+function EventCardSettingBtn(props) {
+  const generalCtx = useContext(GeneralContext);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  handleChange = (event, checked) => {
-    this.setState({ auth: checked });
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
-  handleMenu = (event) => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleClose = () => {
-    this.setState({ anchorEl: null });
-  };
-
-  handleOnClick = (link) => {
-    if (link == "Delete Event") {
-      deleteReq("/api/event/" + this.props.eventId, {
-        event_id: this.props.eventId,
-      });
+  const handleOnClick = (link) => {
+    if (link == "Edit Event") {
+      generalCtx.handleSelectEvent(props.eventId);
     }
-    this.setState({ anchorEl: null });
+    if (link == "Delete Event") {
+      deleteReq("https://rfriend.herokuapp.com/api/event/", {
+        id: props.eventId,
+      })
+        .then((result) => {
+          if (result.status == 200) {
+            generalCtx.handleEventModified();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    setAnchorEl(null);
   };
 
-  render() {
-    const { classes } = this.props;
-    const { auth, anchorEl } = this.state;
-    const open = Boolean(anchorEl);
-    const Wrapper = this.props.iconType;
-    const listItems = this.props.items.map((link) => (
+  const open = Boolean(anchorEl);
+  const Wrapper = props.iconType;
+  const listItems = props.items.map((link) => {
+    return (
       <MenuItem
         onClick={() => {
-          this.handleOnClick(link);
+          handleOnClick(link);
         }}
         key={link}
       >
         {link}
       </MenuItem>
-    ));
-
-    return (
-      <div>
-        <IconButton aria-owns={open ? "menu-appbar" : null} aria-haspopup="true" onClick={this.handleMenu}>
-          {<Wrapper />}
-        </IconButton>
-        <Menu
-          id="menu-appbar"
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={open}
-          onClose={this.handleClose}
-        >
-          {listItems}
-        </Menu>
-      </div>
     );
-  }
+  });
+  return (
+    <div>
+      <IconButton aria-owns={open ? "menu-appbar" : null} aria-haspopup="true" onClick={handleMenu}>
+        {<Wrapper />}
+      </IconButton>
+      <Menu
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={open}
+        onClose={handleClose}
+      >
+        {listItems}
+      </Menu>
+    </div>
+  );
 }
-
 export default EventCardSettingBtn;

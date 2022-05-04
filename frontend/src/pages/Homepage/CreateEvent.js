@@ -1,5 +1,5 @@
 //@ts-check
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useContext, useEffect } from "react";
 import { useState } from "react";
 import {
   TextField,
@@ -24,9 +24,12 @@ import PrivacyButtonGroup from "../../components/PrivacyButtonGroup";
 import SubmitIconButton from "../../components/SubmitIconButton";
 import ImageIcon from "@mui/icons-material/Image";
 import post from "../../lib/post";
+import put from "../../lib/put";
 import { categoryPhotos } from "../../lib/sharedResource";
 import CoordinateChooser from "../../components/CoordinateChooser";
-
+import GeneralContext from "../../store/general-context";
+import AuthContext from "../../store/auth-context";
+import get from "../../lib/get";
 const style = {
   //control the style of the modal container
   position: "absolute",
@@ -59,7 +62,10 @@ const style = {
 };
 
 function CreateEvent(props) {
-  const handleClose = () => props.setShowCreateEvent(false);
+  const handleClose = () => {
+    props.setShowCreateEvent(false);
+    generalCtx.handleSelectEvent(null);
+  };
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
   const [category, setCategory] = useState("");
@@ -67,15 +73,15 @@ function CreateEvent(props) {
   const [quota, setQuota] = useState(1);
   const [eventPic, setEventPic] = useState("");
   const [eventPicFailed, setEventPicFailed] = useState(undefined);
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
+  const [startTime, setStartTime] = useState(Number(new Date()));
+  const [endTime, setEndTime] = useState(Number(new Date().setSeconds(new Date().getSeconds() + 3600)));
   const [location, setLocation] = useState("");
   const [privacy, setPrivacy] = useState("friend");
   const [remarks, setRemarks] = useState("");
   const [creating, setCreating] = useState(false);
   const [createFailed, setCreateFailed] = useState(undefined);
   const [coordinate, setCoordinate] = useState({ lat: null, lng: null });
-
+  const generalCtx = useContext(GeneralContext);
   const validateTitle = (title) => {};
 
   const handleChangePrivacy = (event, newPrivacy) => {
@@ -116,19 +122,20 @@ function CreateEvent(props) {
   };
 
   const createEvent = () => {
-    let duration = endTime - startTime;
+    console.log("creating event");
+    let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
     let data = {
       name: title,
       category: category,
-      time: startTime,
-      duration: duration,
+      time: Math.round(Number(startTime) / 1000),
+      duration: Math.round(duration),
       location: location,
       max_participants: quota,
-      photo: eventPic,
       privacy: privacy,
       remarks: remarks,
-      coordinate_lat: coordinate.lat,
-      coordinate_lon: coordinate.lng,
+      ...(eventPic !== "" && eventPic !== null && { photo: eventPic }),
+      ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
+      ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
     };
     console.log(data);
     setCreating(true);
@@ -138,26 +145,90 @@ function CreateEvent(props) {
         setCreateFailed(true);
       } else {
         setCreateFailed(false);
+        generalCtx.handleEventModified();
         setTimeout(() => {
           handleClose();
         }, 1000);
       }
     });
   };
-
+  const updateEvent = () => {
+    let duration = Number(endTime) / 1000 - Number(startTime) / 1000;
+    let isEventPicChanged = true;
+    if (eventPic === null) {
+      isEventPicChanged = false;
+    }
+    if (eventPic !== null) {
+      if (eventPic.includes("http")) {
+        isEventPicChanged = false;
+      }
+    }
+    let data = {
+      id: parseInt(generalCtx.eventIdSelected),
+      name: title,
+      category: category,
+      time: Number(startTime) / 1000,
+      duration: duration,
+      location: location,
+      max_participants: quota,
+      privacy: privacy,
+      remarks: remarks,
+      ...(eventPic !== "" && eventPic !== null && isEventPicChanged && { photo: eventPic }),
+      ...(coordinate.lat !== null && { coordinate_lat: coordinate.lat }),
+      ...(coordinate.lng !== null && { coordinate_lon: coordinate.lng }),
+    };
+    console.log("updating...");
+    console.log(data);
+    setCreating(true);
+    put("https://rfriend.herokuapp.com/api/event", data).then((result) => {
+      setCreating(false);
+      if (result.status != 201) {
+        setCreateFailed(true);
+      } else {
+        setCreateFailed(false);
+        generalCtx.handleEventModified();
+        setTimeout(() => {
+          handleClose();
+        }, 1000);
+      }
+    });
+  };
+  useEffect(() => {
+    console.log("get");
+    console.log(generalCtx.eventIdSelected);
+    get(`https://rfriend.herokuapp.com/api/event/${generalCtx.eventIdSelected}`).then((result) => {
+      console.log("got");
+      console.log(result);
+      setTitle(result.event.name);
+      setCategory(result.event.category);
+      setLocation(result.event.location);
+      setPrivacy(result.event.privacy);
+      setQuota(result.event.maxParticipants);
+      setEventPic(result.event.photoUrl);
+      setRemarks(result.event.remarks);
+      setStartTime(Date.parse(result.event.startsAt));
+      setCoordinate({ lat: result.event.coordinateLat, lng: result.event.coordinateLon });
+      const endTimeStamp = (startsAt) => {
+        let dateObject = new Date(Date.parse(startsAt));
+        return dateObject.setSeconds(dateObject.getSeconds() + result.event.duration);
+      };
+      setEndTime(Number(endTimeStamp(result.event.startsAt)));
+    });
+  }, [generalCtx.eventIdSelected]);
   const displayCustomEventPicIfAvailable = useMemo(() => {
-    if (eventPic === "") {
+    if (eventPic === "" || eventPic === null) {
       return categoryPhotos[category];
     }
 
     return eventPic;
   }, [eventPic, category]);
-
+  console.log(generalCtx.eventIdSelected);
+  console.log(generalCtx.eventIdSelected !== null);
   return (
     <Modal
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
-      open={props.showCreateEvent}
+      open={props.showCreateEvent || generalCtx.eventIdSelected !== null}
       onClose={handleClose}
       closeAfterTransition
       BackdropComponent={Backdrop}
@@ -166,7 +237,7 @@ function CreateEvent(props) {
       }}
       sx={{ overflow: "scroll" }}
     >
-      <Slide in={props.showCreateEvent}>
+      <Slide in={props.showCreateEvent || generalCtx.eventIdSelected !== null}>
         <Box sx={style}>
           <Box
             sx={{
@@ -199,6 +270,10 @@ function CreateEvent(props) {
                 helperText={titleError ? "Must fill in" : ""}
                 type="text"
                 label="title*"
+                value={title}
+                InputLabelProps={{
+                  shrink: title !== "",
+                }}
                 onChange={(e) => {
                   validateTitle(e.target.value);
                   setTitle(e.target.value);
@@ -207,6 +282,10 @@ function CreateEvent(props) {
               <TextField
                 type="text"
                 label="location"
+                InputLabelProps={{
+                  shrink: location !== "",
+                }}
+                value={location}
                 onChange={(e) => {
                   setLocation(e.target.value);
                 }}
@@ -227,16 +306,16 @@ function CreateEvent(props) {
                 value={quota}
                 onChange={(e) => {
                   console.log(e.target.value);
-                  if (parseInt(e.target.value) > 0)
-                    setQuota(parseInt(e.target.value));
+                  if (parseInt(e.target.value) > 0) setQuota(parseInt(e.target.value));
                 }}
               />
               <TextField
                 label="remark"
                 type="text"
                 InputLabelProps={{
-                  shrink: true,
+                  shrink: remarks !== "",
                 }}
+                value={remarks}
                 onChange={(e) => {
                   setRemarks(e.target.value);
                 }}
@@ -253,12 +332,7 @@ function CreateEvent(props) {
             >
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="Category">Category</InputLabel>
-                <Select
-                  labelId="Category"
-                  value={category}
-                  onChange={handleChangeCategory}
-                  label="Category"
-                >
+                <Select labelId="Category" value={category} onChange={handleChangeCategory} label="Category">
                   <MenuItem value={"dining"}>dining</MenuItem>
                   <MenuItem value={"sports"}>sports</MenuItem>
                   <MenuItem value={"study"}>study</MenuItem>
@@ -283,10 +357,7 @@ function CreateEvent(props) {
                   <MenuItem value={30}>Thirty</MenuItem>
                 </Select>
               </FormControl> */}
-              <PrivacyButtonGroup
-                value={privacy}
-                onChange={handleChangePrivacy}
-              />
+              <PrivacyButtonGroup value={privacy} onChange={handleChangePrivacy} />
             </Box>
 
             <Box
@@ -298,13 +369,14 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TimePicker label="Start time" setTime={setStartTime} />
+              <TimePicker label="Start time" value={startTime} setTime={setStartTime} />
               <SquareToggleButton
                 selected={notification}
                 onChange={() => {
                   setNotification((prev) => !prev);
                 }}
                 color="primary"
+                sx={{ visibility: "hidden" }}
               >
                 <NotificationsIcon />
               </SquareToggleButton>
@@ -318,7 +390,7 @@ function CreateEvent(props) {
                 gap: 1,
               }}
             >
-              <TimePicker label="End time" setTime={setEndTime} />
+              <TimePicker label="End time" value={endTime} setTime={setEndTime} />
               <label htmlFor="icon-button-file">
                 <Input
                   inputProps={{ accept: "image/*" }}
@@ -350,7 +422,7 @@ function CreateEvent(props) {
               </label>
             </Box>
             <Box sx={{ height: 250 }}>
-              <CoordinateChooser setChosenCoord={setCoordinate} />
+              <CoordinateChooser chosenCoord={coordinate} setChosenCoord={setCoordinate} />
             </Box>
             <Box
               sx={{
@@ -367,7 +439,7 @@ function CreateEvent(props) {
               <SubmitButton
                 loading={creating}
                 error={createFailed}
-                onClick={createEvent}
+                onClick={generalCtx.eventIdSelected === null ? createEvent : updateEvent}
               >
                 Submit
               </SubmitButton>

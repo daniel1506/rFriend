@@ -2,7 +2,7 @@ import { ContentSecurityPolicyOptions } from "helmet/dist/types/middlewares/cont
 
 const policy: ContentSecurityPolicyOptions = {
   directives: {
-    connectSrc: [`'self'`, `rfriend.herokuapp.com`],
+    connectSrc: [`'self'`, `rfriend.herokuapp.com`, `maps.googleapis.com`],
     imgSrc: [`'self'`, `data:`, `*`],
     scriptSrc: [`'self'`, `maps.googleapis.com`],
   },

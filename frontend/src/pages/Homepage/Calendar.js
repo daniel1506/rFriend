@@ -1,11 +1,8 @@
 import * as React from "react";
-import Paper from "@material-ui/core/Paper";
+import { styled } from '@mui/material/styles';
+import { Paper } from "@mui/material";
 import TableCell from "@material-ui/core/TableCell";
-import {
-  darken,
-  fade,
-  lighten,
-} from "@material-ui/core/styles/colorManipulator";
+import { darken, alpha, lighten } from "@material-ui/core/styles/colorManipulator";
 import Typography from "@material-ui/core/Typography";
 import { ViewState, EditingState } from "@devexpress/dx-react-scheduler";
 import classNames from "clsx";
@@ -30,21 +27,25 @@ import { owners } from "./calendar-data/tasks";
 import { TurnedIn } from "@mui/icons-material";
 import EventCardModal from "../../components/EventCardModal";
 import { Box } from "@material-ui/core";
+import CalendarEvent from './CalendarEvent';
+
+const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => ({
+}));
 
 const Header = ({ children, appointmentData, ...restProps }) => (
   //<StyledAppointmentTooltipHeader
   //  {...restProps}
   //  appointmentData={appointmentData}
   //>
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "end",
-      alignContent: "center",
-    }}
-  >
-    <EventCardModal />
+   <Box
+     sx={{
+       display: "flex",
+       flexDirection: "row",
+       justifyContent: "end",
+       alignContent: "center",
+     }}
+   >
+    <EventCardModal appointmentData={appointmentData} children={children} {...restProps}/>
   </Box>
   //</StyledAppointmentTooltipHeader>
 );
@@ -133,15 +134,12 @@ const resources = [
 const getBorder = (theme) =>
   `1px solid ${
     theme.palette.type === "light"
-      ? lighten(fade(theme.palette.divider, 1), 0.88)
-      : darken(fade(theme.palette.divider, 1), 0.68)
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
-  <MonthView.DayScaleCell
-    {...props}
-    style={{ textAlign: "center", fontWeight: "bold" }}
-  />
+  <MonthView.DayScaleCell {...props} style={{ textAlign: "center", fontWeight: "bold" }} />
 );
 
 const styles = (theme) => ({
@@ -166,7 +164,7 @@ const styles = (theme) => ({
       backgroundColor: "white",
     },
     "&:focus": {
-      backgroundColor: fade(theme.palette.primary.main, 0.15),
+      backgroundColor: alpha(theme.palette.primary.main, 0.15),
       outline: 0,
     },
   },
@@ -257,9 +255,7 @@ const CellBase = React.memo(
   }) => {
     const iconId = Math.abs(Math.floor(Math.sin(startDate.getDate()) * 10) % 3);
     const isFirstMonthDay = startDate.getDate() === 1;
-    const formatOptions = isFirstMonthDay
-      ? { day: "numeric", month: "long" }
-      : { day: "numeric" };
+    const formatOptions = isFirstMonthDay ? { day: "numeric", month: "long" } : { day: "numeric" };
     return (
       <TableCell
         tabIndex={0}
@@ -272,9 +268,7 @@ const CellBase = React.memo(
         })}
       >
         <div className={classes.content}></div>
-        <div className={classes.text}>
-          {formatDate(startDate, formatOptions)}
-        </div>
+        <div className={classes.text}>{formatDate(startDate, formatOptions)}</div>
       </TableCell>
     );
   }
@@ -282,29 +276,17 @@ const CellBase = React.memo(
 
 const TimeTableCell = withStyles(styles, { name: "Cell" })(CellBase);
 
-const Appointment = withStyles(styles, { name: "Appointment" })(
-  ({ classes, ...restProps }) => (
-    <Appointments.Appointment {...restProps} className={classes.appointment} />
-  )
-);
+const Appointment = withStyles(styles, { name: "Appointment" })(({ classes, ...restProps }) => (
+  <Appointments.Appointment {...restProps} className={classes.appointment} />
+));
 
-const AppointmentContent = withStyles(styles, { name: "AppointmentContent" })(
-  ({ classes, ...restProps }) => (
-    <Appointments.AppointmentContent
-      {...restProps}
-      className={classes.apptContent}
-    />
-  )
-);
+const AppointmentContent = withStyles(styles, { name: "AppointmentContent" })(({ classes, ...restProps }) => (
+  <Appointments.AppointmentContent {...restProps} className={classes.apptContent} />
+));
 
-const FlexibleSpace = withStyles(styles, { name: "ToolbarRoot" })(
-  ({ classes, ...restProps }) => (
-    <Toolbar.FlexibleSpace
-      {...restProps}
-      className={classes.flexibleSpace}
-    ></Toolbar.FlexibleSpace>
-  )
-);
+const FlexibleSpace = withStyles(styles, { name: "ToolbarRoot" })(({ classes, ...restProps }) => (
+  <Toolbar.FlexibleSpace {...restProps} className={classes.flexibleSpace}></Toolbar.FlexibleSpace>
+));
 
 export default class Calendar extends React.PureComponent {
   // #FOLD_BLOCK
@@ -323,15 +305,12 @@ export default class Calendar extends React.PureComponent {
     this.setState((state) => {
       let { data } = state;
       if (added) {
-        const startingAddedId =
-          data.length > 0 ? data[data.length - 1].id + 1 : 0;
+        const startingAddedId = data.length > 0 ? data[data.length - 1].id + 1 : 0;
         data = [...data, { id: startingAddedId, ...added }];
       }
       if (changed) {
         data = data.map((appointment) =>
-          changed[appointment.id]
-            ? { ...appointment, ...changed[appointment.id] }
-            : appointment
+          changed[appointment.id] ? { ...appointment, ...changed[appointment.id] } : appointment
         );
       }
       if (deleted !== undefined) {
@@ -341,24 +320,23 @@ export default class Calendar extends React.PureComponent {
     });
   }
 
+  setCalendarEvent = (events) => {
+    this.setState({ data: events });
+  };
+
   render() {
     const { data } = this.state;
 
     return (
       <Paper>
+        <CalendarEvent setCalendarEvent={this.setCalendarEvent}/>
         <Scheduler data={data}>
           <EditingState onCommitChanges={this.commitChanges} />
           <ViewState defaultCurrentDate={new Date()} />
 
-          <MonthView
-            timeTableCellComponent={TimeTableCell}
-            dayScaleCellComponent={DayScaleCell}
-          />
+          <MonthView timeTableCellComponent={TimeTableCell} dayScaleCellComponent={DayScaleCell} />
 
-          <Appointments
-            appointmentComponent={Appointment}
-            appointmentContentComponent={AppointmentContent}
-          />
+          <Appointments appointmentComponent={Appointment} appointmentContentComponent={AppointmentContent} />
           <Resources data={resources} />
 
           <Toolbar flexibleSpaceComponent={FlexibleSpace} />
@@ -371,7 +349,7 @@ export default class Calendar extends React.PureComponent {
             showDeleteButton
             //showOpenButton
           />
-          <AppointmentForm />
+          {/* <AppointmentForm /> */}
           <DragDropProvider />
         </Scheduler>
       </Paper>

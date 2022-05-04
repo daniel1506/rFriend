@@ -1,8 +1,8 @@
 -- DropForeignKey
-ALTER TABLE `event` DROP FOREIGN KEY `Event_ownerId_fkey`;
+ALTER TABLE `Event` DROP FOREIGN KEY `Event_ownerId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `eventcomment` DROP FOREIGN KEY `EventComment_eventId_fkey`;
+ALTER TABLE `EventComment` DROP FOREIGN KEY `EventComment_eventId_fkey`;
 
 -- AddForeignKey
 ALTER TABLE `Event` ADD CONSTRAINT `Event_ownerId_fkey` FOREIGN KEY (`ownerId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

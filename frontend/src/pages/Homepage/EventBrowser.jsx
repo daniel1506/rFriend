@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import "./EventBrowser.css";
 import { styled } from "@mui/material/styles";
@@ -31,16 +31,17 @@ import EventCard from "../../components/EventCard.js";
 //import GetEvents from './EventAPI.js';
 import get from "../../lib/get.js";
 import { StaticDatePicker } from "@mui/lab";
-
+import GeneralContext from "../../store/general-context";
+import { Container } from "@mui/material";
 //var eventList = GetEvents('https://rfrconsole.log(r.event)iend.herokuapp.com/api/user/browse').then((r)=>{});
 //console.log(GetEvents('https://rfriend.herokuapp.com/api/user/browse'));
 //var filteredEvents = Events;
 
-export default function EventBrowser() {
+export default function EventBrowser(props) {
   const [searchKey, setSearchKey] = React.useState("");
   const [eventList, setEventList] = React.useState([]);
-  const [filteredEvents, setFilteredEvents] = React.useState(Events);
-
+  const [filteredEvents, setFilteredEvents] = React.useState([]);
+  const generalCtx = React.useContext(GeneralContext);
   const sendSearchKey = (key) => {
     // the callback. Use a better name
     setSearchKey(key);
@@ -51,34 +52,17 @@ export default function EventBrowser() {
   };
 
   useEffect(() => {
+    console.log("getting event");
     get("https://rfriend.herokuapp.com/api/user/browse").then((r) => {
       setEventList(r.event);
     });
-  }, []);
+  }, [generalCtx.eventEventModified]);
   //useEffect(() => {eventSearchHandler()}, [searchKey]);
 
   return (
     <>
-      <EventSearchBar sendSearchKey={sendSearchKey} />
-      <div>
-        <div className="container">
-          <div className="row">
-            <div className="col-md-6 col-xl-3 col-filter">
-              <EventFilter
-                eventList={eventList}
-                sendFilteredEvents={sendFilteredEvents}
-              />
-            </div>
-            <div className="col-md-6 event-card-deck">
-              <EventCardDeck
-                eventList={eventList}
-                filteredEvents={filteredEvents}
-                searchKey={searchKey}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <EventFilter eventList={eventList} sendFilteredEvents={sendFilteredEvents} />
+      <EventCardDeck eventList={eventList} filteredEvents={filteredEvents} searchKey={props.searchKey} />
     </>
   );
 }
@@ -161,36 +145,11 @@ function EventFilter({ eventList, sendFilteredEvents }) {
       }
       if (filterTime != null && filterTime != "") {
         let time = new Date(event.startsAt);
-        if (
-          time.getHours() >= 6 &&
-          time.getHours() < 12 &&
-          filterTime != "morning"
-        )
-          return false;
-        else if (
-          time.getHours() >= 12 &&
-          time.getHours() < 18 &&
-          filterTime != "afternoon"
-        )
-          return false;
-        else if (
-          time.getHours() >= 18 &&
-          time.getHours() < 21 &&
-          filterTime != "evening"
-        )
-          return false;
-        else if (
-          time.getHours() >= 21 &&
-          time.getHours() < 24 &&
-          filterTime != "night"
-        )
-          return false;
-        else if (
-          time.getHours() >= 0 &&
-          time.getHours() < 6 &&
-          filterTime != "midnight"
-        )
-          return false;
+        if (time.getHours() >= 6 && time.getHours() < 12 && filterTime != "morning") return false;
+        else if (time.getHours() >= 12 && time.getHours() < 18 && filterTime != "afternoon") return false;
+        else if (time.getHours() >= 18 && time.getHours() < 21 && filterTime != "evening") return false;
+        else if (time.getHours() >= 21 && time.getHours() < 24 && filterTime != "night") return false;
+        else if (time.getHours() >= 0 && time.getHours() < 6 && filterTime != "midnight") return false;
       }
       if (filterPrivacy != null && filterPrivacy != "") {
         if (event.privacy != filterPrivacy) {
@@ -205,88 +164,85 @@ function EventFilter({ eventList, sendFilteredEvents }) {
 
   return (
     <div className="div-filter shadow">
-      <h3>Event Filter</h3>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: 240 }}>
-          <InputLabel id="filter-event-category-label">
-            Event Category
-          </InputLabel>
-          <Select
-            labelId="filter-event-category-label"
-            id="filter-event-category"
-            value={filterCategory}
-            label="Event Category"
-            onChange={handleCategoryChange}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
-            <MenuItem value="dining">Dining</MenuItem>
-            <MenuItem value="leisure">Leisure</MenuItem>
-            <MenuItem value="sports">Sports</MenuItem>
-            <MenuItem value="study">Study</MenuItem>
-            <MenuItem value="work">Work</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 240 }}>
-          <InputLabel id="filter-event-time-label">Event Time</InputLabel>
-          <Select
-            labelId="filter-event-time-label"
-            id="filter-event-time"
-            value={filterTime}
-            label="Event Time"
-            onChange={handleTimeChange}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
-            <MenuItem value="morning">Morning</MenuItem>
-            <MenuItem value="afternoon">Afternoon</MenuItem>
-            <MenuItem value="evening">Evening</MenuItem>
-            <MenuItem value="night">Night</MenuItem>
-            <MenuItem value="midnight">Midnight</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 240 }}>
-          <InputLabel id="filter-event-location-label">
-            Event Location
-          </InputLabel>
-          <Select
-            labelId="filter-event-location-label"
-            id="filter-event-location"
-            value={filterLocation}
-            label="Event Location"
-            onChange={handleLocationChange}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
-            <MenuItem value="hkisland">Hong Kong Island</MenuItem>
-            <MenuItem value="kowloon">Kowloon</MenuItem>
-            <MenuItem value="nt">New Territory</MenuItem>
-            <MenuItem value="online">Online</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 240 }}>
-          <InputLabel id="filter-event-privacy-label">Event Privacy</InputLabel>
-          <Select
-            labelId="filter-event-privacy-label"
-            id="filter-event-privacy"
-            value={filterPrivacy}
-            label="Event Privacy"
-            onChange={handlePrivacyChange}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
-            <MenuItem value="public">Public</MenuItem>
-            <MenuItem value="friends">Friends</MenuItem>
-            <MenuItem value="friends-of-friends">Friends of Friends</MenuItem>
-            <MenuItem value="only-me">Private</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
+      <Typography variant="h6" sx={{ padding: "10px" }}>
+        Event Filter
+      </Typography>
+
+      <FormControl sx={{ margin: "10px", width: 240 }}>
+        <InputLabel id="filter-event-category-label">Event Category</InputLabel>
+        <Select
+          labelId="filter-event-category-label"
+          id="filter-event-category"
+          value={filterCategory}
+          label="Event Category"
+          onChange={handleCategoryChange}
+        >
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          <MenuItem value="dining">Dining</MenuItem>
+          <MenuItem value="leisure">Leisure</MenuItem>
+          <MenuItem value="sports">Sports</MenuItem>
+          <MenuItem value="study">Study</MenuItem>
+          <MenuItem value="work">Work</MenuItem>
+          <MenuItem value="others">Others</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl sx={{ margin: "10px", width: 240 }}>
+        <InputLabel id="filter-event-time-label">Event Time</InputLabel>
+        <Select
+          labelId="filter-event-time-label"
+          id="filter-event-time"
+          value={filterTime}
+          label="Event Time"
+          onChange={handleTimeChange}
+        >
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          <MenuItem value="morning">Morning</MenuItem>
+          <MenuItem value="afternoon">Afternoon</MenuItem>
+          <MenuItem value="evening">Evening</MenuItem>
+          <MenuItem value="night">Night</MenuItem>
+          <MenuItem value="midnight">Midnight</MenuItem>
+        </Select>
+      </FormControl>
+      {/* <FormControl sx={{ margin: "10px", width: 240 }}>
+        <InputLabel id="filter-event-location-label">Event Location</InputLabel>
+        <Select
+          labelId="filter-event-location-label"
+          id="filter-event-location"
+          value={filterLocation}
+          label="Event Location"
+          onChange={handleLocationChange}
+        >
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          <MenuItem value="hkisland">Hong Kong Island</MenuItem>
+          <MenuItem value="kowloon">Kowloon</MenuItem>
+          <MenuItem value="nt">New Territory</MenuItem>
+          <MenuItem value="online">Online</MenuItem>
+        </Select>
+      </FormControl> */}
+      <FormControl sx={{ margin: "10px", width: 240 }}>
+        <InputLabel id="filter-event-privacy-label">Event Privacy</InputLabel>
+        <Select
+          labelId="filter-event-privacy-label"
+          id="filter-event-privacy"
+          value={filterPrivacy}
+          label="Event Privacy"
+          onChange={handlePrivacyChange}
+        >
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          <MenuItem value="public">Public</MenuItem>
+          <MenuItem value="friends">Friends</MenuItem>
+          <MenuItem value="friends-of-friends">Friends of Friends</MenuItem>
+          <MenuItem value="only-me">Private</MenuItem>
+        </Select>
+      </FormControl>
     </div>
   );
 }
@@ -305,9 +261,7 @@ function EventCardDeck(props) {
     if (props.searchKey != null && props.searchKey != "") {
       setDisplayedEventList(
         filteredEventList.filter((event) => {
-          return event.name
-            .toLowerCase()
-            .includes(props.searchKey.toLowerCase());
+          return event.name.toLowerCase().includes(props.searchKey.toLowerCase());
         })
       );
     }
@@ -317,30 +271,34 @@ function EventCardDeck(props) {
   }
 
   return (
-    <>
-      <Grid container spacing={2}>
+    <Container>
+      <Grid container spacing={"20px"}>
         {displayedEventList.map((e, index) => {
           return (
-            <Grid key={index} item xs={12} sm={6} md={4}>
-              <EventCard
-                eventId={e.id}
-                eventName={e.name}
-                hostId={e.ownerId}
-                eventTime={e.startsAt}
-                isJoined={e.isEventJoined}
-                isLiked={e.isEventLiked}
-                photoUrl={e.photoUrl}
-                host={e.owner}
-                eventLocation={e.location}
-                eventCategory={e.category}
-                maxParticipants={e.maxParticipants}
-                eventRemark={e.remarks}
-              />
+            <Grid key={index} item xs={12} sm={6} md={3}>
+              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <EventCard
+                  eventId={e.id}
+                  eventName={e.name}
+                  hostId={e.ownerId}
+                  eventTime={e.startsAt}
+                  isJoined={e.isEventJoined}
+                  isLiked={e.isEventLiked}
+                  photoUrl={e.photoUrl}
+                  host={e.owner}
+                  eventLocation={e.location}
+                  eventCategory={e.category}
+                  participants={e.participants}
+                  maxParticipants={e.maxParticipants}
+                  eventRemark={e.remarks}
+                  eventComment={e.comments}
+                />
+              </Box>
             </Grid>
           );
         })}
       </Grid>
-    </>
+    </Container>
   );
 }
 
@@ -354,5 +312,3 @@ function EventCardDeck(props) {
 //     duration: theme.transitions.duration.shortest,
 //   }),
 // }));
-
-ReactDOM.render(<EventBrowser />, document.querySelector("#eventBrowser"));

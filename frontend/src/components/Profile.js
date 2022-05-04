@@ -84,8 +84,7 @@ export default function Profile(props) {
   const handleClose = () => props.setShowProfile(false);
   const [profilePicUrl, setProfilePicUrl] = React.useState(null);
   const [submittingProPic, setSubmittingProPic] = React.useState(false);
-  const [submittingProPicFailed, setSubmittingProPicFailed] =
-    React.useState(undefined);
+  const [submittingProPicFailed, setSubmittingProPicFailed] = React.useState(undefined);
   const [resetting, setResetting] = React.useState(false);
   const [resetFailed, setResetFailed] = React.useState(undefined);
   const [email, setEmail] = React.useState("");
@@ -96,9 +95,7 @@ export default function Profile(props) {
   const getUserProfile = () => {
     let id = props.id ? props.id : authCtx.id;
     setUpLoading(true);
-    get(
-      `https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`
-    )
+    get(`https://rfriend.herokuapp.com/api/user?user_id=${encodeURIComponent(id)}`)
       .then((result) => {
         console.log(result);
         setProfilePicUrl(result.profile_url);
@@ -155,16 +152,14 @@ export default function Profile(props) {
   const resetPassword = () => {
     let data = { email: authCtx.email };
     setResetting(true);
-    post("https://rfriend.herokuapp.com/api/user/forget_pw", data).then(
-      (result) => {
-        setResetting(false);
-        if (result.status != 200) {
-          setResetFailed(true);
-        } else {
-          setResetFailed(false);
-        }
+    post("https://rfriend.herokuapp.com/api/user/forget_pw", data).then((result) => {
+      setResetting(false);
+      if (result.status != 200) {
+        setResetFailed(true);
+      } else {
+        setResetFailed(false);
       }
-    );
+    });
   };
   const redirectToMailBox = () => {
     let email = authCtx.email;
@@ -175,23 +170,21 @@ export default function Profile(props) {
     let data = { target_user_id: parseInt(props.id) };
     console.log(data);
     setDeleting(true);
-    deleteReq("https://rfriend.herokuapp.com/api/friend", data).then(
-      (result) => {
-        console.log(result);
-        setDeleting(false);
-        if (result.status != 200) {
-          setDeleteFailed(true);
-        } else {
-          setDeleteFailed(false);
+    deleteReq("https://rfriend.herokuapp.com/api/friend", data).then((result) => {
+      console.log(result);
+      setDeleting(false);
+      if (result.status != 200) {
+        setDeleteFailed(true);
+      } else {
+        setDeleteFailed(false);
+        setTimeout(() => {
+          props.setShowProfile(false);
           setTimeout(() => {
-            props.setShowProfile(false);
-            setTimeout(() => {
-              generalCtx.handleFriendModified();
-            }, 500);
+            generalCtx.handleFriendModified();
           }, 500);
-        }
+        }, 500);
       }
-    );
+    });
   };
   return (
     <div>
@@ -249,27 +242,23 @@ export default function Profile(props) {
                               {!submittingProPic && <EditIcon />}
                               {submittingProPic && <LoadingIcon />}
                             </IconButton> */}
-                            <SubmitIconButton
-                              component="span"
-                              error={submittingProPicFailed}
-                              loading={submittingProPic}
-                            >
-                              <EditIcon />
-                            </SubmitIconButton>
+                            {!props.id && (
+                              <SubmitIconButton
+                                component="span"
+                                error={submittingProPicFailed}
+                                loading={submittingProPic}
+                              >
+                                <EditIcon />
+                              </SubmitIconButton>
+                            )}
                           </label>
                         }
                         overlap="circular"
                         anchorOrigin={{ vertical: "top", horizontal: "right" }}
                       >
-                        <Avatar
-                          alt="Cindy Baker"
-                          src={profilePicUrl}
-                          sx={{ width: 200, height: 200 }}
-                        />
+                        <Avatar alt="Cindy Baker" src={profilePicUrl} sx={{ width: 200, height: 200 }} />
                       </Badge>
-                      <NameShowCase>
-                        {`${username} #${props.id ? props.id : authCtx.id}`}
-                      </NameShowCase>
+                      <NameShowCase>{`${username} #${props.id ? props.id : authCtx.id}`}</NameShowCase>
                       <EmailShowCase>{email}</EmailShowCase>
                       {!props.admin && (
                         <SubmitIconButton

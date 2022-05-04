@@ -1,9 +1,10 @@
 import React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { MessageLeft, MessageRight, TextInput } from "./Comment.js";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     paper: {
       width: "80vw",
@@ -39,39 +40,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function CommentSection() {
+export default function CommentSection(props) {
+  const hasComment = (props.eventComment != null);
   const classes = useStyles();
   return (
     <>
-      <MessageLeft
-        message="ABCD"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User A"
-        avatarDisp={true}
-      />
-      <MessageLeft
-        message="ABCD"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User B"
-        avatarDisp={false}
-      />
-      <MessageRight
-        message="EFCG"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User C"
-        avatarDisp={true}
-      />
-      <MessageRight
-        message="ABCE"
-        timestamp="MM/DD 00:00"
-        photoURL=""
-        displayName="User C"
-        avatarDisp={false}
-      />
-      <TextInput />
+      <Typography sx={{ pt: 2, pb: 1 }}>Comments:</Typography>
+      {hasComment?props.eventComment.map((comment) => {
+          return (<MessageLeft key={comment.id} message={comment.text} timestamp={new Date(comment.createdAt).toString()} photoURL={comment.owner.profileUrl} displayName={comment.owner.name} avatarDisp={true} />)
+      }):<></>}
+      <TextInput eventId={props.eventId}/>
     </>
   );
 }

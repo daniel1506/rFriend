@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - backend/controllers/eventController.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>backend/controllers/eventController.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">40.36</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">182</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">40.16</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.66</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { Prisma } from &quot;@prisma/client&quot;;
+import { randomUUID } from &quot;crypto&quot;;
+import { NextFunction, Request, Response } from &quot;express&quot;;
+import { body, param, validationResult } from &quot;express-validator&quot;;
+import photoUploadS3 from &quot;../AWS/photoUploader&quot;;
+import prisma, { prismaErrorHandler } from &quot;../common/dbClient&quot;;
+import HttpException from &quot;../common/httpException&quot;;
+import { generateFriendsList, generateFOFList } from &quot;../services/friendService&quot;;
+import { eventCategory, EventCategoryType, eventPrivacy, EventPrivacyType } from &quot;../types/sharedTypes&quot;;
+
+export const validateUpsert = [
+  body(&quot;id&quot;).optional().isInt().toInt(),
+  body(&quot;name&quot;).isString(),
+  body(&quot;category&quot;).isIn(eventCategory),
+  body(&quot;time&quot;).isInt().toInt(),
+  body(&quot;duration&quot;).isInt().toInt(),
+  body(&quot;location&quot;).isString(),
+  body(&quot;privacy&quot;).isIn(eventPrivacy),
+  body(&quot;max_participants&quot;).isInt().toInt(),
+  body(&quot;photo&quot;).optional().isString().matches(&quot;data:image/.*;base64,.*&quot;),
+  body(&quot;coordinate_lon&quot;).optional().isFloat().toFloat(),
+  body(&quot;coordinate_lat&quot;).optional().isFloat().toFloat(),
+  body(&quot;remarks&quot;).optional().isString(),
+];
+
+export const upsert = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input &quot; + JSON.stringify(errors.array())));
+  }
+  const userId = req.id;
+
+  const id = req.body.id as number | undefined;
+  const { name, location, photo, remarks } = req.body;
+  const category = req.body.category as EventCategoryType;
+  const privacy = req.body.privacy as EventPrivacyType;
+  const time = req.body.time as number;
+  const duration = req.body.duration as number;
+  const maxParticipants = req.body.max_participants as number;
+  const coordinateLat = req.body.coordinate_lat as number | undefined;
+  const coordinateLon = req.body.coordinate_lon as number | undefined;
+  const photoBase64 = req.body.photo as string | undefined;
+  let photoUrl: string | null = null;
+
+  // try upload photo
+  if (photoBase64) {
+    try {
+      const key = randomUUID();
+      photoUrl = await photoUploadS3(key, photoBase64);
+    } catch (e) {
+      return next(new HttpException(500, &quot;AWS Error &quot; + e));
+    }
+  }
+
+  let event = {
+    name,
+    owner: { connect: { id: userId } },
+    category,
+    startsAt: new Date(time * 1000), // js Date accepts millis, not seconds
+    duration,
+    location,
+    privacy,
+    maxParticipants,
+    coordinateLat,
+    coordinateLon,
+    remarks,
+    ...(photoBase64 &amp;&amp; { photoUrl }),
+  };
+
+  let result;
+  try {
+    switch (req.method) {
+      case &quot;POST&quot;: // create
+        result = await prisma.event.create({
+          data: {
+            ...event,
+            participants: { connect: { id: userId } },
+          },
+        });
+        break;
+      case &quot;PUT&quot;: // update
+        if (id === undefined) {
+          return next(new HttpException(422, &quot;Invalid input&quot;));
+        }
+        result = await prisma.event.update({
+          where: { id },
+          data: event,
+        });
+    }
+  } catch (e) {
+    return next(prismaErrorHandler(e));
+  }
+
+  res.status(201).send({ event: result });
+};
+
+// -----------------------------------------------------------------------------
+
+export const validateGet = [param(&quot;id&quot;).isInt().toInt()];
+
+export const get = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input&quot;));
+  }
+
+  const userId = req.id;
+  const id = req.params.id as unknown as number;
+
+  // check if event exists
+  let event = null;
+  try {
+    event = await prisma.event.findFirst({
+      where: { id },
+      include: { comments: true, participants: true, owner: true },
+    });
+    if (!event) {
+      throw &quot;Not found&quot;;
+    }
+  } catch (e) {
+    return next(new HttpException(409, &quot;Event not found&quot;));
+  }
+
+  // check if user can view the event
+  const privacy = event.privacy as EventPrivacyType;
+  switch (privacy) {
+    case &quot;only-me&quot;:
+      if (event.ownerId !== userId) {
+        return next(new HttpException(401, &quot;Access denied for this event&quot;));
+      }
+      break;
+
+    case &quot;friends&quot;:
+      const friendsList = await generateFriendsList(userId);
+
+      if (!friendsList.includes(event.ownerId)) {
+        return next(new HttpException(401, &quot;Access denied for this event&quot;));
+      }
+      break;
+
+    case &quot;friends-of-friends&quot;: {
+      const friendsList = await generateFOFList(userId);
+
+      if (!friendsList.includes(event.ownerId)) {
+        return next(new HttpException(401, &quot;Access denied for this event&quot;));
+      }
+      break;
+    }
+  }
+
+  return res.send({ event });
+};
+
+// -----------------------------------------------------------------------------
+
+export const validateRemove = [body(&quot;id&quot;).isInt().toInt()];
+
+export const remove = async (req: Request, res: Response, next: NextFunction) =&gt; {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpException(422, &quot;Invalid input&quot;));
+  }
+
+  const userId = req.id;
+  const id = req.body.id as number;
+
+  // check if event exists
+  let event = null;
+  try {
+    event = await prisma.event.findFirst({ where: { id, ownerId: userId } });
+    if (!event) {
+      throw &quot;Not found&quot;;
+    }
+
+    const deleteEvent = await prisma.event.delete({ where: { id } });
+  } catch (e) {
+    return next(new HttpException(409, &quot;Event not found&quot;));
+  }
+
+  res.send({});
+};
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

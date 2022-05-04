@@ -8,8 +8,9 @@ const AuthContext = React.createContext({
   name: "",
   token: "",
   role: "",
+  verified_at: null,
   isLoggedIn: false,
-  login: (token, id, email, name, role) => {},
+  login: (token, id, email, name, role, verified_at) => {},
   logout: () => {},
 });
 
@@ -19,14 +20,19 @@ export const AuthContextProvider = (props) => {
   const storedEmail = localStorage.getItem("email");
   const storedName = localStorage.getItem("name");
   const storedRole = localStorage.getItem("role");
+  let storedVerified_at = localStorage.getItem("verified_at");
+  if (storedVerified_at === "null") {
+    storedVerified_at = null;
+  }
   const [token, setToken] = useState(storedToken);
   const [id, setId] = useState(storedId);
   const [email, setEmail] = useState(storedEmail);
   const [name, setName] = useState(storedName);
   const [role, setRole] = useState(storedRole);
+  const [verified_at, setVerified_at] = useState(storedVerified_at);
   const userIsLoggedIn = !!token; //The first ! is just for converting to boolean
 
-  const loginHandler = (token, id, email, name, role) => {
+  const loginHandler = (token, id, email, name, role, verified_at) => {
     //store to localStorage so that user doesn't need to login next time
     //localStorage.setIten("token") must be earlier than setToken(), since the initial fetch of the home page will use get(), and get() depends on localStorage.set.
     localStorage.setItem("token", token);
@@ -34,11 +40,13 @@ export const AuthContextProvider = (props) => {
     localStorage.setItem("email", email);
     localStorage.setItem("name", name);
     localStorage.setItem("role", role);
+    localStorage.setItem("verified_at", verified_at);
     setToken(token); //will trigger userIsLoggedIn to true and then trigger react router to redirect
     setId(id);
     setEmail(email);
     setName(name);
     setRole(role);
+    setVerified_at(verified_at);
   };
 
   const logoutHandler = () => {
@@ -47,11 +55,13 @@ export const AuthContextProvider = (props) => {
     setEmail(null);
     setName(null);
     setRole(null);
+    setVerified_at(null);
     localStorage.removeItem("token");
     localStorage.removeItem("id");
     localStorage.removeItem("email");
     localStorage.removeItem("name");
     localStorage.removeItem("role");
+    localStorage.removeItem("verified_at");
   };
 
   //provide an interface for components to use i.e. authCtx.xxx
@@ -61,16 +71,13 @@ export const AuthContextProvider = (props) => {
     token: token,
     name: name,
     role: role,
+    verified_at: verified_at,
     isLoggedIn: userIsLoggedIn,
     login: loginHandler,
     logout: logoutHandler,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {props.children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;
 };
 
 export default AuthContext;
