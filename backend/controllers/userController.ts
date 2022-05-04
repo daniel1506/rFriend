@@ -160,8 +160,9 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
     };
     try {
       const header = await s3Client.send(new HeadObjectCommand(params));
-
+      
       response_content["profile_url"] = getProfileUrl(id);
+
       res.send(response_content);
     } catch (err) {
       res.send(response_content);

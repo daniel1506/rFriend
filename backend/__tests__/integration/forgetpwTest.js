@@ -173,13 +173,9 @@ describe("Forget and Reset Password", () => {
     let next = jest.fn();
 
     forgetPassword = forgetPassword_mock("0.5s"); // make the expire time short enough to ensure that it expires immediately after its creation
-    // console.log("token from last test is "); // delete
-    // console.log(token); // delete
 
     let token = await forgetPassword(req, res, next); // get a token for resetting pw first
     await wait(1000); // wait some time to make the token expire
-    console.log("token is"); // delete
-    console.log(token); // delete
 
     req = { body: { password: new_pw, token: token } };
     res = { send: jest.fn() };
@@ -194,7 +190,6 @@ describe("Forget and Reset Password", () => {
       email: email,
       password: new_pw,
     });
-    console.log(login.body); // delete
 
     expect(login.status).toBe(401);
   });
